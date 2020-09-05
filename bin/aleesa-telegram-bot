@@ -1,0 +1,97 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings "all";
+use utf8;
+use open qw(:std :utf8);
+
+my $workdir;
+
+# before we run, change working dir
+BEGIN {
+	use Cwd qw(chdir abs_path);
+	my @CWD = split (/\//, abs_path ($0));
+	if ($#CWD > 1) { $#CWD = $#CWD - 2; }
+	$workdir = join ('/', @CWD);
+	chdir ($workdir);
+}
+
+use lib ("$workdir/lib", "$workdir/vendor_perl", "$workdir/vendor_perl/lib/perl5");
+use POSIX qw(setgid setuid setsid);
+use Fcntl qw(O_WRONLY O_TRUNC O_CREAT);
+use File::Path qw(make_path);
+use File::Basename qw(basename);
+use telegrambot;
+use conf;
+
+sub daemonize ();
+sub __fork ();
+sub __mkpidfile ();
+
+$| = 1;
+
+my $piddir = "/var/run/" . basename (abs_path ($0));
+my $C = loadConf ();
+
+# if we run under root, create pid dir and set correct owner for it
+if ($< == 0) {
+	my $user = $C->{user};
+	die "Unable to run as root, please define unprivileged user in config.json\n" unless (defined ($user));
+	my ($uid, $gid) = (getpwnam ($user))[2,3];
+
+	unless (-d $piddir) {
+		make_path (
+			$piddir, {
+				uid   => $uid,
+				group => $gid
+			}
+		);
+	}
+
+# script intended to run as "unit" user, so drop privs to "unit" user
+	setgid ($gid) or die "Unable to switch to group of $user($!)\n";
+	setuid ($uid) or die "Unable to switch to account $user($!)\n";
+}
+
+# double fork attach to /dev/null all stdio and go background
+daemonize ();
+
+# write pidfile
+my $pidfile;
+
+if ($< == 0) {
+# TODO: handle case where we run with unpriv. user
+	$pidfile = sprintf ("%s/%s.pid", $piddir, basename (abs_path ($0)));
+	sysopen (PID, $pidfile, O_WRONLY|O_TRUNC|O_CREAT) or die "Error opening $pidfile: $!\n";
+	syswrite PID, $$ or die "Error writing to $pidfile: $!\n";
+	close PID;
+}
+
+# set correct proctitle
+$0 = abs_path ($0);
+
+# run bot, at last
+run_telegrambot ();
+
+unlink ($pidfile) if (-f $pidfile);
+exit 0;
+
+sub daemonize () {
+	__fork ();
+	POSIX::setsid ();
+	open (STDIN, "<", "/dev/null");
+	open (STDOUT, ">", "/dev/null");
+	open (STDERR, ">", "/dev/null");
+	__fork ();
+	umask 0;
+}
+
+sub __fork () {
+	my $pid = fork;
+	die "Can't fork: $!\n" unless (defined ($pid));
+	exit if ($pid != 0);
+}
+
+
+__END__
+# vim: set ft=perl noet ai ts=4 sw=4 sts=4:

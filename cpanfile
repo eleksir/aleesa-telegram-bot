@@ -1,0 +1,14 @@
+requires 'local::lib';
+requires 'JSON';
+requires 'Hailo';
+requires 'Telegram::Bot';
+requires 'DB_File';
+requires 'Digest::MD5';
+requires 'Encode';
+requires 'File::Path';
+requires 'File::Basename';
+requires 'HTTP::Tiny';
+requires 'Hailo';
+requires 'JSON::XS';
+requires 'Mojo::Base';
+requires 'URI::URL';
