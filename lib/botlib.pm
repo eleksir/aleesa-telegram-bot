@@ -11,12 +11,12 @@ use JSON::XS qw(decode_json encode_json);
 use Digest::MD5 qw(md5_base64);
 use DB_File;
 
-use conf;
+use conf qw(loadConf);
 
 use vars qw/$VERSION/;
 
 use Exporter qw(import);
-our @EXPORT = qw(weather);
+our @EXPORT = qw(weather logger);
 
 $VERSION = "1.0";
 
@@ -188,6 +188,19 @@ sub __urlencode($) {
 	return $str;
 }
 
+sub logger {
+	my $msg = shift;
+
+	if ($c->{debug_log}) {
+		my $mode = '>';
+		$mode = '>>' if (-f $c->{debug_log});
+
+		if (open (LOG, $mode, $c->{debug_log})) {
+			print LOG $msg . "\n";
+			close LOG;
+		}
+	}
+}
 
 1;
 

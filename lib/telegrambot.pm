@@ -5,6 +5,7 @@ use warnings "all";
 use vars qw/$VERSION/;
 use v5.10.0;
 use utf8;
+use Data::Dumper;
 use open qw(:std :utf8);
 use File::Path qw( mkpath );
 use Hailo;
@@ -32,6 +33,13 @@ sub __cron {
 
 sub __on_msg {
 	my ($self, $msg) = @_;
+
+	if ($msg->{'new_chat_members'}) {
+		# we have newcommers here
+		$msg->reply("Дратути. Представьтес, пожалуйста, и расскажите, что вас сюда привело.");
+		return;
+	}
+
 # lazy init chat-bot brains
 	unless (defined($hailo->{$msg->chat->id})) {
 		$hailo->{$msg->chat->id} = Hailo->new(
@@ -65,6 +73,7 @@ sub __on_msg {
 
 		if (defined($reply) && $reply ne '') {
 			$msg->reply($reply);
+			logger ("private chat reply: $reply");
 		} else {
 # if we have no answer, say something default in private chat
 			$msg->reply("Давайте ещё пообщаемся, а то я ещё не научилась от вас плохому.");
@@ -83,7 +92,16 @@ sub __on_msg {
 
 # simple commands
 		if (substr($text, 0, 1) eq $c->{telegrambot}->{csign}) {
-			if (substr($text, 1) eq "ping") {
+			if (substr($text, 1) eq "help") {
+				$reply = '```
+!help | !помощь     - список команд
+!w город | !п город - погода в указанном городе
+!ping | !пинг       - попинговать бота
+```
+Но на самом деле я бот больше для общения, чем для исполнения команд.
+Поговоришь со мной?
+';
+			} elsif (substr($text, 1) eq "ping") {
 				$reply = "Pong.";
 			} elsif (substr($text, 1) eq "пинг") {
 				$reply = "Понг.";
@@ -119,7 +137,10 @@ sub __on_msg {
 		}
 
 		if (defined($reply) && $reply ne '') {
+			logger ("reply with: $reply");
 			$msg->reply($reply);
+		} else {
+			logger ("no reply");
 		}
 # should be channel, so we can't talk
 	} else {
