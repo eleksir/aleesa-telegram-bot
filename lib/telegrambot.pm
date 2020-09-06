@@ -87,8 +87,8 @@ sub __on_msg {
 				$reply = "Pong.";
 			} elsif (substr($text, 1) eq "пинг") {
 				$reply = "Понг.";
-			} elsif (substr($text, 1, 1) eq 'w' || substr($text, 1, 1) eq 'п') {
-				my $city = substr($text, 2);
+			} elsif (substr($text, 1, 2) eq 'w ' || substr($text, 1, 2) eq 'п ') {
+				my $city = substr($text, 3);
 				$reply = weather($city);
 			}
 		} elsif (
