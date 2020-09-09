@@ -16,7 +16,7 @@ use conf qw(loadConf);
 use vars qw/$VERSION/;
 
 use Exporter qw(import);
-our @EXPORT = qw(weather logger);
+our @EXPORT = qw(weather logger trim randomCommonPhrase);
 
 $VERSION = "1.0";
 
@@ -200,6 +200,32 @@ sub logger {
 			close LOG;
 		}
 	}
+}
+
+sub trim($) {
+	my $str = shift;
+
+	while (substr ($str, 0, 1) =~ /^\s$/) {
+		$str = substr($str, 1);
+	}
+
+	while (substr ($str, -1, 1) =~ /^\s$/) {
+		chop ($str);
+	}
+
+	return $str;
+}
+
+sub randomCommonPhrase() {
+	my @myphrase = (
+		"Так, блядь...",
+		"*Закатывает рукава* И ради этого ты меня позвал?",
+		"Ну чего ты начинаешь, нормально же общались",
+		"Повтори свой вопрос, не поняла",
+		"Выйди и зайди нормально"
+	);
+
+	return ($myphrase[rand($#myphrase -1)]);
 }
 
 1;

@@ -137,6 +137,15 @@ sub __on_msg {
 		}
 
 		if (defined($reply) && $reply ne '') {
+			if (lc($reply) eq lc(trim($text))) {
+				$reply = randomCommonPhrase();
+			}
+
+			# in case of trailing dot
+			if (lc($reply) eq substr(lc(trim($text)), 0, -1)) {
+				$reply = randomCommonPhrase();
+			}
+
 			logger ("reply with: $reply");
 			$msg->reply($reply);
 		} else {
