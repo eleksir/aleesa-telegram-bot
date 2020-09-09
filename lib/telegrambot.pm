@@ -1,9 +1,9 @@
 package telegrambot;
 
+use 5.018;
 use strict;
 use warnings "all";
 use vars qw/$VERSION/;
-use v5.10.0;
 use utf8;
 use Data::Dumper;
 use open qw(:std :utf8);

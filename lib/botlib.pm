@@ -1,5 +1,6 @@
 package botlib;
 
+use 5.018;
 use strict;
 use warnings "all";
 use utf8;
