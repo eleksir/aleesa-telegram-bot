@@ -37,7 +37,26 @@ sub __on_msg {
 
 	if ($msg->{'new_chat_members'}) {
 		# we have newcommers here
-		$msg->reply("Дратути. Представьтес, пожалуйста, и расскажите, что вас сюда привело.");
+		my $newcommer;
+
+		if ($msg->{'new_chat_members'}->can('first_name')) {
+			$newcommer .= $msg->{'new_chat_members'}->first_name;
+
+			if ($msg->{'new_chat_members'}->can('last_name')) {
+				$newcommer .= ' ' . $msg->{'new_chat_members'}->last_name;
+			}
+		} elsif ($msg->{'new_chat_members'}->can('last_name')) {
+			$newcommer .= $msg->{'new_chat_members'}->last_name;
+		} elsif ($msg->{'new_chat_members'}->can('username')) {
+			$newcommer .= $msg->{'new_chat_members'}->username;
+		}
+
+		if ($newcommer) {
+			$msg->reply("Дратути, $newcommer. Представьтес, пожалуйста, и расскажите, что вас сюда привело.");
+		} else {
+			$msg->reply("Дратути. Представьтес, пожалуйста, и расскажите, что вас сюда привело.");
+		}
+
 		return;
 	}
 
