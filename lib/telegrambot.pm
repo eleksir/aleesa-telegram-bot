@@ -33,6 +33,7 @@ sub __cron {
 
 sub __on_msg {
 	my ($self, $msg) = @_;
+	my $phrase;
 
 	if ($msg->{'new_chat_members'}) {
 		# we have newcommers here
@@ -123,13 +124,16 @@ sub __on_msg {
 		} else {
 # phrase directed to bot
 			if ((lc($text) =~ /^${qname}[\,|\:]? (.+)/) or (lc($text) =~ /^${qtname}[\,|\:]? (.+)/)){
-				$reply = $hailo->{$msg->chat->id}->learn_reply($1);
+				$phrase = $1;
+				$reply = $hailo->{$msg->chat->id}->learn_reply($phrase);
 # bot mention by name
 			} elsif ((lc($text) =~ /.+ ${qname}[\,|\!|\?|\.| ]/) or (lc($text) =~ / $qname$/)) {
-				$reply = $hailo->{$msg->chat->id}->reply($text);
+				$phrase = $text;
+				$reply = $hailo->{$msg->chat->id}->reply($phrase);
 # bot mention by telegram name
 			} elsif ((lc($text) =~ /.+ ${qtname}[\,|\!|\?|\.| ]/) or (lc($text) =~ / $qtname$/)) {
-				$reply = $hailo->{$msg->chat->id}->reply($text);
+				$phrase = $text;
+				$reply = $hailo->{$msg->chat->id}->reply($phrase);
 # just message in chat
 			} else {
 				$hailo->{$msg->chat->id}->learn($text);
@@ -137,12 +141,21 @@ sub __on_msg {
 		}
 
 		if (defined($reply) && $reply ne '') {
-			if (lc($reply) eq lc(trim($text))) {
-				$reply = randomCommonPhrase();
+			# work a bit more on input phrase
+			$phrase = trim($phrase);
+
+			while ($phrase =~ /[\.|\,|\?|\!]$/) {
+				chop $phrase;
 			}
 
-			# in case of trailing dot
-			if (lc($reply) eq substr(lc(trim($text)), 0, -1)) {
+			$phrase = lc($phrase);
+
+			if (lc($reply) eq $phrase) {
+				$reply = randomCommonPhrase();
+			} elsif (lc($reply) eq substr($phrase, 0, -1)) {
+				# in case of trailing dot
+				$reply = randomCommonPhrase();
+			} elsif (substr(lc($reply), 0, -1) eq $phrase) {
 				$reply = randomCommonPhrase();
 			}
 
@@ -151,6 +164,7 @@ sub __on_msg {
 		} else {
 			logger ("no reply");
 		}
+
 # should be channel, so we can't talk
 	} else {
 		return;
