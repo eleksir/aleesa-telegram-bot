@@ -22,6 +22,9 @@ $VERSION = "1.0";
 
 my $c = loadConf();
 my $hailo;
+my $myid;
+# guess it later
+my $can_talk = 0;
 
 has token => $c->{telegrambot}->{token};
 
@@ -33,9 +36,44 @@ sub __cron {
 
 sub __on_msg {
 	my ($self, $msg) = @_;
+
+	unless ($myid) {
+		my $myObj = Telegram::Bot::Brain::getMe($self);
+		$myid = $myObj->id;
+	}
+
+	if ($msg->{'chat'}->can('id')) {
+		my $chatid = $msg->{'chat'}->id;
+		my $group_talk = 0;
+
+		# because of bot api restriction there is no events about changing permissions in chat sent to bot
+		# so before sending any answer, we should check if we can do so
+
+		# N.B. there is situation when we do not recieve any messages from chat: if we are in exception list, even if it allows any kind of events for bot
+
+		# If we are just member of chat, it looks like we obey general chat restrictions, so we need only to query getChat in this case
+		# If we admin, we can get|send messages even if group by itself disallows it.
+
+		# works only for public chats, so id shoud be < 0.
+
+		if ($chatid < 0) {
+			my $chatobj = getChat ($self, $chatid);
+			# actually evaluates to 1 for true and to 0 for false
+			$group_talk = int ($chatobj->{permissions}->{can_send_messages});
+		}
+
+		my $chatObj = getChatMember ($self, $chatid, $myid);
+
+		if ($chatObj->{'status'} eq 'administrator') {
+			$can_talk = 1;
+		} else {
+			$can_talk = $group_talk;
+		}
+	}
+
 	my $phrase;
 
-	if ($msg->{'new_chat_members'}) {
+	if (($msg->{'new_chat_members'}) && $can_talk) {
 		# we have newcommers here
 		my $newcommer;
 
@@ -159,7 +197,7 @@ sub __on_msg {
 			}
 		}
 
-		if (defined($reply) && $reply ne '') {
+		if (defined($reply) && $reply ne '' && $can_talk) {
 			# work a bit more on input phrase
 			$phrase = trim($phrase);
 
@@ -181,7 +219,11 @@ sub __on_msg {
 			logger ("reply with: $reply");
 			$msg->reply($reply);
 		} else {
-			logger ("no reply");
+			if ($can_talk) {
+				logger ("no reply");
+			} else {
+				logger ("Can't talk, but reply is: $reply");
+			}
 		}
 
 # should be channel, so we can't talk
@@ -200,7 +242,7 @@ sub init {
 
 	my $self = shift;
 	$self->add_listener(\&__on_msg);
-#	$self->add_repeating_task(900, \&__cron);
+	# $self->add_repeating_task(900, \&__cron);
 }
 
 sub run_telegrambot {
@@ -209,6 +251,41 @@ sub run_telegrambot {
 			telegrambot->new->think;
 		}
 	}
+}
+
+# complete framework with our getChat()
+sub getChat {
+	my $self = shift;
+	my $id = shift;
+	my $send_args = {};
+	$send_args->{chat_id} = $id;
+
+	my $token = $self->token;
+	my $url = "https://api.telegram.org/bot${token}/getChat";
+	my $api_response = $self->_post_request($url, $send_args);
+
+	# we seek for permissions, when making call to this subroutine, but
+	# framework does just omits it, when creating object from hash, so
+	# pick raw json object instead
+
+	#return Telegram::Bot::Object::User->create_from_hash($api_response, $self);
+	return $api_response;
+}
+
+# complete framework with our getChatMember()
+sub getChatMember {
+	my $self = shift;
+	my $chatid = shift;
+	my $userid = shift;
+	my $send_args = {};
+	$send_args->{chat_id} = $chatid;
+	$send_args->{user_id} = $userid;
+	my $token = $self->token;
+	my $url = "https://api.telegram.org/bot${token}/getChatMember";
+	my $api_response = $self->_post_request($url, $send_args);
+
+	# return Telegram::Bot::Object::User->create_from_hash($api_response, $self);
+	return $api_response;
 }
 
 1;
