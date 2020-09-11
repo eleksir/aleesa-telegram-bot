@@ -35,7 +35,8 @@ sub loadConf () {
 	}
 
 	close C;
-	return decode_json ($json);
+	my $j = JSON::XS->new->utf8->relaxed;
+	return $j->decode ($json);
 }
 
 sub saveConf($) {
