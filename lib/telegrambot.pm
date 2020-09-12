@@ -36,6 +36,7 @@ sub __cron {
 
 sub __on_msg {
 	my ($self, $msg) = @_;
+	my $chatid;
 
 	unless ($myid) {
 		my $myObj = Telegram::Bot::Brain::getMe($self);
@@ -43,7 +44,7 @@ sub __on_msg {
 	}
 
 	if ($msg->{'chat'}->can('id')) {
-		my $chatid = $msg->{'chat'}->id;
+		$chatid = $msg->{'chat'}->id;
 		my $group_talk = 0;
 
 		# because of bot api restriction there is no events about changing permissions in chat sent to bot
@@ -69,6 +70,8 @@ sub __on_msg {
 		} else {
 			$can_talk = $group_talk;
 		}
+	} else {
+		return;
 	}
 
 	my $phrase;
@@ -99,10 +102,10 @@ sub __on_msg {
 	}
 
 # lazy init chat-bot brains
-	unless (defined($hailo->{$msg->chat->id})) {
-		$hailo->{$msg->chat->id} = Hailo->new(
+	unless (defined($hailo->{$chatid})) {
+		$hailo->{$chatid} = Hailo->new(
 # we'll got file like this: data/telegrambot-brains/-1001332512695.brain.sqlite
-			brain => sprintf("%s/%s.brain.sqlite", $c->{telegrambot}->{braindir}, $msg->chat->id),
+			brain => sprintf("%s/%s.brain.sqlite", $c->{telegrambot}->{braindir}, $chatid),
 			order => 3
 		);
 	}
@@ -151,7 +154,9 @@ sub __on_msg {
 # simple commands
 		if (substr($text, 0, 1) eq $c->{telegrambot}->{csign}) {
 			if (substr($text, 1) eq "help") {
-				$reply = '```
+				return unless ($can_talk);
+				my $send_args;
+				$send_args->{text} = '```
 !help | !помощь     - список команд
 !w город | !п город - погода в указанном городе
 !ping | !пинг       - попинговать бота
@@ -159,6 +164,10 @@ sub __on_msg {
 Но на самом деле я бот больше для общения, чем для исполнения команд.
 Поговоришь со мной?
 ';
+				$send_args->{parse_mode} = 'Markdown';
+				$send_args->{chat_id} = $chatid;
+				Telegram::Bot::Brain::sendMessage($self, $send_args);
+				return;
 			} elsif (substr($text, 1) eq "ping") {
 				$reply = "Pong.";
 			} elsif (substr($text, 1) eq "пинг") {
