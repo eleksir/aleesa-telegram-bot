@@ -18,6 +18,8 @@ BEGIN {
 }
 
 use lib ("$workdir/lib", "$workdir/vendor_perl", "$workdir/vendor_perl/lib/perl5");
+no Cwd;
+use Cwd::utf8 qw(chdir abs_path);
 use POSIX qw(setgid setuid setsid);
 use File::Path qw(make_path);
 use File::Basename qw(basename dirname);
@@ -70,8 +72,13 @@ if ($< == 0) {
 # double fork attach to /dev/null all stdio and go background
 daemonize ();
 
+unless (defined($apath)) {
+	logger ("Unable to get abs_path: $!");
+	die "Unable to get abs_path: $!\n";
+};
+
 # write pidfile
-my $pidfile = sprintf ("%s/%s.pid", $piddir, basename (abs_path ($0)));
+my $pidfile = sprintf ("%s/%s.pid", $piddir, basename ($apath));
 logger ("Creating pidfile at $pidfile");
 open (PID, ">", $pidfile) or die "Error opening $pidfile: $!\n";
 print PID $$ or die "Error writing to $pidfile: $!\n";
