@@ -12,8 +12,8 @@ Bot can be run via **bin/aleesa-telegam-bot** and acts as daemon.
 
 ## Installation
 
-In order to run this application, you need to "bootstrap" it - download all
-dependencies and libraries.
+In order to run this application, you need to "bootstrap" it - download and build
+all required dependencies and libraries.
 
 You'll need "Development Tools" or similar group of packages, perl, perl-devel,
 perl-local-lib, perl-app-cpanm, sqlite-devel, zlib-devel, openssl-devel,
@@ -25,12 +25,12 @@ After installng required dependencies it is possible to run:
 bash bootstrap.sh
 ```
 
-and all libraries should be downloaded and built.
+and all libraries should be downloaded, built, tested and installed.
 
 ## N.B.
 
-If bot is unable to post to channel due to limitated permissions, it will die.
-It if possible to change this behavior by patching Telegram/Bot/Brain.pm:
+If bot is unable to post to channel due to limited permissions, it will die.
+It is possible to change this behavior by patching Telegram/Bot/Brain.pm:
 
 ```diff
 --- Brain.pm	2019-07-01 04:04:17.000000000 +0300
