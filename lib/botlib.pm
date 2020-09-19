@@ -25,8 +25,7 @@ my $c = loadConf();
 
 sub weather($) {
 	my $city = shift;
-	while (substr($city, -1) eq "\n") { chomp($city); }
-	while (substr($city, 0, 1) eq "\n") { $city = substr($city, 1); }
+	$city = trim($city);
 
 	return "Мне нужно ИМЯ города." if ($city eq '');
 	return "Длинновато для названия города." if (length($city) > 80);
