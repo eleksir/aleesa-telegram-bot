@@ -37,6 +37,7 @@ sub __cron {
 sub __on_msg {
 	my ($self, $msg) = @_;
 	my $chatid;
+	$can_talk = 0;
 
 	unless ($myid) {
 		my $myObj = Telegram::Bot::Brain::getMe($self);
@@ -46,6 +47,9 @@ sub __on_msg {
 	if ($msg->{'chat'}->can('id')) {
 		$chatid = $msg->{'chat'}->id;
 		my $group_talk = 0;
+
+		my $chatname = 'Noname chat';
+		$chatname = $msg->{'chat'}->username if ($msg->{'chat'}->can('username'));
 
 		# because of bot api restriction there is no events about changing permissions in chat sent to bot
 		# so before sending any answer, we should check if we can do so
@@ -66,12 +70,15 @@ sub __on_msg {
 		my $chatObj = getChatMember ($self, $chatid, $myid);
 
 		if ($chatObj->{'status'} eq 'administrator') {
+			logger "can talk in $chatname";
 			$can_talk = 1;
 		} else {
+			logger "can talk in $chatname" if ($group_talk);
+			logger "can not talk in $chatname" unless ($group_talk);
 			$can_talk = $group_talk;
 		}
 	} else {
-		return;
+		logger "mute in $chatid";
 	}
 
 	my $phrase;
@@ -94,7 +101,9 @@ sub __on_msg {
 
 		if ($newcommer) {
 			$msg->reply("Дратути, $newcommer. Представьтес, пожалуйста, и расскажите, что вас сюда привело.");
+			logger "newcommer $newcommer in $chatid";
 		} else {
+			logger "newcommer in $chatid";
 			$msg->reply("Дратути. Представьтес, пожалуйста, и расскажите, что вас сюда привело.");
 		}
 
@@ -142,7 +151,13 @@ sub __on_msg {
 # group chat
 	} elsif (($msg->chat->type eq 'supergroup') or ($msg->chat->type eq 'group')) {
 		my $reply;
-		return unless(defined($msg->text));
+
+		unless(defined($msg->text)) {
+			logger "No text in message";
+			logger Dumper($msg);
+			return;
+		}
+
 		my $text = $msg->text;
 # sometimes shit happens?
 		return unless(defined($text));
