@@ -192,11 +192,15 @@ sub logger {
 	my $msg = shift;
 
 	if ($c->{debug_log}) {
+		my @date = localtime();
+		my @month = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
+		my $t = sprintf ("%02s %02d %02d:%02d:%02d ", $month[$date[4]], $date[3], $date[2], $date[1], $date[0]);
+
 		my $mode = '>';
 		$mode = '>>' if (-f $c->{debug_log});
 
 		if (open (LOG, $mode, $c->{debug_log})) {
-			print LOG $msg . "\n";
+			print LOG $t . $msg . "\n";
 			close LOG;
 		}
 	}
