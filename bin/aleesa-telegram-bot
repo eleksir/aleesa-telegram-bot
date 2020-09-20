@@ -72,6 +72,9 @@ if ($< == 0) {
 # double fork attach to /dev/null all stdio and go background
 daemonize ();
 
+# write pidfile
+my $apath = abs_path ($0);
+
 unless (defined($apath)) {
 	logger ("Unable to get abs_path: $!");
 	die "Unable to get abs_path: $!\n";
