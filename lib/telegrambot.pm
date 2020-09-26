@@ -14,6 +14,7 @@ use Mojo::Base 'Telegram::Bot::Brain';
 
 use conf;
 use botlib;
+use telegramlib;
 
 use Exporter qw(import);
 our @EXPORT = qw(run_telegrambot);
@@ -23,6 +24,10 @@ $VERSION = "1.0";
 my $c = loadConf();
 my $hailo;
 my $myid;
+my $myusername;
+my $myfirst_name;
+my $mylast_name;
+my $myfullname;
 # guess it later
 my $can_talk = 0;
 
@@ -36,139 +41,254 @@ sub __cron {
 
 sub __on_msg {
 	my ($self, $msg) = @_;
+	# chat info
 	my $chatid;
+	my $chatname = 'Noname chat';
+	# user sending message info
+	my $userid;
+	my $username;
+	my $fullname;
+	my $vis_a_vi = 'unknown';
+
 	$can_talk = 0;
 
 	unless ($myid) {
-		my $myObj = Telegram::Bot::Brain::getMe($self);
+		my $myObj = Telegram::Bot::Brain::getMe ($self);
 		$myid = $myObj->id;
+		# TODO: use these values instead of pre-defined in config!
+		$myusername = $myObj->username;
+		$myfirst_name = $myObj->first_name;
+		$mylast_name = $myObj->last_name;
+
+		if (defined ($myfirst_name) && ($myfirst_name ne '') && defined ($mylast_name) && ($mylast_name ne '')) {
+			$myfullname = $myfirst_name . ' ' . $mylast_name;
+		} elsif (defined ($myfirst_name) && ($myfirst_name ne '')) {
+			$myfullname = $myfirst_name;
+		} elsif (defined ($mylast_name) && ($mylast_name ne '')) {
+			$myfullname = $mylast_name;
+		} else {
+			$myfullname = $myusername;
+		}
 	}
 
-	if ($msg->{'chat'}->can('id')) {
-		$chatid = $msg->{'chat'}->id;
+	if ($msg->chat->can ('id') && defined ($msg->chat->id)) {
+		$chatid = $msg->chat->id;
 		my $group_talk = 0;
 
-		my $chatname = 'Noname chat';
-		$chatname = $msg->{'chat'}->username if ($msg->{'chat'}->can('username'));
+		if ($msg->chat->can ('username') && defined ($msg->chat->username)) {
+			$chatname = $msg->chat->username ;
+		} else {
+			if ($msg->chat->can ('title') && defined ($msg->chat->title)) {
+				$chatname = $msg->chat->title;
+			} else {
+				$chatname = 'Noname chat';
+			}
+		}
 
-		# because of bot api restriction there is no events about changing permissions in chat sent to bot
-		# so before sending any answer, we should check if we can do so
+		# because of bot api restriction there is no events about changing permissions
+		# in chat sent to bot so before sending any answer, we should check if we can do so
 
-		# N.B. there is situation when we do not recieve any messages from chat: if we are in exception list, even if it allows any kind of events for bot
+		# N.B. there is situation when we do not recieve any messages from chat: if we
+		# are in exception list, even if it allows any kind of events for bot
 
-		# If we are just member of chat, it looks like we obey general chat restrictions, so we need only to query getChat in this case
+		# If we are just member of chat, it looks like we obey general chat restrictions,
+		# so we need only to query getChat in this case
 		# If we admin, we can get|send messages even if group by itself disallows it.
 
 		# works only for public chats, so id shoud be < 0.
-
 		if ($chatid < 0) {
 			my $chatobj = getChat ($self, $chatid);
 			# actually evaluates to 1 for true and to 0 for false
 			$group_talk = int ($chatobj->{permissions}->{can_send_messages});
-		}
+			my $chatObj = getChatMember ($self, $chatid, $myid);
 
-		my $chatObj = getChatMember ($self, $chatid, $myid);
-
-		if ($chatObj->{'status'} eq 'administrator') {
-			logger "can talk in $chatname";
-			$can_talk = 1;
+			if ($chatObj->{'status'} eq 'administrator') {
+				logger "I can talk in group chat $chatname ($chatid)";
+				$can_talk = 1;
+			} else {
+				logger "I can talk in group chat $chatname ($chatid)" if ($group_talk);
+				logger "I can not talk in group chat $chatname ($chatid)" unless ($group_talk);
+				$can_talk = $group_talk;
+			}
 		} else {
-			logger "can talk in $chatname" if ($group_talk);
-			logger "can not talk in $chatname" unless ($group_talk);
-			$can_talk = $group_talk;
+			# private chat, so definely can talk
+			logger "I can talk in private chat $chatname ($chatid)";
+			$can_talk = 1;
 		}
 	} else {
-		logger "mute in $chatid";
+		logger "Unable to get chatid";
 	}
 
-	my $phrase;
+	# according api user must have username and/or first_name and/or last_name at least one of these fields
+	if ($msg->can ('from') && defined ($msg->from)) {
+		$userid = $msg->from->id; # it must be filled, so do not check it
+		$username = $msg->from->username if ($msg->from->can ('username') && defined($msg->from->username));
 
-	if (($msg->{'new_chat_members'}) && $can_talk) {
-		# we have newcommers here
-		my $newcommer;
+		if ($msg->from->can ('first_name') && defined ($msg->from->first_name)) {
+			$fullname = $msg->from->first_name;
 
-		if ($msg->{'new_chat_members'}->can('first_name')) {
-			$newcommer .= $msg->{'new_chat_members'}->first_name;
-
-			if ($msg->{'new_chat_members'}->can('last_name')) {
-				$newcommer .= ' ' . $msg->{'new_chat_members'}->last_name;
+			if ($msg->from->can('last_name') && defined ($msg->from->last_name)) {
+				$fullname .= ' ' . $msg->from->last_name;
 			}
-		} elsif ($msg->{'new_chat_members'}->can('last_name')) {
-			$newcommer .= $msg->{'new_chat_members'}->last_name;
-		} elsif ($msg->{'new_chat_members'}->can('username')) {
-			$newcommer .= $msg->{'new_chat_members'}->username;
+		} elsif ($msg->from->can ('last_name') && defined ($msg->from->last_name)) {
+			$fullname .= $msg->from->last_name;
 		}
 
-		if ($newcommer) {
-			$msg->reply("Дратути, $newcommer. Представьтес, пожалуйста, и расскажите, что вас сюда привело.");
-			logger "newcommer $newcommer in $chatid";
+		$vis_a_vi = visavi ($userid, $username, $fullname);
+	}
+
+	my $phrase = '';
+
+	# Newcommer event, greet our new member and suggest to introduce themself.
+	if ($msg->can ('new_chat_members') && defined ($msg->new_chat_members)) {
+		my $send_args;
+		$send_args->{parse_mode} = 'Markdown';
+		$send_args->{chat_id} = $chatid;
+
+		if (defined ($username)) {
+			if (defined ($fullname)) {
+				logger "Newcommer in $chatname ($chatid): \@$username, $fullname";
+				$send_args->{text} = "Дратути, [$fullname](mention:\@$username). Представьтес, пожалуйста, и расскажите, что вас сюда привело.";
+			} else {
+				logger "Newcommer in $chatname ($chatid): \@$username";
+				$send_args->{text} = "Дратути, [$username](mention:\@$username). Представьтес, пожалуйста, и расскажите, что вас сюда привело.";
+			}
 		} else {
-			logger "newcommer in $chatid";
-			$msg->reply("Дратути. Представьтес, пожалуйста, и расскажите, что вас сюда привело.");
+			logger "Newcommer in $chatname ($chatid): $fullname";
+			$send_args->{text} = "Дратути, [$fullname](mention:$fullname). Представьтес, пожалуйста, и расскажите, что вас сюда привело.";
 		}
 
+		Telegram::Bot::Brain::sendMessage ($self, $send_args);
 		return;
 	}
 
 # lazy init chat-bot brains
-	unless (defined($hailo->{$chatid})) {
-		$hailo->{$chatid} = Hailo->new(
+	unless (defined ($hailo->{$chatid})) {
+		my $brainname = sprintf ("%s/%s.brain.sqlite", $c->{telegrambot}->{braindir}, $chatid);
+
+		$hailo->{$chatid} = Hailo->new (
 # we'll got file like this: data/telegrambot-brains/-1001332512695.brain.sqlite
-			brain => sprintf("%s/%s.brain.sqlite", $c->{telegrambot}->{braindir}, $chatid),
+			brain => $brainname,
 			order => 3
 		);
+
+		if ($chatid < 0) {
+			logger "Initialized brain for public chat $chatname ($chatid): $brainname";
+		} else {
+			logger "Initialized for private chat $chatname ($chatid): $brainname";
+		}
 	}
 
 # is this a 1-on-1 ?
 	if ($msg->chat->type eq 'private') {
-		return unless(defined($msg->text));
-		my $text = $msg->text;
-		my $csign = quotemeta($c->{telegrambot}->{csign});
-		my $reply;
+		# TODO: what about stickers, photos, documents, audio, video, etc... We should log em at least.
+		return unless ($msg->can ('text') && defined ($msg->text));
 
-		if (substr($text, 0, 1) eq $c->{telegrambot}->{csign}) {
-			if (substr($text, 1) eq "ping") {
+		my $text = $msg->text;
+		logger sprintf ("Private chat %s say to bot: %s", $vis_a_vi, $text);
+		my $csign = quotemeta ($c->{telegrambot}->{csign});
+		my $reply = "Давайте ещё пообщаемся, а то я ещё не научилась от вас плохому.";
+
+		# TODO: Process commands in separate sub, they are same for public and private chats.
+		if (substr ($text, 0, 1) eq $c->{telegrambot}->{csign}) {
+			if (substr ($text, 1) eq "ping") {
 				$reply = "Pong.";
-			} elsif (substr($text, 1) eq "пинг") {
+			} elsif (substr ($text, 1) eq "пинг") {
 				$reply = "Понг.";
-			} elsif (substr($text, 1, 1) eq 'w' || substr($text, 1, 1) eq 'п') {
-				my $city = substr($text, 2);
-				$reply = weather($city);
+			} elsif (substr ($text, 1, 2) eq 'w ' || substr ($text, 1, 2) eq 'п ') {
+				my $city = substr ($text, 2);
+				$reply = weather ($city);
 			} else {
 				$reply = "Чего?";
 			}
 		} else {
-			$reply = $hailo->{$msg->chat->id}->learn_reply($text);
+			my $str = $hailo->{$msg->chat->id}->learn_reply ($text);
+
+			if (defined ($str) && $str ne '') {
+				$reply = $str;
+				# TODO: move it to telegramlib.pm/botlib.pm!
+				$phrase = trim ($text);
+
+				while ($phrase =~ /[\.|\,|\?|\!]$/) {
+					chop $phrase;
+				}
+
+				$phrase = lc ($phrase);
+
+				if (lc ($reply) eq $phrase) {
+					$reply = randomCommonPhrase();
+				} elsif (lc ($reply) eq substr ($phrase, 0, -1)) {
+					# in case of trailing dot
+					$reply = randomCommonPhrase();
+				} elsif (substr (lc ($reply), 0, -1) eq $phrase) {
+					$reply = randomCommonPhrase();
+				}
+			}
 		}
 
-		if (defined($reply) && $reply ne '') {
-			$msg->reply($reply);
-			logger ("private chat reply: $reply");
-		} else {
-# if we have no answer, say something default in private chat
-			$msg->reply("Давайте ещё пообщаемся, а то я ещё не научилась от вас плохому.");
-		}
+		logger sprintf ("Private chat bot reply to $vis_a_vi: %s", $reply);
+		$msg->reply ($reply);
 # group chat
 	} elsif (($msg->chat->type eq 'supergroup') or ($msg->chat->type eq 'group')) {
 		my $reply;
 
-		unless(defined($msg->text)) {
-			logger "No text in message";
-			logger Dumper($msg);
+		# detect and log messages without text, noop here
+		unless (defined ($msg->text)) {
+			logger sprintf("No text in message from %s", $vis_a_vi);
+
+			if ($msg->can ('document') && defined ($msg->document)) {
+				if (defined ($msg->document->{'file_name'})) {
+					my $docsize = 'unknown';
+					$docsize = $msg->document->{'file_size'} if (defined ($msg->document->{'file_size'}));
+					my $type = 'unknown';
+					$type = $msg->document->{'mime_type'} if (defined ($msg->document->{'mime_type'}));
+					logger sprintf ("In public chat %s (%s) %s send document type %s named %s, size %s bytes", $chatname, $chatid, $vis_a_vi, $type, $msg->document->{'file_name'}, $docsize);
+				} else {
+					logger sprintf ("In public chat %s (%s) %s send unknown document", $chatname, $chatid, $vis_a_vi);
+				}
+			} elsif ($msg->can ('sticker') && defined ($msg->sticker)) {
+				my $set_name = 'unknown';
+				$set_name = $msg->sticker->set_name if ($msg->sticker->can ('set_name') && defined ($msg->sticker->set_name));
+				my $emoji = 'unknown';
+				$emoji = $msg->sticker->emoji if ($msg->sticker->can ('emoji') && defined ($msg->sticker->emoji));
+				logger sprintf ("In public chat %s (%s) %s reacted with sticker %s from pack %s", $chatname, $chatid, $vis_a_vi, $emoji, $set_name);
+			} elsif ($msg->can ('photo') && defined ($msg->photo)) {
+				# actually it is an array! duh, hate arrays!
+				logger sprintf ("In public chat %s (%s) %s send photo", $chatname, $chatid, $vis_a_vi);
+			} else {
+				logger Dumper ($msg);
+			}
+
 			return;
 		}
 
+		# we have text here! so potentially we can chit-chat
 		my $text = $msg->text;
-# sometimes shit happens?
-		return unless(defined($text));
+		logger sprintf ("In public chat %s (%s) %s say: %s", $chatname, $chatid, $vis_a_vi, $text);
+		my $qname = quotemeta ($c->{telegrambot}->{name});
+		my $qtname = quotemeta ($c->{telegrambot}->{tname});
+		my $csign = quotemeta ($c->{telegrambot}->{csign});
 
-		my $qname = quotemeta($c->{telegrambot}->{name});
-		my $qtname = quotemeta($c->{telegrambot}->{tname});
-		my $csign = quotemeta($c->{telegrambot}->{csign});
+		# are they quote something, maybe, us?
+		if (defined ($msg->reply_to_message) &&
+		            defined ($msg->reply_to_message->from) &&
+		                    defined ($msg->reply_to_message->from->username) &&
+		                            ($msg->reply_to_message->from->username eq $myusername)) {
+			logger sprintf ("In public chat %s (%s) %s quote us!", $chatname, $chatid, $vis_a_vi);
+			# remove our name from users reply, just in case
+			my $pat1 = quotemeta ('@' . $myusername);
+			my $pat2 = quotemeta ($myfullname);
+			$phrase = $text;
+			$phrase =~ s/$pat1//g;
+			$phrase =~ s/$pat2//g;
 
-# simple commands
-		if (substr($text, 0, 1) eq $c->{telegrambot}->{csign}) {
-			if (substr($text, 1) eq "help") {
+			# figure out reply :)
+			$reply = $hailo->{$msg->chat->id}->learn_reply ($phrase);
+		# simple commands
+		# TODO: Process commands in separate sub, they are same for public and private chats.
+		# TODO: Log commands and answers
+		} elsif (substr ($text, 0, 1) eq $c->{telegrambot}->{csign}) {
+			if (substr ($text, 1) eq "help") {
 				return unless ($can_talk);
 				my $send_args;
 				$send_args->{text} = '```
@@ -181,72 +301,72 @@ sub __on_msg {
 ';
 				$send_args->{parse_mode} = 'Markdown';
 				$send_args->{chat_id} = $chatid;
-				Telegram::Bot::Brain::sendMessage($self, $send_args);
+				Telegram::Bot::Brain::sendMessage ($self, $send_args);
 				return;
-			} elsif (substr($text, 1) eq "ping") {
+			} elsif (substr ($text, 1) eq "ping") {
 				$reply = "Pong.";
-			} elsif (substr($text, 1) eq "пинг") {
+			} elsif (substr ($text, 1) eq "пинг") {
 				$reply = "Понг.";
-			} elsif (substr($text, 1) eq "pong") {
+			} elsif (substr ($text, 1) eq "pong") {
 				$reply = "Wat?";
-			} elsif (substr($text, 1) eq "понг") {
+			} elsif (substr ($text, 1) eq "понг") {
 				$reply = "Шта?";
-			} elsif (substr($text, 1, 2) eq 'w ' || substr($text, 1, 2) eq 'п ') {
-				my $city = substr($text, 3);
-				$reply = weather($city);
+			} elsif (substr ($text, 1, 2) eq 'w ' || substr ($text, 1, 2) eq 'п ') {
+				my $city = substr ($text, 3);
+				$reply = weather ($city);
 			}
 		} elsif (
 				($text eq $qname) or
-				($text eq sprintf("%s", $qtname)) or
-				($text eq sprintf("@%s_bot", $qname)) or # :(
-				($text eq sprintf("%s ", $qtname))
+				($text eq sprintf ("%s", $qtname)) or
+				($text eq sprintf ("@%s_bot", $qname)) or # :(
+				($text eq sprintf ("%s ", $qtname))
 			) {
 				$reply = "Чего?";
 		} else {
-# phrase directed to bot
-			if ((lc($text) =~ /^${qname}[\,|\:]? (.+)/) or (lc($text) =~ /^${qtname}[\,|\:]? (.+)/)){
+			# phrase directed to bot
+			if ((lc ($text) =~ /^${qname}[\,|\:]? (.+)/) or (lc ($text) =~ /^${qtname}[\,|\:]? (.+)/)){
 				$phrase = $1;
-				$reply = $hailo->{$msg->chat->id}->learn_reply($phrase);
-# bot mention by name
-			} elsif ((lc($text) =~ /.+ ${qname}[\,|\!|\?|\.| ]/) or (lc($text) =~ / $qname$/)) {
+				$reply = $hailo->{$msg->chat->id}->learn_reply ($phrase);
+			# bot mention by name
+			} elsif ((lc ($text) =~ /.+ ${qname}[\,|\!|\?|\.| ]/) or (lc ($text) =~ / $qname$/)) {
 				$phrase = $text;
 				$reply = $hailo->{$msg->chat->id}->reply($phrase);
-# bot mention by telegram name
-			} elsif ((lc($text) =~ /.+ ${qtname}[\,|\!|\?|\.| ]/) or (lc($text) =~ / $qtname$/)) {
+			# bot mention by telegram name
+			} elsif ((lc ($text) =~ /.+ ${qtname}[\,|\!|\?|\.| ]/) or (lc ($text) =~ / $qtname$/)) {
 				$phrase = $text;
-				$reply = $hailo->{$msg->chat->id}->reply($phrase);
-# just message in chat
+				$reply = $hailo->{$msg->chat->id}->reply ($phrase);
+			# just message in chat
 			} else {
-				$hailo->{$msg->chat->id}->learn($text);
+				$hailo->{$msg->chat->id}->learn ($text);
 			}
 		}
 
-		if (defined($reply) && $reply ne '' && $can_talk) {
+		if (defined ($reply) && $reply ne '' && $can_talk) {
 			# work a bit more on input phrase
-			$phrase = trim($phrase);
+			$phrase = trim ($phrase);
 
 			while ($phrase =~ /[\.|\,|\?|\!]$/) {
 				chop $phrase;
 			}
 
-			$phrase = lc($phrase);
+			$phrase = lc ($phrase);
 
-			if (lc($reply) eq $phrase) {
+			if (lc ($reply) eq $phrase) {
 				$reply = randomCommonPhrase();
-			} elsif (lc($reply) eq substr($phrase, 0, -1)) {
+			} elsif (lc ($reply) eq substr ($phrase, 0, -1)) {
 				# in case of trailing dot
 				$reply = randomCommonPhrase();
-			} elsif (substr(lc($reply), 0, -1) eq $phrase) {
+			} elsif (substr(lc ($reply), 0, -1) eq $phrase) {
 				$reply = randomCommonPhrase();
 			}
 
-			logger ("reply with: $reply");
-			$msg->reply($reply);
+			logger sprintf ("In public chat %s (%s) bot reply to %s: %s", $chatname, $chatid, $vis_a_vi, $reply);
+			$msg->reply ($reply);
 		} else {
 			if ($can_talk) {
-				logger ("no reply");
+				logger sprintf ("In public chat %s (%s) bot is not required to reply to %s", $chatname, $chatid, $vis_a_vi);
 			} else {
-				logger ("Can't talk, but reply is: $reply");
+				logger sprintf ("In public chat %s (%s) bot can't talk, but reply to %s is: %s", $chatname, $chatid, $vis_a_vi, $reply);
 			}
 		}
 
@@ -265,7 +385,7 @@ sub init {
 	}
 
 	my $self = shift;
-	$self->add_listener(\&__on_msg);
+	$self->add_listener (\&__on_msg);
 	# $self->add_repeating_task(900, \&__cron);
 }
 
@@ -275,41 +395,6 @@ sub run_telegrambot {
 			telegrambot->new->think;
 		}
 	}
-}
-
-# complete framework with our getChat()
-sub getChat {
-	my $self = shift;
-	my $id = shift;
-	my $send_args = {};
-	$send_args->{chat_id} = $id;
-
-	my $token = $self->token;
-	my $url = "https://api.telegram.org/bot${token}/getChat";
-	my $api_response = $self->_post_request($url, $send_args);
-
-	# we seek for permissions, when making call to this subroutine, but
-	# framework does just omits it, when creating object from hash, so
-	# pick raw json object instead
-
-	#return Telegram::Bot::Object::User->create_from_hash($api_response, $self);
-	return $api_response;
-}
-
-# complete framework with our getChatMember()
-sub getChatMember {
-	my $self = shift;
-	my $chatid = shift;
-	my $userid = shift;
-	my $send_args = {};
-	$send_args->{chat_id} = $chatid;
-	$send_args->{user_id} = $userid;
-	my $token = $self->token;
-	my $url = "https://api.telegram.org/bot${token}/getChatMember";
-	my $api_response = $self->_post_request($url, $send_args);
-
-	# return Telegram::Bot::Object::User->create_from_hash($api_response, $self);
-	return $api_response;
 }
 
 1;
