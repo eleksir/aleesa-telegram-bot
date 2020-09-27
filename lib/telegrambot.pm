@@ -147,15 +147,15 @@ sub __on_msg {
 
 		if (defined ($username)) {
 			if (defined ($fullname)) {
-				logger "Newcommer in $chatname ($chatid): \@$username, $fullname";
-				$send_args->{text} = "Дратути, [$fullname](mention:\@$username). Представьтес, пожалуйста, и расскажите, что вас сюда привело.";
+				logger "Newcommer in $chatname ($chatid): \@$username, $fullname ($userid)";
+				$send_args->{text} = "Дратути, [$fullname](tg://user?id=$userid). Представьтес, пожалуйста, и расскажите, что вас сюда привело.";
 			} else {
-				logger "Newcommer in $chatname ($chatid): \@$username";
-				$send_args->{text} = "Дратути, [$username](mention:\@$username). Представьтес, пожалуйста, и расскажите, что вас сюда привело.";
+				logger "Newcommer in $chatname ($chatid): \@$username ($userid)";
+				$send_args->{text} = "Дратути, [$username](tg://user?id=$userid). Представьтес, пожалуйста, и расскажите, что вас сюда привело.";
 			}
 		} else {
-			logger "Newcommer in $chatname ($chatid): $fullname";
-			$send_args->{text} = "Дратути, [$fullname](mention:$fullname). Представьтес, пожалуйста, и расскажите, что вас сюда привело.";
+			logger "Newcommer in $chatname ($chatid): $fullname ($userid)";
+			$send_args->{text} = "Дратути, [$fullname](tg://user?id=$userid). Представьтес, пожалуйста, и расскажите, что вас сюда привело.";
 		}
 
 		Telegram::Bot::Brain::sendMessage ($self, $send_args);
