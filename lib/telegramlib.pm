@@ -13,7 +13,7 @@ use Telegram::Bot::Brain;
 # module shit
 use vars qw/$VERSION/;
 use Exporter qw(import);
-our @EXPORT = qw(getChat getChatMember visavi);
+our @EXPORT = qw(getChat getChatMember sendChatAction visavi);
 
 $VERSION = "1.0";
 
@@ -50,6 +50,23 @@ sub getChatMember {
 
 	# return Telegram::Bot::Object::User->create_from_hash($api_response, $self);
 	return $api_response;
+}
+
+# complete framework with our sendChatAction()
+# sets bot status to "typing" for 5 seconds
+# # TODO: more actions!
+sub sendChatAction {
+	my $self = shift;
+	my $chatid = shift;
+	my $send_args = {};
+	$send_args->{chat_id} = $chatid;
+	$send_args->{action} = "typing";
+	my $token = $self->token;
+	my $url = "https://api.telegram.org/bot${token}/sendChatAction";
+	my $api_response = $self->_post_request ($url, $send_args);
+
+	# return Telegram::Bot::Object::User->create_from_hash($api_response, $self);
+	return;
 }
 
 sub visavi (@) {

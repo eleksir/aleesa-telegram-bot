@@ -158,6 +158,17 @@ sub __on_msg {
 			$send_args->{text} = "Дратути, [$fullname](tg://user?id=$userid). Представьтес, пожалуйста, и расскажите, что вас сюда привело.";
 		}
 
+		# let's emulate real human and delay answer
+		sleep (int ( rand (3) + 1));
+
+		for (my $i = 0; $i <= (4 + int (rand (3))); $i++) {
+			sendChatAction($chatid);
+			sleep(3);
+			sleep 3 unless ($i);
+		}
+
+		sleep ( 3 + int ( rand (2)));
+
 		Telegram::Bot::Brain::sendMessage ($self, $send_args);
 		return;
 	}
@@ -360,6 +371,7 @@ sub __on_msg {
 				$reply = randomCommonPhrase();
 			}
 
+			sleep (int (rand (2)));
 			logger sprintf ("In public chat %s (%s) bot reply to %s: %s", $chatname, $chatid, $vis_a_vi, $reply);
 			$msg->reply ($reply);
 		} else {
