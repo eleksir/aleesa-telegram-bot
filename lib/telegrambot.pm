@@ -1,8 +1,9 @@
 package telegrambot;
+# main bot gears are here
 
 use 5.018;
 use strict;
-use warnings "all";
+use warnings;
 use vars qw/$VERSION/;
 use utf8;
 use Data::Dumper;
@@ -12,14 +13,14 @@ use Hailo;
 use Encode;
 use Mojo::Base 'Telegram::Bot::Brain';
 
-use conf;
-use botlib;
-use telegramlib;
+use conf qw(loadConf);
+use botlib qw(weather logger trim randomCommonPhrase);
+use telegramlib qw(getChat getChatMember sendChatAction visavi);
 
 use Exporter qw(import);
-our @EXPORT = qw(run_telegrambot);
+our @EXPORT_OK = qw(run_telegrambot);
 
-$VERSION = "1.0";
+$VERSION = '1.0';
 
 my $c = loadConf();
 my $hailo;
@@ -33,7 +34,8 @@ my $can_talk = 0;
 
 has token => $c->{telegrambot}->{token};
 
-sub __cron {
+# i promise, i'll make use of this sub
+sub __cron {                                         ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
 	my $self = shift;
 # noop
 	return;
@@ -116,7 +118,7 @@ sub __on_msg {
 			$can_talk = 1;
 		}
 	} else {
-		logger "Unable to get chatid";
+		logger 'Unable to get chatid';
 	}
 
 	# according api user must have username and/or first_name and/or last_name at least one of these fields
@@ -161,10 +163,10 @@ sub __on_msg {
 		# let's emulate real human and delay answer
 		sleep (int ( rand (3) + 1));
 
-		for (my $i = 0; $i <= (4 + int (rand (3))); $i++) {
+		for (0..(4 + int (rand (3)))) {
 			sendChatAction($chatid);
 			sleep(3);
-			sleep 3 unless ($i);
+			sleep 3 unless ($_);
 		}
 
 		sleep ( 3 + int ( rand (2)));
@@ -175,7 +177,7 @@ sub __on_msg {
 
 # lazy init chat-bot brains
 	unless (defined ($hailo->{$chatid})) {
-		my $brainname = sprintf ("%s/%s.brain.sqlite", $c->{telegrambot}->{braindir}, $chatid);
+		my $brainname = sprintf ('%s/%s.brain.sqlite', $c->{telegrambot}->{braindir}, $chatid);
 
 		$hailo->{$chatid} = Hailo->new (
 # we'll got file like this: data/telegrambot-brains/-1001332512695.brain.sqlite
@@ -196,21 +198,21 @@ sub __on_msg {
 		return unless ($msg->can ('text') && defined ($msg->text));
 
 		my $text = $msg->text;
-		logger sprintf ("Private chat %s say to bot: %s", $vis_a_vi, $text);
+		logger sprintf ('Private chat %s say to bot: %s', $vis_a_vi, $text);
 		my $csign = quotemeta ($c->{telegrambot}->{csign});
-		my $reply = "Давайте ещё пообщаемся, а то я ещё не научилась от вас плохому.";
+		my $reply = 'Давайте ещё пообщаемся, а то я ещё не научилась от вас плохому.';
 
 		# TODO: Process commands in separate sub, they are same for public and private chats.
 		if (substr ($text, 0, 1) eq $c->{telegrambot}->{csign}) {
-			if (substr ($text, 1) eq "ping") {
-				$reply = "Pong.";
-			} elsif (substr ($text, 1) eq "пинг") {
-				$reply = "Понг.";
+			if (substr ($text, 1) eq 'ping') {
+				$reply = 'Pong.';
+			} elsif (substr ($text, 1) eq 'пинг') {
+				$reply = 'Понг.';
 			} elsif (substr ($text, 1, 2) eq 'w ' || substr ($text, 1, 2) eq 'п ') {
 				my $city = substr ($text, 2);
 				$reply = weather ($city);
 			} else {
-				$reply = "Чего?";
+				$reply = 'Чего?';
 			}
 		} else {
 			my $str = $hailo->{$msg->chat->id}->learn_reply ($text);
@@ -245,7 +247,7 @@ sub __on_msg {
 
 		# detect and log messages without text, noop here
 		unless (defined ($msg->text)) {
-			logger sprintf("No text in message from %s", $vis_a_vi);
+			logger sprintf('No text in message from %s', $vis_a_vi);
 
 			if ($msg->can ('document') && defined ($msg->document)) {
 				if (defined ($msg->document->{'file_name'})) {
@@ -253,19 +255,19 @@ sub __on_msg {
 					$docsize = $msg->document->{'file_size'} if (defined ($msg->document->{'file_size'}));
 					my $type = 'unknown';
 					$type = $msg->document->{'mime_type'} if (defined ($msg->document->{'mime_type'}));
-					logger sprintf ("In public chat %s (%s) %s send document type %s named %s, size %s bytes", $chatname, $chatid, $vis_a_vi, $type, $msg->document->{'file_name'}, $docsize);
+					logger sprintf ('In public chat %s (%s) %s send document type %s named %s, size %s bytes', $chatname, $chatid, $vis_a_vi, $type, $msg->document->{'file_name'}, $docsize);
 				} else {
-					logger sprintf ("In public chat %s (%s) %s send unknown document", $chatname, $chatid, $vis_a_vi);
+					logger sprintf ('In public chat %s (%s) %s send unknown document', $chatname, $chatid, $vis_a_vi);
 				}
 			} elsif ($msg->can ('sticker') && defined ($msg->sticker)) {
 				my $set_name = 'unknown';
 				$set_name = $msg->sticker->set_name if ($msg->sticker->can ('set_name') && defined ($msg->sticker->set_name));
 				my $emoji = 'unknown';
 				$emoji = $msg->sticker->emoji if ($msg->sticker->can ('emoji') && defined ($msg->sticker->emoji));
-				logger sprintf ("In public chat %s (%s) %s reacted with sticker %s from pack %s", $chatname, $chatid, $vis_a_vi, $emoji, $set_name);
+				logger sprintf ('In public chat %s (%s) %s reacted with sticker %s from pack %s', $chatname, $chatid, $vis_a_vi, $emoji, $set_name);
 			} elsif ($msg->can ('photo') && defined ($msg->photo)) {
 				# actually it is an array! duh, hate arrays!
-				logger sprintf ("In public chat %s (%s) %s send photo", $chatname, $chatid, $vis_a_vi);
+				logger sprintf ('In public chat %s (%s) %s send photo', $chatname, $chatid, $vis_a_vi);
 			} else {
 				logger Dumper ($msg);
 			}
@@ -275,7 +277,7 @@ sub __on_msg {
 
 		# we have text here! so potentially we can chit-chat
 		my $text = $msg->text;
-		logger sprintf ("In public chat %s (%s) %s say: %s", $chatname, $chatid, $vis_a_vi, $text);
+		logger sprintf ('In public chat %s (%s) %s say: %s', $chatname, $chatid, $vis_a_vi, $text);
 		my $qname = quotemeta ($c->{telegrambot}->{name});
 		my $qtname = quotemeta ($c->{telegrambot}->{tname});
 		my $csign = quotemeta ($c->{telegrambot}->{csign});
@@ -285,7 +287,7 @@ sub __on_msg {
 		            defined ($msg->reply_to_message->from) &&
 		                    defined ($msg->reply_to_message->from->username) &&
 		                            ($msg->reply_to_message->from->username eq $myusername)) {
-			logger sprintf ("In public chat %s (%s) %s quote us!", $chatname, $chatid, $vis_a_vi);
+			logger sprintf ('In public chat %s (%s) %s quote us!', $chatname, $chatid, $vis_a_vi);
 			# remove our name from users reply, just in case
 			my $pat1 = quotemeta ('@' . $myusername);
 			my $pat2 = quotemeta ($myfullname);
@@ -299,40 +301,44 @@ sub __on_msg {
 		# TODO: Process commands in separate sub, they are same for public and private chats.
 		# TODO: Log commands and answers
 		} elsif (substr ($text, 0, 1) eq $c->{telegrambot}->{csign}) {
-			if (substr ($text, 1) eq "help") {
-				return unless ($can_talk);
+			if (substr ($text, 1) eq 'help') {
+				unless ($can_talk) {
+					return ;
+				}
+
 				my $send_args;
-				$send_args->{text} = '```
+				$send_args->{text} = << 'MYHELP';
+```
 !help | !помощь     - список команд
 !w город | !п город - погода в указанном городе
 !ping | !пинг       - попинговать бота
 ```
 Но на самом деле я бот больше для общения, чем для исполнения команд.
 Поговоришь со мной?
-';
+MYHELP
 				$send_args->{parse_mode} = 'Markdown';
 				$send_args->{chat_id} = $chatid;
 				Telegram::Bot::Brain::sendMessage ($self, $send_args);
 				return;
-			} elsif (substr ($text, 1) eq "ping") {
-				$reply = "Pong.";
-			} elsif (substr ($text, 1) eq "пинг") {
-				$reply = "Понг.";
-			} elsif (substr ($text, 1) eq "pong") {
-				$reply = "Wat?";
-			} elsif (substr ($text, 1) eq "понг") {
-				$reply = "Шта?";
+			} elsif (substr ($text, 1) eq 'ping') {
+				$reply = 'Pong.';
+			} elsif (substr ($text, 1) eq 'пинг') {
+				$reply = 'Понг.';
+			} elsif (substr ($text, 1) eq 'pong') {
+				$reply = 'Wat?';
+			} elsif (substr ($text, 1) eq 'понг') {
+				$reply = 'Шта?';
 			} elsif (substr ($text, 1, 2) eq 'w ' || substr ($text, 1, 2) eq 'п ') {
 				my $city = substr ($text, 3);
 				$reply = weather ($city);
 			}
 		} elsif (
 				($text eq $qname) or
-				($text eq sprintf ("%s", $qtname)) or
+				($text eq sprintf ('%s', $qtname)) or
 				($text eq sprintf ("@%s_bot", $qname)) or # :(
-				($text eq sprintf ("%s ", $qtname))
+				($text eq sprintf ('%s ', $qtname))
 			) {
-				$reply = "Чего?";
+				$reply = 'Чего?';
 		} else {
 			# phrase directed to bot
 			if ((lc ($text) =~ /^${qname}[\,|\:]? (.+)/) or (lc ($text) =~ /^${qtname}[\,|\:]? (.+)/)){
@@ -372,13 +378,13 @@ sub __on_msg {
 			}
 
 			sleep (int (rand (2)));
-			logger sprintf ("In public chat %s (%s) bot reply to %s: %s", $chatname, $chatid, $vis_a_vi, $reply);
+			logger sprintf ('In public chat %s (%s) bot reply to %s: %s', $chatname, $chatid, $vis_a_vi, $reply);
 			$msg->reply ($reply);
 		} else {
 			if ($can_talk) {
-				logger sprintf ("In public chat %s (%s) bot is not required to reply to %s", $chatname, $chatid, $vis_a_vi);
+				logger sprintf ('In public chat %s (%s) bot is not required to reply to %s', $chatname, $chatid, $vis_a_vi);
 			} else {
-				logger sprintf ("In public chat %s (%s) bot can't talk, but reply to %s is: %s", $chatname, $chatid, $vis_a_vi, $reply);
+				logger sprintf ('In public chat %s (%s) bot can\'t talk, but reply to %s is: %s', $chatname, $chatid, $vis_a_vi, $reply);
 			}
 		}
 
@@ -393,20 +399,23 @@ sub __on_msg {
 # setup our bot
 sub init {
 	unless (-d $c->{telegrambot}->{braindir}) {
-		mkpath ($c->{telegrambot}->{braindir}, 0, 0755);
+		mkpath ($c->{telegrambot}->{braindir}, 0, 0755); ## no critic (ValuesAndExpressions::ProhibitLeadingZeros)
 	}
 
 	my $self = shift;
 	$self->add_listener (\&__on_msg);
 	# $self->add_repeating_task(900, \&__cron);
+	return;
 }
 
 sub run_telegrambot {
 	while (sleep 3) {
-		eval {
+		eval {                                       ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
 			telegrambot->new->think;
 		}
 	}
+
+	return;
 }
 
 1;

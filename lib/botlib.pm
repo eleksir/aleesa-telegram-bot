@@ -1,10 +1,12 @@
 package botlib;
+# store here utility functions that are not protocol-specified
 
 use 5.018;
 use strict;
-use warnings "all";
+use warnings;
 use utf8;
 use open qw(:std :utf8);
+use English qw( -no_match_vars );
 
 use HTTP::Tiny;
 use URI::URL;
@@ -17,18 +19,61 @@ use conf qw(loadConf);
 use vars qw/$VERSION/;
 
 use Exporter qw(import);
-our @EXPORT = qw(weather logger trim randomCommonPhrase);
+our @EXPORT_OK = qw(weather logger trim randomCommonPhrase);
 
-$VERSION = "1.0";
+$VERSION = '1.0';
 
 my $c = loadConf();
 
-sub weather ($) {
+sub __urlencode {
+	my $str = shift;
+	my $urlobj = url $str;
+	$str = $urlobj->as_string;
+	$urlobj = undef; undef $urlobj;
+	return $str;
+}
+
+sub logger {
+	my $msg = shift;
+
+	if ($c->{debug_log}) {
+		my @date = localtime();
+		my @month = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
+		my $t = sprintf ('%02s %02d %02d:%02d:%02d ', $month[$date[4]], $date[3], $date[2], $date[1], $date[0]);
+
+		my $mode = '>';
+		$mode = '>>' if (-f $c->{debug_log});
+
+		if (open my $LOG, $mode, $c->{debug_log}) {
+			print $LOG $t . $msg . "\n";             ## no critic (InputOutput::RequireCheckedSyscalls)
+			close $LOG;                              ## no critic (InputOutput::RequireCheckedSyscalls)
+		}
+	}
+
+	return;
+}
+
+sub trim {
+	my $str = shift;
+
+	while (substr ($str, 0, 1) =~ /^\s$/xms) {
+		$str = substr ($str, 1);
+	}
+
+	while (substr ($str, -1, 1) =~ /^\s$/xms) {
+		chop ($str);
+	}
+
+	return $str;
+}
+
+
+sub weather {
 	my $city = shift;
 	$city = trim ($city);
 
-	return "Мне нужно ИМЯ города." if ($city eq '');
-	return "Длинновато для названия города." if (length($city) > 80);
+	return 'Мне нужно ИМЯ города.' if ($city eq '');
+	return 'Длинновато для названия города.' if (length($city) > 80);
 
 	$city = ucfirst ($city);
 	my $w = __weather ($city);
@@ -36,7 +81,7 @@ sub weather ($) {
 
 	if ($w) {
 		if ($w->{temperature_min} == $w->{temperature_max}) {
-			$reply = sprintf ("Погода в городе %s, %s:\n%s, ветер %s %s м/c, температура %s°C, ощущается как %s°C, относительная влажность %s%%, давление %s мм.рт.ст",
+			$reply = sprintf ("Погода в городе %s, %s:\n%s, ветер %s %s м/c, температура %s°C, ощущается как %s°C, относительная влажность %s%%, давление %s мм.рт.с",
 				$w->{name},
 				$w->{country},
 				ucfirst ($w->{description}),
@@ -68,7 +113,7 @@ sub weather ($) {
 	return $reply;
 }
 
-sub __weather ($) {
+sub __weather {
 	my $city = shift;
 	$city = __urlencode ($city);
 	my $id = md5_base64 ($city);
@@ -79,12 +124,12 @@ sub __weather ($) {
 
 	# attach to cache data
 	tie my %cachetime, 'DB_File', $c->{openweathermap}->{cachetime} or do {
-		warn "Something nasty happen when cachetime ties to its data: $!";
+		logger "Something nasty happen when cachetime ties to its data: $OS_ERROR";
 		return undef;
 	};
 
 	tie my %cachedata, 'DB_File', $c->{openweathermap}->{cachedata} or do {
-		warn "Something nasty happen when cachedata ties to its data: $!";
+		logger "Something nasty happen when cachedata ties to its data: $OS_ERROR";
 		return undef;
 	};
 
@@ -95,10 +140,10 @@ sub __weather ($) {
 		my $r;
 
 		# try 3 times and giveup
-		for (my $counter = 0; $counter < 3; $counter++) {
+		for (1..3) {
 			next if ($r->{success});
 			my $http = HTTP::Tiny->new (timeout => 3);
-			$r = $http->get (sprintf ("http://api.openweathermap.org/data/2.5/weather?q=%s&lang=ru&APPID=%s", $city, $appid));
+			$r = $http->get (sprintf ('http://api.openweathermap.org/data/2.5/weather?q=%s&lang=ru&APPID=%s', $city, $appid));
 			sleep 2;
 		}
 
@@ -106,8 +151,8 @@ sub __weather ($) {
 		if ($r->{success}) {
 			$fc = eval { decode_json ($r->{content}) };
 
-			if ($@) {
-				warn "[WARN] openweathermap returns corrupted json: $@";
+			if ($EVAL_ERROR) {
+				logger "[WARN] openweathermap returns corrupted json: $EVAL_ERROR";
 				untie %cachetime;
 				untie %cachedata;
 				return undef;
@@ -180,62 +225,22 @@ sub __weather ($) {
 	return $w;
 }
 
-sub __urlencode ($) {
-	my $str = shift;
-	my $urlobj = url $str;
-	$str = $urlobj->as_string;
-	$urlobj = undef; undef $urlobj;
-	return $str;
-}
-
-sub logger {
-	my $msg = shift;
-
-	if ($c->{debug_log}) {
-		my @date = localtime();
-		my @month = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
-		my $t = sprintf ("%02s %02d %02d:%02d:%02d ", $month[$date[4]], $date[3], $date[2], $date[1], $date[0]);
-
-		my $mode = '>';
-		$mode = '>>' if (-f $c->{debug_log});
-
-		if (open (LOG, $mode, $c->{debug_log})) {
-			print LOG $t . $msg . "\n";
-			close LOG;
-		}
-	}
-}
-
-sub trim ($) {
-	my $str = shift;
-
-	while (substr ($str, 0, 1) =~ /^\s$/) {
-		$str = substr ($str, 1);
-	}
-
-	while (substr ($str, -1, 1) =~ /^\s$/) {
-		chop ($str);
-	}
-
-	return $str;
-}
-
-sub randomCommonPhrase () {
+sub randomCommonPhrase {
 	my @myphrase = (
-		"Так, блядь...",
-		"*Закатывает рукава* И ради этого ты меня позвал?",
-		"Ну чего ты начинаешь, нормально же общались",
-		"Повтори свой вопрос, не поняла",
-		"Выйди и зайди нормально",
-		"Я подумаю",
-		"Даже не знаю что на это ответить",
-		"Ты упал такие вопросы девочке задавать?",
-		"Можно и так, но не уверена",
-		"А как ты думаешь?",
-		"А ви, таки, почему интересуетесь?"
+		'Так, блядь...',
+		'*Закатывает рукава* И ради этого ты меня позвал?',
+		'Ну чего ты начинаешь, нормально же общались',
+		'Повтори свой вопрос, не поняла',
+		'Выйди и зайди нормально',
+		'Я подумаю',
+		'Даже не знаю что на это ответить',
+		'Ты упал такие вопросы девочке задавать?',
+		'Можно и так, но не уверена',
+		'А как ты думаешь?',
+		'А ви, таки, почему интересуетесь?',
 	);
 
-	return ($myphrase[rand ($#myphrase -1)]);
+	return $myphrase[rand ($#myphrase -1)];
 }
 
 1;

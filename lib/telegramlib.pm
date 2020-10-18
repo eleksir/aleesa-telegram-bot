@@ -3,7 +3,7 @@ package telegramlib;
 
 use 5.018;
 use strict;
-use warnings "all";
+use warnings;
 use utf8;
 use open qw(:std :utf8);
 
@@ -13,9 +13,9 @@ use Telegram::Bot::Brain;
 # module shit
 use vars qw/$VERSION/;
 use Exporter qw(import);
-our @EXPORT = qw(getChat getChatMember sendChatAction visavi);
+our @EXPORT_OK = qw(getChat getChatMember sendChatAction visavi);
 
-$VERSION = "1.0";
+$VERSION = '1.0';
 
 # complete framework with our getChat()
 sub getChat {
@@ -60,7 +60,7 @@ sub sendChatAction {
 	my $chatid = shift;
 	my $send_args = {};
 	$send_args->{chat_id} = $chatid;
-	$send_args->{action} = "typing";
+	$send_args->{action} = 'typing';
 	my $token = $self->token;
 	my $url = "https://api.telegram.org/bot${token}/sendChatAction";
 	my $api_response = $self->_post_request ($url, $send_args);
@@ -69,7 +69,7 @@ sub sendChatAction {
 	return;
 }
 
-sub visavi (@) {
+sub visavi {
 	my ($userid, $username, $fullname) = @_;
 	my $name = '';
 
@@ -83,3 +83,7 @@ sub visavi (@) {
 	$name .= " ($userid)";
 	return $name;
 }
+
+1;
+
+# vim: ft=perl noet ai ts=4 sw=4 sts=4:
