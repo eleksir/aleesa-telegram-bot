@@ -16,6 +16,7 @@ use Mojo::Base 'Telegram::Bot::Brain';
 use conf qw(loadConf);
 use botlib qw(weather logger trim randomCommonPhrase);
 use telegramlib qw(getChat getChatMember sendChatAction visavi);
+use lat qw(latAnswer);
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(run_telegrambot);
@@ -211,6 +212,8 @@ sub __on_msg {
 			} elsif (substr ($text, 1, 2) eq 'w ' || substr ($text, 1, 2) eq 'п ') {
 				my $city = substr ($text, 2);
 				$reply = weather ($city);
+			} elsif ((length ($text) == 4) && (substr ($text, 1, 3) eq 'lat' || substr ($text, 1, 2) eq 'лат')) {
+				$reply = latAnswer();
 			} else {
 				$reply = 'Чего?';
 			}
@@ -312,6 +315,7 @@ sub __on_msg {
 !help | !помощь     - список команд
 !w город | !п город - погода в указанном городе
 !ping | !пинг       - попинговать бота
+!lat | !лат         - сгенерировать фразу из крылатых латинских выражений
 ```
 Но на самом деле я бот больше для общения, чем для исполнения команд.
 Поговоришь со мной?
@@ -331,6 +335,8 @@ MYHELP
 			} elsif (substr ($text, 1, 2) eq 'w ' || substr ($text, 1, 2) eq 'п ') {
 				my $city = substr ($text, 3);
 				$reply = weather ($city);
+			} elsif (length ($text) == 4 && (substr ($text, 1, 3) eq 'lat' || substr ($text, 1, 3) eq 'лат')) {
+				$reply = latAnswer();
 			}
 		} elsif (
 				($text eq $qname) or
