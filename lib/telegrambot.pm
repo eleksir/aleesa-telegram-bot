@@ -162,10 +162,10 @@ sub __on_msg {
 		}
 
 		# let's emulate real human and delay answer
-		sleep (int ( rand (3) + 1));
+		sleep (int ( rand (2) + 1));
 
 		for (0..(4 + int (rand (3)))) {
-			sendChatAction($chatid);
+			sendChatAction ($self, $chatid);
 			sleep(3);
 			sleep 3 unless ($_);
 		}
@@ -242,6 +242,8 @@ sub __on_msg {
 			}
 		}
 
+		sendChatAction ($self, $chatid);
+		sleep 1;
 		logger sprintf ("Private chat bot reply to $vis_a_vi: %s", $reply);
 		$msg->reply ($reply);
 # group chat
@@ -383,6 +385,7 @@ MYHELP
 				$reply = randomCommonPhrase();
 			}
 
+			sendChatAction ($self, $chatid);
 			sleep (int (rand (2)));
 			logger sprintf ('In public chat %s (%s) bot reply to %s: %s', $chatname, $chatid, $vis_a_vi, $reply);
 			$msg->reply ($reply);
