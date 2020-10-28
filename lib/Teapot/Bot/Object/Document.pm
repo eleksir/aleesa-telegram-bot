@@ -1,11 +1,11 @@
 package Teapot::Bot::Object::Document;
-$Teapot::Bot::Object::Document::VERSION = '0.021';
 # ABSTRACT: The base class for Telegram 'Document' objects
-
 
 use Mojo::Base 'Teapot::Bot::Object::Base';
 
 use Teapot::Bot::Object::PhotoSize;
+
+$Teapot::Bot::Object::Document::VERSION = '0.021';
 
 has 'file_id';
 has 'thumb'; #PhotoSize

@@ -1,11 +1,11 @@
 package Teapot::Bot::Object::PassportData;
-$Teapot::Bot::Object::PassportData::VERSION = '0.021';
 # ABSTRACT: The base class for Telegram 'PassportData' type objects
-
 
 use Mojo::Base 'Teapot::Bot::Object::Base';
 use Teapot::Bot::Object::EncryptedPassportElement;
 use Teapot::Bot::Object::EncryptedCredentials;
+
+$Teapot::Bot::Object::PassportData::VERSION = '0.021';
 
 has 'data'; # Array of EncryptedPassportElement
 has 'credentials'; # EncryptedCredentials
@@ -15,8 +15,9 @@ sub fields {
            'Teapot::Bot::Object::EncryptedCredentials'     => [qw/credentials/],
          };
 }
+
 sub arrays {
-  qw/data/;
+  return qw/data/;
 }
 
 1;

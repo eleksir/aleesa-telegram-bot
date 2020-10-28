@@ -1,5 +1,4 @@
 package Teapot::Bot::Object::Game;
-$Teapot::Bot::Object::Game::VERSION = '0.021';
 # ABSTRACT: The base class for Telegram message 'Game' type.
 
 
@@ -7,6 +6,8 @@ use Mojo::Base 'Teapot::Bot::Object::Base';
 use Teapot::Bot::Object::PhotoSize;
 use Teapot::Bot::Object::Animation;
 use Teapot::Bot::Object::MessageEntity;
+
+$Teapot::Bot::Object::Game::VERSION = '0.021';
 
 has 'title';
 has 'description';
@@ -23,7 +24,7 @@ sub fields {
          };
 }
 
-sub arrays { qw/photo text_entities/ }
+sub arrays { return qw/photo text_entities/; }
 
 1;
 

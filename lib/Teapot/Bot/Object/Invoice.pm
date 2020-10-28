@@ -1,9 +1,9 @@
 package Teapot::Bot::Object::Invoice;
-$Teapot::Bot::Object::Invoice::VERSION = '0.021';
 # ABSTRACT: The base class for Telegram 'Invoice' type objects
 
-
 use Mojo::Base 'Teapot::Bot::Object::Base';
+
+$Teapot::Bot::Object::Invoice::VERSION = '0.021';
 
 has 'title';
 has 'description';

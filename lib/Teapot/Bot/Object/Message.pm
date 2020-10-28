@@ -1,7 +1,5 @@
 package Teapot::Bot::Object::Message;
-$Teapot::Bot::Object::Message::VERSION = '0.021';
 # ABSTRACT: The base class for the Telegram type "Message".
-
 
 use Mojo::Base 'Teapot::Bot::Object::Base';
 
@@ -29,6 +27,8 @@ use Teapot::Bot::Object::PassportData;
 use Teapot::Bot::Object::InlineKeyboardMarkup;
 
 use Data::Dumper;
+
+$Teapot::Bot::Object::Message::VERSION = '0.021';
 
 # basic message stuff
 has 'message_id';
@@ -124,7 +124,7 @@ sub fields {
 }
 
 sub arrays {
-  qw/photo entities caption_entities new_chat_members new_chat_photo/
+  return qw/photo entities caption_entities new_chat_members new_chat_photo/;
 }
 
 

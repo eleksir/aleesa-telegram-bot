@@ -1,9 +1,9 @@
 package Teapot::Bot::Object::Base;
-$Teapot::Bot::Object::Base::VERSION = '0.021';
 # ABSTRACT: The base class for all Teapot::Bot::Object objects.
 
-
 use Mojo::Base -base;
+
+$Teapot::Bot::Object::Base::VERSION = '0.021';
 
 has '_brain'; # a reference to our brain
 

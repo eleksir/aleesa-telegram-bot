@@ -1,9 +1,9 @@
 package Teapot::Bot::Object::Contact;
-$Teapot::Bot::Object::Contact::VERSION = '0.021';
 # ABSTRACT: The base class for Telegram 'Contact' objects.
 
-
 use Mojo::Base 'Teapot::Bot::Object::Base';
+
+$Teapot::Bot::Object::Contact::VERSION = '0.021';
 
 has 'phone_number';
 has 'first_name';

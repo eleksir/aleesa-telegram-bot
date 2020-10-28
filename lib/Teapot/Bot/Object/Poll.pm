@@ -1,11 +1,10 @@
 package Teapot::Bot::Object::Poll;
-$Teapot::Bot::Object::Poll::VERSION = '0.021';
 # ABSTRACT: The base class for Telegram 'Poll' type objects
-
 
 use Mojo::Base 'Teapot::Bot::Object::Base';
 use Teapot::Bot::Object::PollOption;
 
+$Teapot::Bot::Object::Poll::VERSION = '0.021';
 
 has 'id';
 has 'question';
@@ -20,7 +19,7 @@ sub fields {
 }
 
 sub arrays {
-  qw/options/;
+  return qw/options/;
 }
 
 1;

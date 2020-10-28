@@ -1,11 +1,11 @@
 package Teapot::Bot::Object::InlineKeyboardButton;
-$Teapot::Bot::Object::InlineKeyboardButton::VERSION = '0.021';
 # ABSTRACT: The base class for Telegram 'InlineKeyboardButton' type objects
-
 
 use Mojo::Base 'Teapot::Bot::Object::Base';
 use Teapot::Bot::Object::LoginUrl;
 use Teapot::Bot::Object::CallbackGame;
+
+$Teapot::Bot::Object::InlineKeyboardButton::VERSION = '0.021';
 
 has 'text';
 has 'url';

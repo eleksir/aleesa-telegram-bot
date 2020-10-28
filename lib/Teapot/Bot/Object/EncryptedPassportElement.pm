@@ -1,9 +1,9 @@
 package Teapot::Bot::Object::EncryptedPassportElement;
-$Teapot::Bot::Object::EncryptedPassportElement::VERSION = '0.021';
 # ABSTRACT: The base class for Telegram 'EncryptedPassportElement' type objects
 
-
 use Mojo::Base 'Teapot::Bot::Object::Base';
+
+$Teapot::Bot::Object::EncryptedPassportElement::VERSION = '0.021';
 
 # XXX Implement rest of this
 # https://core.telegram.org/bots/api#encryptedpassportelement

@@ -1,10 +1,9 @@
 package Teapot::Bot;
-$Teapot::Bot::VERSION = '0.021';
+
 use strict;
 use warnings;
-
+$Teapot::Bot::VERSION = '0.021';
 # ABSTRACT: A base class to make your very own Telegram bot
-
 
 1;
 

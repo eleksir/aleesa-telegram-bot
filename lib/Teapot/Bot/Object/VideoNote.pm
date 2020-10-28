@@ -1,10 +1,11 @@
 package Teapot::Bot::Object::VideoNote;
-$Teapot::Bot::Object::VideoNote::VERSION = '0.021';
 # ABSTRACT: The base class for Telegram 'VideoNote' type objects
 
 
 use Mojo::Base 'Teapot::Bot::Object::Base';
 use Teapot::Bot::Object::PhotoSize;
+
+$Teapot::Bot::Object::VideoNote::VERSION = '0.021';
 
 has 'file_id';
 has 'length';

@@ -1,9 +1,9 @@
 package Teapot::Bot::Object::PollOption;
-$Teapot::Bot::Object::PollOption::VERSION = '0.021';
 # ABSTRACT: The base class for Telegram 'PollOption' type objects
 
-
 use Mojo::Base 'Teapot::Bot::Object::Base';
+
+$Teapot::Bot::Object::PollOption::VERSION = '0.021';
 
 has 'text';
 has 'voter_count';

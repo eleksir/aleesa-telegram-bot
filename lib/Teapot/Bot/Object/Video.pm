@@ -1,10 +1,10 @@
 package Teapot::Bot::Object::Video;
-$Teapot::Bot::Object::Video::VERSION = '0.021';
 # ABSTRACT: The base class for Telegram 'Video' object.
-
 
 use Mojo::Base 'Teapot::Bot::Object::Base';
 use Teapot::Bot::Object::PhotoSize;
+
+$Teapot::Bot::Object::Video::VERSION = '0.021';
 
 has 'file_id';
 has 'width';

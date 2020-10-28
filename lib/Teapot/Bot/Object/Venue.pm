@@ -1,10 +1,10 @@
 package Teapot::Bot::Object::Venue;
-$Teapot::Bot::Object::Venue::VERSION = '0.021';
 # ABSTRACT: The base class for Telegram 'LoginUrl' type objects
-
 
 use Mojo::Base 'Teapot::Bot::Object::Base';
 use Teapot::Bot::Object::Location;
+
+$Teapot::Bot::Object::Venue::VERSION = '0.021';
 
 has 'location'; #Location
 has 'title';

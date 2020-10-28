@@ -1,10 +1,10 @@
 package Teapot::Bot::Object::PhotoSize;
-$Teapot::Bot::Object::PhotoSize::VERSION = '0.021';
 # ABSTRACT: The base class for Telegram message 'PhotoSize' type.
-
 
 use Mojo::Base 'Teapot::Bot::Object::Base';
 use Carp qw/croak/;
+
+$Teapot::Bot::Object::PhotoSize::VERSION = '0.021';
 
 has 'file_id';
 has 'width';

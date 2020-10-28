@@ -1,10 +1,10 @@
 package Teapot::Bot::Object::SuccessfulPayment;
-$Teapot::Bot::Object::SuccessfulPayment::VERSION = '0.021';
 # ABSTRACT: The base class for Telegram 'SuccessfulPayment' type objects
-
 
 use Mojo::Base 'Teapot::Bot::Object::Base';
 # use Teapot::Bot::Object::OrderInfo;
+
+$Teapot::Bot::Object::SuccessfulPayment::VERSION = '0.021';
 
 has 'currency';
 has 'total_amount';

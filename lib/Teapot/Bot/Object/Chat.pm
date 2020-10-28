@@ -1,11 +1,11 @@
 package Teapot::Bot::Object::Chat;
-$Teapot::Bot::Object::Chat::VERSION = '0.021';
 # ABSTRACT: The base class for Telegram 'Chat' type objects
-
 
 use Mojo::Base 'Teapot::Bot::Object::Base';
 use Teapot::Bot::Object::ChatPhoto;
 use Teapot::Bot::Object::Message;
+
+$Teapot::Bot::Object::Chat::VERSION = '0.021';
 
 has 'id';
 has 'type';
@@ -34,12 +34,12 @@ sub fields {
 
 
 sub is_user {
-  shift->id > 0;
+  return shift->id > 0;
 }
 
 
 sub is_group {
-  shift->id < 0;
+  return shift->id < 0;
 }
 
 1;

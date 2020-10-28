@@ -1,9 +1,10 @@
 package Teapot::Bot::Object::User;
-$Teapot::Bot::Object::User::VERSION = '0.021';
 # ABSTRACT: The base class for Telegram message 'User' type.
 
 
 use Mojo::Base 'Teapot::Bot::Object::Base';
+
+$Teapot::Bot::Object::User::VERSION = '0.021';
 
 has 'id';
 has 'is_bot';

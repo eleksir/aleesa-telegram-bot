@@ -1,9 +1,9 @@
 package Teapot::Bot::Object::Location;
-$Teapot::Bot::Object::Location::VERSION = '0.021';
 # ABSTRACT: The base class for Telegram message 'Location' type.
 
-
 use Mojo::Base 'Teapot::Bot::Object::Base';
+
+$Teapot::Bot::Object::Location::VERSION = '0.021';
 
 has 'longitude';
 has 'latitude';

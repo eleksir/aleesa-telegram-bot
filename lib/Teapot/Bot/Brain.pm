@@ -1,7 +1,6 @@
 package Teapot::Bot::Brain;
-$Teapot::Bot::Brain::VERSION = '0.021';
-# ABSTRACT: A base class to make your very own Telegram bot
 
+# ABSTRACT: A base class to make your very own Telegram bot
 
 use Mojo::Base -base;
 
@@ -15,6 +14,8 @@ use Log::Any;
 use Data::Dumper;
 
 use Teapot::Bot::Object::Message;
+
+$Teapot::Bot::Brain::VERSION = '0.021';
 
 # base class for building telegram robots with Mojolicious
 has longpoll_time => 60;
@@ -50,6 +51,7 @@ sub add_repeating_task {
 
   # kick it off
   $repeater->();
+  return;
 }
 
 
@@ -58,6 +60,7 @@ sub add_listener {
   my $coderef = shift;
 
   push @{ $self->listeners }, $coderef;
+  return;
 }
 
 sub init {
@@ -71,6 +74,7 @@ sub think {
 
   $self->_add_getUpdates_handler;
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+  return;
 }
 
 
@@ -106,7 +110,6 @@ sub sendMessage {
   # check reply_markup is the right kind
   if (exists $args->{reply_markup}) {
     my $reply_markup = $args->{reply_markup};
-    die "bad reply_markup supplied"
       if ( ref($reply_markup) ne 'Teapot::Bot::Object::InlineKeyboardMarkup' &&
            ref($reply_markup) ne 'Teapot::Bot::Object::ReplyKeyboardMarkup'  &&
            ref($reply_markup) ne 'Teapot::Bot::Object::ReplyKeyboardRemove'  &&
@@ -201,6 +204,8 @@ sub _add_getUpdates_handler {
       $http_active = 0;
     });
   });
+
+  return;
 }
 
 # process a message which arrived via getUpdates
@@ -227,6 +232,8 @@ sub _process_message {
       # call the listener code, supplying ourself and the update
       $listener->($self, $update);
     }
+
+    return;
 }
 
 

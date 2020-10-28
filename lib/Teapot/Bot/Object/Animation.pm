@@ -1,11 +1,11 @@
 package Teapot::Bot::Object::Animation;
-$Teapot::Bot::Object::Animation::VERSION = '0.021';
 # ABSTRACT: The base class for Telegram message 'Animation' type.
-
 
 use Mojo::Base 'Teapot::Bot::Object::Base';
 use Teapot::Bot::Object::PhotoSize;
 use Carp qw/croak/;
+
+$Teapot::Bot::Object::Animation::VERSION = '0.021';
 
 has 'file_id';
 has 'width';

@@ -1,10 +1,10 @@
 package Teapot::Bot::Object::Sticker;
-$Teapot::Bot::Object::Sticker::VERSION = '0.021';
 # ABSTRACT: The base class for Telegram message 'Sticker' type.
-
 
 use Mojo::Base 'Teapot::Bot::Object::Base';
 use Teapot::Bot::Object::PhotoSize;
+
+$Teapot::Bot::Object::Sticker::VERSION = '0.021';
 
 has 'file_id';
 has 'width';
