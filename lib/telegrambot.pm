@@ -11,7 +11,7 @@ use open qw(:std :utf8);
 use File::Path qw( mkpath );
 use Hailo;
 use Encode;
-use Mojo::Base 'Telegram::Bot::Brain';
+use Mojo::Base 'Teapot::Bot::Brain';
 
 use conf qw(loadConf);
 use botlib qw(weather logger trim randomCommonPhrase);
@@ -56,7 +56,7 @@ sub __on_msg {
 	$can_talk = 0;
 
 	unless ($myid) {
-		my $myObj = Telegram::Bot::Brain::getMe ($self);
+		my $myObj = Teapot::Bot::Brain::getMe ($self);
 		$myid = $myObj->id;
 		# TODO: use these values instead of pre-defined in config!
 		$myusername = $myObj->username;
@@ -172,7 +172,7 @@ sub __on_msg {
 
 		sleep ( 3 + int ( rand (2)));
 
-		Telegram::Bot::Brain::sendMessage ($self, $send_args);
+		Teapot::Bot::Brain::sendMessage ($self, $send_args);
 		return;
 	}
 
@@ -324,7 +324,7 @@ sub __on_msg {
 MYHELP
 				$send_args->{parse_mode} = 'Markdown';
 				$send_args->{chat_id} = $chatid;
-				Telegram::Bot::Brain::sendMessage ($self, $send_args);
+				Teapot::Bot::Brain::sendMessage ($self, $send_args);
 				return;
 			} elsif (substr ($text, 1) eq 'ping') {
 				$reply = 'Pong.';

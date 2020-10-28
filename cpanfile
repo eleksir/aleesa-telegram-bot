@@ -10,6 +10,5 @@ requires 'JSON';
 requires 'JSON::XS';
 requires 'JSON::PP';
 requires 'Mojo::Base';
-requires 'Telegram::Bot';
 requires 'URI::URL';
 requires 'local::lib';

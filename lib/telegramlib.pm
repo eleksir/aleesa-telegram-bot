@@ -1,5 +1,5 @@
 package telegramlib;
-# store here functions that are not implemented in Telegram::Bot
+# store here functions that are not implemented in Teapot::Bot
 
 use 5.018;
 use strict;
@@ -8,7 +8,7 @@ use utf8;
 use open qw(:std :utf8);
 
 use botlib qw(trim);
-use Telegram::Bot::Brain;
+use Teapot::Bot::Brain;
 
 # module shit
 use vars qw/$VERSION/;
@@ -32,7 +32,7 @@ sub getChat {
 	# framework does just omits it, when creating object from hash, so
 	# pick raw json object instead
 
-	#return Telegram::Bot::Object::User->create_from_hash($api_response, $self);
+	#return Teapot::Bot::Object::User->create_from_hash($api_response, $self);
 	return $api_response;
 }
 
@@ -48,7 +48,7 @@ sub getChatMember {
 	my $url = "https://api.telegram.org/bot${token}/getChatMember";
 	my $api_response = $self->_post_request ($url, $send_args);
 
-	# return Telegram::Bot::Object::User->create_from_hash($api_response, $self);
+	# return Teapot::Bot::Object::User->create_from_hash($api_response, $self);
 	return $api_response;
 }
 
@@ -65,7 +65,7 @@ sub sendChatAction {
 	my $url = "https://api.telegram.org/bot${token}/sendChatAction";
 	my $api_response = $self->_post_request ($url, $send_args);
 
-	# return Telegram::Bot::Object::User->create_from_hash($api_response, $self);
+	# return Teapot::Bot::Object::User->create_from_hash($api_response, $self);
 	return;
 }
 
