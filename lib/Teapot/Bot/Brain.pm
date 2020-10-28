@@ -176,6 +176,52 @@ sub sendPhoto {
   return Teapot::Bot::Object::Message->create_from_hash($api_response, $self);
 }
 
+sub sendChatAction {
+  my $self = shift;
+  my $args = shift || {};
+  my $send_args = {};
+
+  croak "no chat_id supplied" unless $args->{chat_id};
+  $send_args->{chat_id} = $args->{chat_id};
+
+  if ($args->{action} eq 'upload_photo') {
+    $send_args->{action} = 'upload_photo';
+  }
+  elsif ($args->{action} eq 'record_video') {
+    $send_args->{action} = 'record_video';
+  }
+  elsif ($args->{action} eq 'upload_video') {
+    $send_args->{action} = 'upload_video';
+  }
+  elsif ($args->{action} eq 'record_audio') {
+    $send_args->{action} = 'record_audio';
+  }
+  elsif ($args->{action} eq 'upload_audio') {
+    $send_args->{action} = 'upload_audio';
+  }
+  elsif ($args->{action} eq 'upload_document') {
+    $send_args->{action} = 'upload_document';
+  }
+  elsif ($args->{action} eq 'find_location') {
+    $send_args->{action} = 'find_location';
+  }
+  elsif ($args->{action} eq 'record_video_note') {
+    $send_args->{action} = 'record_video_note';
+  }
+  elsif ($args->{action} eq 'upload_video_note') {
+    $send_args->{action} = 'upload_video_note';
+  }
+  else {
+    $send_args->{action} = 'typing';
+  }
+
+  my $token = $self->token || croak "no token?";
+  my $url = "https://api.telegram.org/bot${token}/sendChatAction";
+  my $api_response = $self->_post_request ($url, $send_args);
+
+  return Telegram::Bot::Object::User->create_from_hash($api_response, $self);
+}
+
 
 sub _add_getUpdates_handler {
   my $self = shift;
