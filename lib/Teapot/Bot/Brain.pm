@@ -90,6 +90,25 @@ sub getMe {
 }
 
 
+sub getChatMember {
+  my $self = shift;
+  my $args = shift || {};
+
+  my $send_args = {};
+  croak "no chat_id supplied" unless $args->{chat_id};
+  croak "no user_id supplied" unless $args->{user_id};
+  $send_args->{chat_id} = $args->{chat_id};
+  $send_args->{user_id} = $args->{user_id};
+
+  my $token = $self->token || croak "no token?";
+
+  my $url = "https://api.telegram.org/bot${token}/getChatMember";
+  my $api_response = $self->_post_request($url);
+
+  return Teapot::Bot::Object::ChatMember->create_from_hash($api_response, $self);
+}
+
+
 sub sendMessage {
   my $self = shift;
   my $args = shift || {};
@@ -388,6 +407,16 @@ L<https://core.telegram.org/bots/api#getme>.
 
 Takes no arguments, and returns the L<Teapot::Bot::Object::User> that
 represents this bot.
+
+=head2 getChatMember
+
+This is the wrapper around the C<getChatMember> API method. See
+L<https://core.telegram.org/bots/api#getchatmember>.
+
+Takes chat_id, and user_id as arguments.
+
+Returns the L<Teapot::Bot::Object::ChatMember> that
+represents properties of Chat User.
 
 =head2 sendMessage
 
