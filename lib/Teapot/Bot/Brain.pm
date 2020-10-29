@@ -219,7 +219,7 @@ sub sendChatAction {
   my $url = "https://api.telegram.org/bot${token}/sendChatAction";
   my $api_response = $self->_post_request ($url, $send_args);
 
-  return Telegram::Bot::Object::User->create_from_hash($api_response, $self);
+  return;
 }
 
 
@@ -406,6 +406,11 @@ Returns a L<Teapot::Bot::Object::Message> object.
 See L<https://core.telegram.org/bots/api#sendphoto>.
 
 Returns a L<Teapot::Bot::Object::Message> object.
+
+=head2 sendChatAction
+See L<https://core.telegram.org/bots/api#sendchataction>.
+
+Returns nothing, it's send-only method (Telegram API returns true on success)
 
 =head1 SEE ALSO
 
