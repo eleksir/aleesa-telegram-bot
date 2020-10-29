@@ -9,12 +9,16 @@ $Teapot::Bot::Object::User::VERSION = '0.021';
 has 'id';
 has 'is_bot';
 has 'first_name';
-has 'last_name';     # optional
-has 'username';      # optional
-has 'language_code'; # optional
+has 'last_name';                  # optional
+has 'username';                   # optional
+has 'language_code';              # optional
+has 'can_join_groups'             # optional, only for getMe() method
+has 'can_read_all_group_messages' # optional, only for getMe() method
+has 'supports_inline_queries'     # optional, only for getMe() method
 
 sub fields {
-  return { scalar => [qw/id is_bot first_name last_name username language_code/]
+  return { scalar => [qw/id is_bot first_name last_name username language_code can_join_groups
+                         can_read_all_group_messages supports_inline_queries/]
          };
 }
 

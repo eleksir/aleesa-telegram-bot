@@ -9,13 +9,14 @@ $Teapot::Bot::Object::MessageEntity::VERSION = '0.021';
 has 'type';
 has 'offset';
 has 'length';
-has 'url';
-has 'user'; #User
+has 'url';      # Optional.
+has 'user';     # Optional. Teapot::Bot::Object::User
+has 'language'; # Optional. For “pre” only, the programming language of the entity text
 
 sub fields {
   return {
-          'scalar'                      => [qw/type offset length url/],
-          'Teapot::Bot::Object::User' => [qw/user/],
+          'scalar'                      => [qw/type offset length url language/],
+          'Teapot::Bot::Object::User'   => [qw/user/],
         };
 }
 
