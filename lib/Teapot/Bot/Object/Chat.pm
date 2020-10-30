@@ -4,31 +4,34 @@ package Teapot::Bot::Object::Chat;
 use Mojo::Base 'Teapot::Bot::Object::Base';
 use Teapot::Bot::Object::ChatPhoto;
 use Teapot::Bot::Object::Message;
+use Teapot::Bot::Object::ChatPermissions;
 
 $Teapot::Bot::Object::Chat::VERSION = '0.021';
 
 has 'id';
 has 'type';
-has 'title';
-has 'username';
-has 'first_name';
-has 'last_name';
-has 'all_members_are_administrators';
-has 'photo'; #ChatPhoto
-has 'description';
-has 'invite_link';
-has 'pinned_message'; #Message
-has 'sticker_set_name';
-has 'can_set_sticker_set';
+has 'title';               # Optional.
+has 'username';            # Optional.
+has 'first_name';          # Optional.
+has 'last_name';           # Optional.
+has 'photo';               # Teapot::Bot::Object::ChatPhoto. Optional. Returned only in getChat.
+has 'description';         # Optional. Returned only in getChat.
+has 'invite_link';         # Optional. Returned only in getChat.
+has 'pinned_message';      # Teapot::Bot::Object::Message
+has 'permissions';         # Teapot::Bot::Object::ChatPermissions. Optional. Default chat member permissions, for
+                           # groups and supergroups. Returned only in getChat.
+has 'slow_mode_delay';     # Optional. Returned only in getChat.
+has 'sticker_set_name';    # Optional. Returned only in getChat.
+has 'can_set_sticker_set'; # Optional. Returned only in getChat.
 
 sub fields {
   return {
-          'scalar'                           => [qw/id type title username first_name
-                                                    last_name all_members_are_administrators
-                                                    description invite_link sticker_set_name
-                                                    can_set_sticker_set/],
-          'Teapot::Bot::Object::ChatPhoto' => [qw/photo/],
-          'Teapot::Bot::Object::Message'   => [qw/pinned_message/],
+          'scalar'                               => [qw/id type title username first_name last_name description 
+                                                        invite_link slow_mode_delay sticker_set_name 
+                                                        can_set_sticker_set /],
+          'Teapot::Bot::Object::ChatPhoto'       => [qw/photo/],
+          'Teapot::Bot::Object::Message'         => [qw/pinned_message/],
+          'Teapot::Bot::Object::ChatPermissions' => [qw/permissions/],
         };
 }
 
