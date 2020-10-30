@@ -2,4 +2,5 @@ vendor_perl
 data/config.json
 data/cache
 data/telegrambot-brains
+data/lat
 TODO

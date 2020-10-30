@@ -9,7 +9,7 @@ use warnings;
 
 use Mojo::IOLoop;
 use Mojo::UserAgent;
-use Carp qw/croak, cluck, confess/; # use croak where we return error up to app that supply something wrong
+use Carp qw/croak cluck confess/; # use croak where we return error up to app that supply something wrong
                                     # use cluck where we want to say that something bad but non-critical happen in
                                     #     lower layer (Mojo loop)
                                     # use confess where we want to say that fatal error happen in lower layer (Mojo loop)
@@ -111,7 +111,7 @@ sub getChatMember {
   my $token = $self->token || croak "no token?";
 
   my $url = "https://api.telegram.org/bot${token}/getChatMember";
-  my $api_response = $self->_post_request($url);
+  my $api_response = $self->_post_request($url, $send_args);
 
   if ($api_response) {
     return Teapot::Bot::Object::ChatMember->create_from_hash($api_response, $self);
@@ -133,7 +133,7 @@ sub getChat {
   my $token = $self->token || croak "no token?";
 
   my $url = "https://api.telegram.org/bot${token}/getChat";
-  my $api_response = $self->_post_request($url);
+  my $api_response = $self->_post_request($url, $send_args);
 
   if ($api_response) {
     return Teapot::Bot::Object::Chat->create_from_hash($api_response, $self);

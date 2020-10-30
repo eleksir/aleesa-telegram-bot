@@ -1,3 +1,5 @@
+requires 'Carp';
+requires 'Log::Any';
 requires 'Cwd::utf8';
 requires 'DB_File';
 requires 'Digest::MD5';

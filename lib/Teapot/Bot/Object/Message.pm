@@ -5,6 +5,8 @@ use Mojo::Base 'Teapot::Bot::Object::Base';
 
 use Teapot::Bot::Object::User;
 use Teapot::Bot::Object::Chat;
+use Teapot::Bot::Object::ChatMember;
+use Teapot::Bot::Object::ChatPermissions;
 use Teapot::Bot::Object::MessageEntity;
 use Teapot::Bot::Object::Audio;
 use Teapot::Bot::Object::Document;
@@ -133,6 +135,11 @@ sub reply {
   my $self = shift;
   my $text = shift;
   return $self->_brain->sendMessage({chat_id => $self->chat->id, text => $text});
+}
+
+sub typing {
+  my $self = shift;
+  return $self->_brain->sendChatAction({chat_id => $self->chat->id});
 }
 
 1;

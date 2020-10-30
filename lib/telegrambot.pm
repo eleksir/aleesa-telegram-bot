@@ -58,7 +58,7 @@ sub __on_msg {
 	unless ($myid) {
 		my $myObj = Teapot::Bot::Brain::getMe ($self);
 
-		unless ($myObj) do {
+		unless ($myObj) {
 			sleep 3;
 			$myObj = Teapot::Bot::Brain::getMe ($self);
 		}
@@ -108,7 +108,7 @@ sub __on_msg {
 		if ($chatid < 0) {
 			my $chatobj = Teapot::Bot::Brain::getChat ($self, { 'chat_id' => $chatid });
 
-			unless ($chatobj) do {
+			unless ($chatobj) {
 				sleep 3;
 				$chatobj = Teapot::Bot::Brain::getChat ($self, { 'chat_id' => $chatid });
 			}
@@ -117,7 +117,7 @@ sub __on_msg {
 			$group_talk = int ($chatobj->{permissions}->{can_send_messages});
 			my $me = Teapot::Bot::Brain::getChatMember ($self, { 'chat_id' => $chatid, 'user_id' => $myid });
 
-			unless ($me) do {
+			unless ($me) {
 				sleep 3;
 				$me = Teapot::Bot::Brain::getChatMember ($self, { 'chat_id' => $chatid, 'user_id' => $myid });
 			}
@@ -182,7 +182,7 @@ sub __on_msg {
 		sleep (int ( rand (2) + 1));
 
 		for (0..(4 + int (rand (3)))) {
-			Teapot::Bot::Brain::sendChatAction ($self, $chatid);
+			$msg->typing();
 			sleep(3);
 			sleep 3 unless ($_);
 		}
@@ -259,7 +259,7 @@ sub __on_msg {
 			}
 		}
 
-		Teapot::Bot::Brain::sendChatAction ($self, $chatid);
+		$msg->typing();
 		sleep 1;
 		logger sprintf ("Private chat bot reply to $vis_a_vi: %s", $reply);
 		$msg->reply ($reply);
@@ -402,7 +402,7 @@ MYHELP
 				$reply = randomCommonPhrase();
 			}
 
-			Teapot::Bot::Brain::sendChatAction ($self, $chatid);
+			$msg->typing();
 			sleep (int (rand (2)));
 			logger sprintf ('In public chat %s (%s) bot reply to %s: %s', $chatname, $chatid, $vis_a_vi, $reply);
 			$msg->reply ($reply);
