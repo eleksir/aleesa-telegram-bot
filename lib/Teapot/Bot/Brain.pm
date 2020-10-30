@@ -254,6 +254,11 @@ sub sendChatAction {
   croak "no chat_id supplied in sendChatAction" unless $args->{chat_id};
   $send_args->{chat_id} = $args->{chat_id};
 
+  unless (defined $args->{action}) {
+    $args->{action} = 'typing';
+    $send_args->{action} = 'typing';
+  }
+
   if ($args->{action} eq 'upload_photo') {
     $send_args->{action} = 'upload_photo';
   }
