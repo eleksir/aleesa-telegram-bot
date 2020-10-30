@@ -4,7 +4,7 @@ package Teapot::Bot::Object::ChatMember;
 use Mojo::Base 'Teapot::Bot::Object::Base';
 use Teapot::Bot::Object::User;
 
-$Teapot::Bot::Object::Chat::VERSION = '0.021';
+$Teapot::Bot::Object::ChatMember::VERSION = '0.021';
 
 has 'user';
 has 'status';
