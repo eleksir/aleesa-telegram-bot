@@ -94,7 +94,7 @@ sub getMe {
   }
   else {
     return {"error" => 1};
-  } 
+  }
 }
 
 
@@ -149,10 +149,10 @@ sub sendMessage {
   my $args = shift || {};
 
   my $send_args = {};
-  croak "no chat_id supplied" unless $args->{chat_id};
+  croak "no chat_id supplied in sendMessage" unless $args->{chat_id};
   $send_args->{chat_id} = $args->{chat_id};
 
-  croak "no text supplied"    unless $args->{text};
+  croak "no text supplied in sendMessage"    unless $args->{text};
   $send_args->{text}    = $args->{text};
 
   # these are optional, send if they are supplied
@@ -164,14 +164,14 @@ sub sendMessage {
   # check reply_markup is the right kind
   if (exists $args->{reply_markup}) {
     my $reply_markup = $args->{reply_markup};
-      croak "Incorrect reply_markup" if ( ref($reply_markup) ne 'Teapot::Bot::Object::InlineKeyboardMarkup' &&
+      croak "Incorrect reply_markup in sendMessage" if ( ref($reply_markup) ne 'Teapot::Bot::Object::InlineKeyboardMarkup' &&
            ref($reply_markup) ne 'Teapot::Bot::Object::ReplyKeyboardMarkup'  &&
            ref($reply_markup) ne 'Teapot::Bot::Object::ReplyKeyboardRemove'  &&
            ref($reply_markup) ne 'Teapot::Bot::Object::ForceReply' );
     $send_args->{reply_markup} = $reply_markup;
   }
 
-  my $token = $self->token || croak "no token?";
+  my $token = $self->token || croak "no token in sendMessage?";
   my $url = "https://api.telegram.org/bot${token}/sendMessage";
   my $api_response = $self->_post_request($url, $send_args);
 
@@ -188,19 +188,19 @@ sub forwardMessage {
   my $self = shift;
   my $args = shift || {};
   my $send_args = {};
-  croak "no chat_id supplied" unless $args->{chat_id};
+  croak "no chat_id supplied in forwardMessage" unless $args->{chat_id};
   $send_args->{chat_id} = $args->{chat_id};
 
-  croak "no from_chat_id supplied"    unless $args->{from_chat_id};
+  croak "no from_chat_id supplied in forwardMessage"    unless $args->{from_chat_id};
   $send_args->{from_chat_id}    = $args->{from_chat_id};
 
-  croak "no message_id supplied"    unless $args->{message_id};
+  croak "no message_id supplied in forwardMessage"    unless $args->{message_id};
   $send_args->{message_id}    = $args->{message_id};
 
   # these are optional, send if they are supplied
   $send_args->{disable_notification} = $args->{disable_notification} if exists $args->{disable_notification};
 
-  my $token = $self->token || croak "no token?";
+  my $token = $self->token || croak "no token in forwardMessage?";
   my $url = "https://api.telegram.org/bot${token}/forwardMessage";
   my $api_response = $self->_post_request($url, $send_args);
 
@@ -225,7 +225,7 @@ sub sendPhoto {
   # to fetch, or a file_id string) or a file on disk to upload - we need
   # to handle that last case here as it changes the way we create the HTTP
   # request
-  croak "no photo supplied" unless $args->{photo};
+  croak "no photo supplied in sendPhoto" unless $args->{photo};
   if (-e $args->{photo}) {
     $send_args->{photo} = { photo => { file => $args->{photo} } };
   }
@@ -233,7 +233,7 @@ sub sendPhoto {
     $send_args->{photo} = $args->{photo};
   }
 
-  my $token = $self->token || croak "no token?";
+  my $token = $self->token || croak "no token in sendPhoto?";
   my $url = "https://api.telegram.org/bot${token}/sendPhoto";
   my $api_response = $self->_post_request($url, $send_args);
 
@@ -251,7 +251,7 @@ sub sendChatAction {
   my $args = shift || {};
   my $send_args = {};
 
-  croak "no chat_id supplied" unless $args->{chat_id};
+  croak "no chat_id supplied in sendChatAction" unless $args->{chat_id};
   $send_args->{chat_id} = $args->{chat_id};
 
   if ($args->{action} eq 'upload_photo') {
@@ -285,7 +285,7 @@ sub sendChatAction {
     $send_args->{action} = 'typing';
   }
 
-  my $token = $self->token || croak "no token?";
+  my $token = $self->token || croak "no token in sendChatAction?";
   my $url = "https://api.telegram.org/bot${token}/sendChatAction";
   my $api_response = $self->_post_request ($url, $send_args);
 
