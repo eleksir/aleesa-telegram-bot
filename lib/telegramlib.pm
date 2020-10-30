@@ -13,61 +13,9 @@ use Teapot::Bot::Brain;
 # module shit
 use vars qw/$VERSION/;
 use Exporter qw(import);
-our @EXPORT_OK = qw(getChat getChatMember sendChatAction visavi);
+our @EXPORT_OK = qw(visavi);
 
 $VERSION = '1.0';
-
-# complete framework with our getChat()
-sub getChat {
-	my $self = shift;
-	my $id = shift;
-	my $send_args = {};
-	$send_args->{chat_id} = $id;
-
-	my $token = $self->token;
-	my $url = "https://api.telegram.org/bot${token}/getChat";
-	my $api_response = $self->_post_request ($url, $send_args);
-
-	# we seek for permissions, when making call to this subroutine, but
-	# framework does just omits it, when creating object from hash, so
-	# pick raw json object instead
-
-	#return Teapot::Bot::Object::User->create_from_hash($api_response, $self);
-	return $api_response;
-}
-
-# complete framework with our getChatMember()
-sub getChatMember {
-	my $self = shift;
-	my $chatid = shift;
-	my $userid = shift;
-	my $send_args = {};
-	$send_args->{chat_id} = $chatid;
-	$send_args->{user_id} = $userid;
-	my $token = $self->token;
-	my $url = "https://api.telegram.org/bot${token}/getChatMember";
-	my $api_response = $self->_post_request ($url, $send_args);
-
-	# return Teapot::Bot::Object::User->create_from_hash($api_response, $self);
-	return $api_response;
-}
-
-# complete framework with our sendChatAction()
-# sets bot status to "typing" for 5 seconds
-# # TODO: more actions!
-sub sendChatAction {
-	my $self = shift;
-	my $chatid = shift;
-	my $send_args = {};
-	$send_args->{chat_id} = $chatid;
-	$send_args->{action} = 'typing';
-	my $token = $self->token;
-	my $url = "https://api.telegram.org/bot${token}/sendChatAction";
-	my $api_response = $self->_post_request ($url, $send_args);
-
-	# return Teapot::Bot::Object::User->create_from_hash($api_response, $self);
-	return;
-}
 
 sub visavi {
 	my ($userid, $username, $fullname) = @_;

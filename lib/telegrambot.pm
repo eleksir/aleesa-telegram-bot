@@ -15,7 +15,7 @@ use Mojo::Base 'Teapot::Bot::Brain';
 
 use conf qw(loadConf);
 use botlib qw(weather logger trim randomCommonPhrase);
-use telegramlib qw(getChat getChatMember sendChatAction visavi);
+use telegramlib qw(visavi);
 use lat qw(latAnswer);
 
 use Exporter qw(import);
@@ -57,6 +57,12 @@ sub __on_msg {
 
 	unless ($myid) {
 		my $myObj = Teapot::Bot::Brain::getMe ($self);
+
+		unless ($myObj) do {
+			sleep 3;
+			$myObj = Teapot::Bot::Brain::getMe ($self);
+		}
+
 		$myid = $myObj->id;
 		# TODO: use these values instead of pre-defined in config!
 		$myusername = $myObj->username;
@@ -100,12 +106,23 @@ sub __on_msg {
 
 		# works only for public chats, so id shoud be < 0.
 		if ($chatid < 0) {
-			my $chatobj = getChat ($self, $chatid);
+			my $chatobj = Teapot::Bot::Brain::getChat ($self, { 'chat_id' => $chatid });
+
+			unless ($chatobj) do {
+				sleep 3;
+				$chatobj = Teapot::Bot::Brain::getChat ($self, { 'chat_id' => $chatid });
+			}
+
 			# actually evaluates to 1 for true and to 0 for false
 			$group_talk = int ($chatobj->{permissions}->{can_send_messages});
-			my $chatObj = getChatMember ($self, $chatid, $myid);
+			my $me = Teapot::Bot::Brain::getChatMember ($self, { 'chat_id' => $chatid, 'user_id' => $myid });
 
-			if ($chatObj->{'status'} eq 'administrator') {
+			unless ($me) do {
+				sleep 3;
+				$me = Teapot::Bot::Brain::getChatMember ($self, { 'chat_id' => $chatid, 'user_id' => $myid });
+			}
+
+			if ($me->{'status'} eq 'administrator') {
 				logger "I can talk in group chat $chatname ($chatid)";
 				$can_talk = 1;
 			} else {
@@ -114,7 +131,7 @@ sub __on_msg {
 				$can_talk = $group_talk;
 			}
 		} else {
-			# private chat, so definely can talk
+			# private chat, so definely bot can talk
 			logger "I can talk in private chat $chatname ($chatid)";
 			$can_talk = 1;
 		}
@@ -165,7 +182,7 @@ sub __on_msg {
 		sleep (int ( rand (2) + 1));
 
 		for (0..(4 + int (rand (3)))) {
-			sendChatAction ($self, $chatid);
+			Teapot::Bot::Brain::sendChatAction ($self, $chatid);
 			sleep(3);
 			sleep 3 unless ($_);
 		}
@@ -242,7 +259,7 @@ sub __on_msg {
 			}
 		}
 
-		sendChatAction ($self, $chatid);
+		Teapot::Bot::Brain::sendChatAction ($self, $chatid);
 		sleep 1;
 		logger sprintf ("Private chat bot reply to $vis_a_vi: %s", $reply);
 		$msg->reply ($reply);
@@ -385,7 +402,7 @@ MYHELP
 				$reply = randomCommonPhrase();
 			}
 
-			sendChatAction ($self, $chatid);
+			Teapot::Bot::Brain::sendChatAction ($self, $chatid);
 			sleep (int (rand (2)));
 			logger sprintf ('In public chat %s (%s) bot reply to %s: %s', $chatname, $chatid, $vis_a_vi, $reply);
 			$msg->reply ($reply);
