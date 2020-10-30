@@ -9,7 +9,10 @@ use warnings;
 
 use Mojo::IOLoop;
 use Mojo::UserAgent;
-use Carp qw/croak/;
+use Carp qw/croak, cluck, confess/; # use croak where we return error up to app that supply something wrong
+                                    # use cluck where we want to say that something bad but non-critical happen in
+                                    #     lower layer (Mojo loop)
+                                    # use confess where we want to say that fatal error happen in lower layer (Mojo loop)
 use Log::Any;
 use Data::Dumper;
 
@@ -86,7 +89,12 @@ sub getMe {
   my $url = "https://api.telegram.org/bot${token}/getMe";
   my $api_response = $self->_post_request($url);
 
-  return Teapot::Bot::Object::User->create_from_hash($api_response, $self);
+  if ($api_response) {
+    return Teapot::Bot::Object::User->create_from_hash($api_response, $self);
+  }
+  else {
+    return {"error" => 1};
+  } 
 }
 
 
@@ -105,7 +113,12 @@ sub getChatMember {
   my $url = "https://api.telegram.org/bot${token}/getChatMember";
   my $api_response = $self->_post_request($url);
 
-  return Teapot::Bot::Object::ChatMember->create_from_hash($api_response, $self);
+  if ($api_response) {
+    return Teapot::Bot::Object::ChatMember->create_from_hash($api_response, $self);
+  }
+  else {
+    return {"error" => 1};
+  }
 }
 
 
@@ -122,7 +135,12 @@ sub getChat {
   my $url = "https://api.telegram.org/bot${token}/getChat";
   my $api_response = $self->_post_request($url);
 
-  return Teapot::Bot::Object::Chat->create_from_hash($api_response, $self);
+  if ($api_response) {
+    return Teapot::Bot::Object::Chat->create_from_hash($api_response, $self);
+  }
+  else {
+    return {"error" => 1};
+  }
 }
 
 
@@ -146,7 +164,7 @@ sub sendMessage {
   # check reply_markup is the right kind
   if (exists $args->{reply_markup}) {
     my $reply_markup = $args->{reply_markup};
-      if ( ref($reply_markup) ne 'Teapot::Bot::Object::InlineKeyboardMarkup' &&
+      croak "Incorrect reply_markup" if ( ref($reply_markup) ne 'Teapot::Bot::Object::InlineKeyboardMarkup' &&
            ref($reply_markup) ne 'Teapot::Bot::Object::ReplyKeyboardMarkup'  &&
            ref($reply_markup) ne 'Teapot::Bot::Object::ReplyKeyboardRemove'  &&
            ref($reply_markup) ne 'Teapot::Bot::Object::ForceReply' );
@@ -157,7 +175,12 @@ sub sendMessage {
   my $url = "https://api.telegram.org/bot${token}/sendMessage";
   my $api_response = $self->_post_request($url, $send_args);
 
-  return Teapot::Bot::Object::Message->create_from_hash($api_response, $self);
+  if ($api_response) {
+    return Teapot::Bot::Object::Message->create_from_hash($api_response, $self);
+  }
+  else {
+    return {"error" => 1};
+  }
 }
 
 
@@ -181,7 +204,12 @@ sub forwardMessage {
   my $url = "https://api.telegram.org/bot${token}/forwardMessage";
   my $api_response = $self->_post_request($url, $send_args);
 
-  return Teapot::Bot::Object::Message->create_from_hash($api_response, $self);
+  if ($api_response) {
+    return Teapot::Bot::Object::Message->create_from_hash($api_response, $self);
+  }
+  else {
+    return {"error" => 1};
+  }
 }
 
 
@@ -209,8 +237,14 @@ sub sendPhoto {
   my $url = "https://api.telegram.org/bot${token}/sendPhoto";
   my $api_response = $self->_post_request($url, $send_args);
 
-  return Teapot::Bot::Object::Message->create_from_hash($api_response, $self);
+  if ($api_response) {
+    return Teapot::Bot::Object::Message->create_from_hash($api_response, $self);
+  }
+  else {
+    return {"error" => 1};
+  }
 }
+
 
 sub sendChatAction {
   my $self = shift;
@@ -303,11 +337,12 @@ sub _process_message {
     $update = Teapot::Bot::Object::Message->create_from_hash($item->{edited_message}, $self)      if $item->{edited_message};
     $update = Teapot::Bot::Object::Message->create_from_hash($item->{channel_post}, $self)        if $item->{channel_post};
     $update = Teapot::Bot::Object::Message->create_from_hash($item->{edited_channel_post}, $self) if $item->{edited_channel_post};
+    $update = Teapot::Bot::Object::Message->create_from_hash($item->{poll}, $self)                if $item->{poll};
 
     # if we got to this point without creating a response, it must be a type we
     # don't handle yet
     if (! $update) {
-      die "Do not know how to handle this update: " . Dumper($item);
+      cluck "Do not know how to handle this update: " . Dumper($item);
     }
 
     foreach my $listener (@{ $self->listeners }) {
@@ -325,9 +360,19 @@ sub _post_request {
   my $form_args = shift || {};
 
   my $res = $self->ua->post($url, form => $form_args)->result;
-  if    ($res->is_success) { return $res->json->{result}; }
-  elsif ($res->is_error)   { die "Failed to post: " . $res->message; }
-  else                     { die "Not sure what went wrong"; }
+
+  if ($res->is_success) { 
+    return $res->json->{result};
+  }
+  elsif ($res->is_error) {
+    # This can be non-fatal error: api change.
+    cluck "Failed to post: " . $res->message;
+    return 0; # to handle this as false in upper layers
+  }
+  else {
+    # This must be something fatal for sure, because either is_success or is_error must be set by Mojo
+    confess "Not sure what went wrong";
+  }
 }
 
 
@@ -425,6 +470,8 @@ L<https://core.telegram.org/bots/api#getme>.
 Takes no arguments, and returns the L<Teapot::Bot::Object::User> that
 represents this bot.
 
+On error returns hash reference with error set to 1
+
 =head2 getChatMember
 
 This is the wrapper around the C<getChatMember> API method. See
@@ -435,6 +482,8 @@ Takes chat_id, and user_id as arguments.
 Returns the L<Teapot::Bot::Object::ChatMember> that represents properties
 of Chat User.
 
+On error returns hash reference with error set to 1
+
 =head2 getChat
 
 This is the wrapper around the C<getChat> API method. See
@@ -444,11 +493,15 @@ Takes chat_id as argument.
 
 Returns the L<Teapot::Bot::Object::Chat> that represents properties of Chat.
 
+On error returns hash reference with error set to 1
+
 =head2 sendMessage
 
 See L<https://core.telegram.org/bots/api#sendmessage>.
 
 Returns a L<Teapot::Bot::Object::Message> object.
+
+On error returns hash reference with error set to 1
 
 =head2 forwardMessage
 
@@ -456,11 +509,15 @@ See L<https://core.telegram.org/bots/api#forwardmessage>.
 
 Returns a L<Teapot::Bot::Object::Message> object.
 
+On error returns hash reference with error set to 1
+
 =head2 sendPhoto
 
 See L<https://core.telegram.org/bots/api#sendphoto>.
 
 Returns a L<Teapot::Bot::Object::Message> object.
+
+On error returns hash reference with error set to 1
 
 =head2 sendChatAction
 See L<https://core.telegram.org/bots/api#sendchataction>.
