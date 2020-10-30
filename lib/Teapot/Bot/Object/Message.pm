@@ -44,6 +44,7 @@ has 'forward_sender_name';
 has 'forward_date';
 
 has 'reply_to_message'; # Message
+has 'via_bot'; # User
 has 'edit_date';
 has 'media_group_id';
 has 'author_signature';
@@ -93,7 +94,7 @@ sub fields {
                                                             group_chat_created supergroup_chat_created
                                                             channel_chat_created migrate_to_chat_id
                                                             migrate_from_chat_id connected_website/],
-          'Teapot::Bot::Object::User'                 => [qw/from forward_from new_chat_members left_chat_member /],
+          'Teapot::Bot::Object::User'                 => [qw/from forward_from via_bot new_chat_members left_chat_member /],
 
           'Teapot::Bot::Object::Chat'                 => [qw/chat forward_from_chat/],
           'Teapot::Bot::Object::Message'              => [qw/reply_to_message pinned_message/],
