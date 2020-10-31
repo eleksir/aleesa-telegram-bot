@@ -11,8 +11,9 @@ has 'data'; # Array of EncryptedPassportElement
 has 'credentials'; # EncryptedCredentials
 
 sub fields {
-  return { 'Teapot::Bot::Object::EncryptedPassportElement' => [qw/data/],
-           'Teapot::Bot::Object::EncryptedCredentials'     => [qw/credentials/],
+  return {
+            'Teapot::Bot::Object::EncryptedPassportElement' => [qw/data/],
+            'Teapot::Bot::Object::EncryptedCredentials'     => [qw/credentials/],
          };
 }
 
@@ -37,6 +38,7 @@ Teapot::Bot::Object::PassportData - The base class for Telegram 'PassportData' t
 version 0.021
 
 =head1 DESCRIPTION
+The base class for Telegram 'PassportData' type objects.
 
 See L<https://core.telegram.org/bots/api#passportdata> for details of the
 attributes available for L<Teapot::Bot::Object::PassportData> objects.
@@ -45,7 +47,7 @@ attributes available for L<Teapot::Bot::Object::PassportData> objects.
 
 Justin Hawkins <justin@eatmorecode.com>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE AND COPYRIGHT
 
 This software is copyright (c) 2019 by Justin Hawkins.
 

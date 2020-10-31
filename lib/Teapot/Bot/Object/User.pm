@@ -17,7 +17,8 @@ has 'can_read_all_group_messages';# optional, only for getMe() method
 has 'supports_inline_queries';    # optional, only for getMe() method
 
 sub fields {
-  return { scalar => [qw/id is_bot first_name last_name username language_code can_join_groups
+  return {
+           scalar => [qw/id is_bot first_name last_name username language_code can_join_groups
                          can_read_all_group_messages supports_inline_queries/]
          };
 }
@@ -32,13 +33,14 @@ __END__
 
 =head1 NAME
 
-Teapot::Bot::Object::User - The base class for Telegram message 'User' type.
+Teapot::Bot::Object::User - The base class for Telegram message 'User' type
 
 =head1 VERSION
 
 version 0.021
 
 =head1 DESCRIPTION
+The base class for Telegram message 'User' type.
 
 See L<https://core.telegram.org/bots/api#user> for details of the
 attributes available for L<Teapot::Bot::Object::User> objects.
@@ -47,7 +49,7 @@ attributes available for L<Teapot::Bot::Object::User> objects.
 
 Justin Hawkins <justin@eatmorecode.com>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE AND COPYRIGHT
 
 This software is copyright (c) 2019 by Justin Hawkins.
 

@@ -1,9 +1,8 @@
 package Teapot::Bot::Object::CallbackGame;
-$Teapot::Bot::Object::CallbackGame::VERSION = '0.021';
 # ABSTRACT: The base class for Telegram message 'CallbackGame' type.
 
-
 use Mojo::Base 'Teapot::Bot::Object::Base';
+$Teapot::Bot::Object::CallbackGame::VERSION = '0.021';
 
 # https://core.telegram.org/bots/api#callbackgame
 # "A placeholder, currently holds no information. Use BotFather to set up your game"
@@ -22,13 +21,14 @@ __END__
 
 =head1 NAME
 
-Teapot::Bot::Object::CallbackGame - The base class for Telegram message 'CallbackGame' type.
+Teapot::Bot::Object::CallbackGame - The base class for Telegram message 'CallbackGame' type
 
 =head1 VERSION
 
 version 0.021
 
 =head1 DESCRIPTION
+The base class for Telegram message 'CallbackGame' type.
 
 See L<https://core.telegram.org/bots/api#callbackgame> for details of the
 attributes available for L<Teapot::Bot::Object::CallbackGame> objects.
@@ -37,7 +37,7 @@ attributes available for L<Teapot::Bot::Object::CallbackGame> objects.
 
 Justin Hawkins <justin@eatmorecode.com>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE AND COPYRIGHT
 
 This software is copyright (c) 2019 by Justin Hawkins.
 

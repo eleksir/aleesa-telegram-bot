@@ -10,8 +10,8 @@ has 'big_file_id';
 
 sub fields {
   return {
-          'scalar' => [qw/small_file_id big_file_id/],
-        };
+           'scalar' => [qw/small_file_id big_file_id/],
+         };
 }
 
 1;
@@ -31,6 +31,7 @@ Teapot::Bot::Object::ChatPhoto - The base class for Telegram 'ChatPhoto' type ob
 version 0.021
 
 =head1 DESCRIPTION
+The base class for Telegram 'ChatPhoto' type objects.
 
 See L<https://core.telegram.org/bots/api#chatphoto> for details of the
 attributes available for L<Teapot::Bot::Object::ChatPhoto> objects.
@@ -39,7 +40,7 @@ attributes available for L<Teapot::Bot::Object::ChatPhoto> objects.
 
 Justin Hawkins <justin@eatmorecode.com>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE AND COPYRIGHT
 
 This software is copyright (c) 2019 by Justin Hawkins.
 

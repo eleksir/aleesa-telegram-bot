@@ -1,5 +1,6 @@
 requires 'Carp';
 requires 'Log::Any';
+requires 'List::Util';
 requires 'Cwd::utf8';
 requires 'DB_File';
 requires 'Digest::MD5';

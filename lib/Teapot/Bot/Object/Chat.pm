@@ -62,6 +62,7 @@ Teapot::Bot::Object::Chat - The base class for Telegram 'Chat' type objects
 version 0.021
 
 =head1 DESCRIPTION
+The base class for Telegram 'Chat' type objects.
 
 See L<https://core.telegram.org/bots/api#chat> for details of the
 attributes available for L<Teapot::Bot::Object::Chat> objects.
@@ -80,7 +81,7 @@ Returns true if this is a chat is a group.
 
 Justin Hawkins <justin@eatmorecode.com>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE AND COPYRIGHT
 
 This software is copyright (c) 2019 by Justin Hawkins.
 

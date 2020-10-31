@@ -2,28 +2,30 @@ package Teapot::Bot::Object::Base;
 # ABSTRACT: The base class for all Teapot::Bot::Object objects.
 
 use Mojo::Base -base;
+use List::Util qw/any/;
+use Carp qw/croak/;
 
 $Teapot::Bot::Object::Base::VERSION = '0.021';
 
 has '_brain'; # a reference to our brain
 
 
-sub arrays { qw// }  # override if needed
+sub arrays { return qw// }  # override if needed
 sub _field_is_array {
   my $self = shift;
   my $field = shift;
-  if (grep /^$field$/, $self->arrays) {
+  if (any { /^$field$/ } $self->arrays) {
     return 1;
   }
   return;
 }
 
 
-sub array_of_arrays { qw// } #override if needed
+sub array_of_arrays {  return qw// } #override if needed
 sub _field_is_array_of_arrays {
   my $self = shift;
   my $field = shift;
-  if (grep /^$field$/, $self->array_of_arrays) {
+  if (any { /^$field$/ } $self->array_of_arrays) {
     return 1;
   }
   return;
@@ -35,7 +37,7 @@ sub _field_is_array_of_arrays {
 sub create_from_hash {
   my $class = shift;
   my $hash  = shift;
-  my $brain = shift || die "no brain supplied";
+  my $brain = shift || croak 'No brain supplied to create_from_hash()';
   my $obj   = $class->new(_brain => $brain);
 
   # deal with each type of field
@@ -60,7 +62,7 @@ sub create_from_hash {
           $obj->$field($val);
         }
         elsif ($obj->_field_is_array_of_arrays) {
-          die "not yet implemented for scalars";
+          croak 'Not yet implemented for scalars';
         }
         else {
           my $val = $hash->{$field};
@@ -81,7 +83,7 @@ sub create_from_hash {
           $obj->$field(\@sub_array);
         }
         elsif ($obj->_field_is_array_of_arrays) {
-          die "not yet implemented for scalars";
+          croak 'Not yet implemented for scalars';
         }
         else {
           $obj->$field($type->create_from_hash($hash->{$field}, $brain));
@@ -129,13 +131,15 @@ __END__
 
 =head1 NAME
 
-Teapot::Bot::Object::Base - The base class for all Telegram::Bot::Object objects.
+Teapot::Bot::Object::Base - The base class for all Telegram::Bot::Object objects
 
 =head1 VERSION
 
 version 0.021
 
 =head1 DESCRIPTION
+
+The base class for all Telegram::Bot::Object objects.
 
 This class should not be instantiated itself. Instead, instantiate a sub-class.
 
@@ -170,7 +174,7 @@ Return this object as a hashref.
 
 Justin Hawkins <justin@eatmorecode.com>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE AND COPYRIGHT
 
 This software is copyright (c) 2019 by Justin Hawkins.
 

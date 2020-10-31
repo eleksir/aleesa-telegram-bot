@@ -17,7 +17,8 @@ has 'text_entities'; #Array of MessageEntity
 has 'animation'; #Animation
 
 sub fields {
-  return { scalar                                 => [qw/title description text/],
+  return {
+           scalar                               => [qw/title description text/],
            'Teapot::Bot::Object::PhotoSize'     => [qw/photo/],
            'Teapot::Bot::Object::MessageEntity' => [qw/text_entities/],
            'Teapot::Bot::Object::Animation'     => [qw/animation/],
@@ -36,13 +37,14 @@ __END__
 
 =head1 NAME
 
-Teapot::Bot::Object::Game - The base class for Telegram message 'Game' type.
+Teapot::Bot::Object::Game - The base class for Telegram message 'Game' type
 
 =head1 VERSION
 
 version 0.021
 
 =head1 DESCRIPTION
+The base class for Telegram message 'Game' type.
 
 See L<https://core.telegram.org/bots/api#game> for details of the
 attributes available for L<Teapot::Bot::Object::Game> objects.
@@ -51,7 +53,7 @@ attributes available for L<Teapot::Bot::Object::Game> objects.
 
 Justin Hawkins <justin@eatmorecode.com>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE AND COPYRIGHT
 
 This software is copyright (c) 2019 by Justin Hawkins.
 

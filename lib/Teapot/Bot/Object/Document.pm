@@ -14,7 +14,8 @@ has 'mime_type';
 has 'file_size';
 
 sub fields {
-  return { scalar => [qw/file_id file_name mime_type file_size/],
+  return {
+            scalar                          => [qw/file_id file_name mime_type file_size/],
            'Teapot::Bot::Object::PhotoSize' => [qw/thumb/]
          };
 }
@@ -36,6 +37,7 @@ Teapot::Bot::Object::Document - The base class for Telegram 'Document' objects
 version 0.021
 
 =head1 DESCRIPTION
+The base class for Telegram 'Document' objects.
 
 See L<https://core.telegram.org/bots/api#document> for details of the
 attributes available for L<Teapot::Bot::Object::Document> objects.
@@ -44,7 +46,7 @@ attributes available for L<Teapot::Bot::Object::Document> objects.
 
 Justin Hawkins <justin@eatmorecode.com>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE AND COPYRIGHT
 
 This software is copyright (c) 2019 by Justin Hawkins.
 

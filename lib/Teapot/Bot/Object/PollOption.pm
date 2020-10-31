@@ -9,8 +9,7 @@ has 'text';
 has 'voter_count';
 
 sub fields {
-  return { scalar  => [qw/text voter_count/],
-         };
+  return { scalar  => [qw/text voter_count/] };
 }
 
 1;
@@ -30,6 +29,7 @@ Teapot::Bot::Object::PollOption - The base class for Telegram 'PollOption' type 
 version 0.021
 
 =head1 DESCRIPTION
+The base class for Telegram 'PollOption' type objects.
 
 See L<https://core.telegram.org/bots/api#polloption> for details of the
 attributes available for L<Teapot::Bot::Object::PollOption> objects.
@@ -38,7 +38,7 @@ attributes available for L<Teapot::Bot::Object::PollOption> objects.
 
 Justin Hawkins <justin@eatmorecode.com>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE AND COPYRIGHT
 
 This software is copyright (c) 2019 by Justin Hawkins.
 

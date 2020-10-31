@@ -53,6 +53,7 @@ Teapot::Bot::Object::ChatMember - The base class for Telegram 'ChatMember' type 
 version 0.021
 
 =head1 DESCRIPTION
+The base class for Telegram 'ChatMember' type objects.
 
 See L<https://core.telegram.org/bots/api#chatmember> for details of the
 attributes available for L<Teapot::Bot::Object::ChatMember> objects.
@@ -61,7 +62,7 @@ attributes available for L<Teapot::Bot::Object::ChatMember> objects.
 
 Sergei Fedosov <eleksir@gmail.com>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE AND COPYRIGHT
 
 This software is copyright (c) 2020 by Sergei Fedosov <eleksir@gmail.com>
 

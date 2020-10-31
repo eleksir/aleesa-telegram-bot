@@ -10,9 +10,9 @@ use warnings;
 use Mojo::IOLoop;
 use Mojo::UserAgent;
 use Carp qw/croak cluck confess/; # use croak where we return error up to app that supply something wrong
-                                    # use cluck where we want to say that something bad but non-critical happen in
-                                    #     lower layer (Mojo loop)
-                                    # use confess where we want to say that fatal error happen in lower layer (Mojo loop)
+                                  # use cluck where we want to say that something bad but non-critical happen in
+                                  #     lower layer (Mojo loop)
+                                  # use confess where we want to say that fatal error happen in lower layer (Mojo loop)
 use Log::Any;
 use Data::Dumper;
 
@@ -22,13 +22,13 @@ $Teapot::Bot::Brain::VERSION = '0.021';
 
 # base class for building telegram robots with Mojolicious
 has longpoll_time => 60;
-has ua         => sub { Mojo::UserAgent->new->inactivity_timeout(shift->longpoll_time + 15) };
-has token      => sub { croak "you need to supply your own token"; };
+has ua            => sub { Mojo::UserAgent->new->inactivity_timeout(shift->longpoll_time + 15) };
+has token         => sub { croak 'You need to supply your own token'; };
 
-has tasks      => sub { [] };
-has listeners  => sub { [] };
+has tasks         => sub { [] };
+has listeners     => sub { [] };
 
-has log        => sub { Log::Any->get_logger };
+has log           => sub { Log::Any->get_logger };
 
 
 sub add_repeating_task {
@@ -43,7 +43,7 @@ sub add_repeating_task {
     Mojo::IOLoop->recurring(0.1 => sub {
                               my $loop = shift;
                               my $now  = time();
-                              return unless ($now - $last_check) >= $seconds;
+                              return if ($now - $last_check) < $seconds;
                               $last_check = $now;
                               $task->($self);
                             });
@@ -67,7 +67,7 @@ sub add_listener {
 }
 
 sub init {
-  die "init was not overridden!";
+  croak 'init() was not overridden!';
 }
 
 
@@ -84,7 +84,7 @@ sub think {
 
 sub getMe {
   my $self = shift;
-  my $token = $self->token || croak "no token?";
+  my $token = $self->token || croak 'No token supplied to getMe()?';
 
   my $url = "https://api.telegram.org/bot${token}/getMe";
   my $api_response = $self->_post_request($url);
@@ -93,7 +93,7 @@ sub getMe {
     return Teapot::Bot::Object::User->create_from_hash($api_response, $self);
   }
   else {
-    return {"error" => 1};
+    return {'error' => 1};
   }
 }
 
@@ -103,12 +103,12 @@ sub getChatMember {
   my $args = shift || {};
 
   my $send_args = {};
-  croak "no chat_id supplied" unless $args->{chat_id};
-  croak "no user_id supplied" unless $args->{user_id};
+  croak 'No chat_id supplied to getChatMember()' unless $args->{chat_id};
+  croak 'No user_id supplied to getChatMember()' unless $args->{user_id};
   $send_args->{chat_id} = $args->{chat_id};
   $send_args->{user_id} = $args->{user_id};
 
-  my $token = $self->token || croak "no token?";
+  my $token = $self->token || croak 'No token supplied to getChatMember?';
 
   my $url = "https://api.telegram.org/bot${token}/getChatMember";
   my $api_response = $self->_post_request($url, $send_args);
@@ -117,7 +117,7 @@ sub getChatMember {
     return Teapot::Bot::Object::ChatMember->create_from_hash($api_response, $self);
   }
   else {
-    return {"error" => 1};
+    return {'error' => 1};
   }
 }
 
@@ -127,10 +127,10 @@ sub getChat {
   my $args = shift || {};
 
   my $send_args = {};
-  croak "no chat_id supplied" unless $args->{chat_id};
+  croak 'No chat_id supplied to getChat()' unless $args->{chat_id};
   $send_args->{chat_id} = $args->{chat_id};
 
-  my $token = $self->token || croak "no token?";
+  my $token = $self->token || croak 'No token supplied to getChat()?';
 
   my $url = "https://api.telegram.org/bot${token}/getChat";
   my $api_response = $self->_post_request($url, $send_args);
@@ -139,7 +139,7 @@ sub getChat {
     return Teapot::Bot::Object::Chat->create_from_hash($api_response, $self);
   }
   else {
-    return {"error" => 1};
+    return {'error' => 1};
   }
 }
 
@@ -149,10 +149,10 @@ sub sendMessage {
   my $args = shift || {};
 
   my $send_args = {};
-  croak "no chat_id supplied in sendMessage" unless $args->{chat_id};
+  croak 'No chat_id supplied in sendMessage()' unless $args->{chat_id};
   $send_args->{chat_id} = $args->{chat_id};
 
-  croak "no text supplied in sendMessage"    unless $args->{text};
+  croak 'No text supplied in sendMessage()' unless $args->{text};
   $send_args->{text}    = $args->{text};
 
   # these are optional, send if they are supplied
@@ -164,14 +164,18 @@ sub sendMessage {
   # check reply_markup is the right kind
   if (exists $args->{reply_markup}) {
     my $reply_markup = $args->{reply_markup};
-      croak "Incorrect reply_markup in sendMessage" if ( ref($reply_markup) ne 'Teapot::Bot::Object::InlineKeyboardMarkup' &&
+
+    if ( ref($reply_markup) ne 'Teapot::Bot::Object::InlineKeyboardMarkup' &&
            ref($reply_markup) ne 'Teapot::Bot::Object::ReplyKeyboardMarkup'  &&
-           ref($reply_markup) ne 'Teapot::Bot::Object::ReplyKeyboardRemove'  &&
-           ref($reply_markup) ne 'Teapot::Bot::Object::ForceReply' );
+             ref($reply_markup) ne 'Teapot::Bot::Object::ReplyKeyboardRemove'  &&
+               ref($reply_markup) ne 'Teapot::Bot::Object::ForceReply' ) {
+      croak 'Incorrect reply_markup in sendMessage()';
+    }
+
     $send_args->{reply_markup} = $reply_markup;
   }
 
-  my $token = $self->token || croak "no token in sendMessage?";
+  my $token = $self->token || croak 'No token supplied to sendMessage()?';
   my $url = "https://api.telegram.org/bot${token}/sendMessage";
   my $api_response = $self->_post_request($url, $send_args);
 
@@ -179,7 +183,7 @@ sub sendMessage {
     return Teapot::Bot::Object::Message->create_from_hash($api_response, $self);
   }
   else {
-    return {"error" => 1};
+    return {'error' => 1};
   }
 }
 
@@ -188,19 +192,19 @@ sub forwardMessage {
   my $self = shift;
   my $args = shift || {};
   my $send_args = {};
-  croak "no chat_id supplied in forwardMessage" unless $args->{chat_id};
+  croak 'No chat_id supplied in forwardMessage()' unless $args->{chat_id};
   $send_args->{chat_id} = $args->{chat_id};
 
-  croak "no from_chat_id supplied in forwardMessage"    unless $args->{from_chat_id};
-  $send_args->{from_chat_id}    = $args->{from_chat_id};
+  croak 'No from_chat_id supplied in forwardMessage()' unless $args->{from_chat_id};
+  $send_args->{from_chat_id} = $args->{from_chat_id};
 
-  croak "no message_id supplied in forwardMessage"    unless $args->{message_id};
-  $send_args->{message_id}    = $args->{message_id};
+  croak 'No message_id supplied in forwardMessage()' unless $args->{message_id};
+  $send_args->{message_id} = $args->{message_id};
 
   # these are optional, send if they are supplied
   $send_args->{disable_notification} = $args->{disable_notification} if exists $args->{disable_notification};
 
-  my $token = $self->token || croak "no token in forwardMessage?";
+  my $token = $self->token || croak 'No token supplied to forwardMessage()?';
   my $url = "https://api.telegram.org/bot${token}/forwardMessage";
   my $api_response = $self->_post_request($url, $send_args);
 
@@ -208,7 +212,7 @@ sub forwardMessage {
     return Teapot::Bot::Object::Message->create_from_hash($api_response, $self);
   }
   else {
-    return {"error" => 1};
+    return {'error' => 1};
   }
 }
 
@@ -218,14 +222,14 @@ sub sendPhoto {
   my $args = shift || {};
   my $send_args = {};
 
-  croak "no chat_id supplied" unless $args->{chat_id};
+  croak 'No chat_id supplied to sendPhoto()' unless $args->{chat_id};
   $send_args->{chat_id} = $args->{chat_id};
 
   # photo can be a string (which might be either a URL for telegram servers
   # to fetch, or a file_id string) or a file on disk to upload - we need
   # to handle that last case here as it changes the way we create the HTTP
   # request
-  croak "no photo supplied in sendPhoto" unless $args->{photo};
+  croak 'No photo supplied in sendPhoto()' unless $args->{photo};
   if (-e $args->{photo}) {
     $send_args->{photo} = { photo => { file => $args->{photo} } };
   }
@@ -233,7 +237,7 @@ sub sendPhoto {
     $send_args->{photo} = $args->{photo};
   }
 
-  my $token = $self->token || croak "no token in sendPhoto?";
+  my $token = $self->token || croak 'No token in sendPhoto()?';
   my $url = "https://api.telegram.org/bot${token}/sendPhoto";
   my $api_response = $self->_post_request($url, $send_args);
 
@@ -241,7 +245,7 @@ sub sendPhoto {
     return Teapot::Bot::Object::Message->create_from_hash($api_response, $self);
   }
   else {
-    return {"error" => 1};
+    return {'error' => 1};
   }
 }
 
@@ -251,7 +255,7 @@ sub sendChatAction {
   my $args = shift || {};
   my $send_args = {};
 
-  croak "no chat_id supplied in sendChatAction" unless $args->{chat_id};
+  croak 'No chat_id supplied in sendChatAction()' unless $args->{chat_id};
   $send_args->{chat_id} = $args->{chat_id};
 
   unless (defined $args->{action}) {
@@ -290,7 +294,7 @@ sub sendChatAction {
     $send_args->{action} = 'typing';
   }
 
-  my $token = $self->token || croak "no token in sendChatAction?";
+  my $token = $self->token || croak 'No token in sendChatAction()?';
   my $url = "https://api.telegram.org/bot${token}/sendChatAction";
   my $api_response = $self->_post_request ($url, $send_args);
 
@@ -317,7 +321,7 @@ sub _add_getUpdates_handler {
       my ($ua, $tx) = @_;
       my $res = $tx->res->json;
       my $items = $res->{result};
-      foreach my $item (@$items) {
+      foreach my $item (@{$items}) {
         $last_update_id = $item->{update_id};
         $self->_process_message($item);
       }
@@ -347,7 +351,7 @@ sub _process_message {
     # if we got to this point without creating a response, it must be a type we
     # don't handle yet
     if (! $update) {
-      cluck "Do not know how to handle this update: " . Dumper($item);
+      cluck 'Do not know how to handle this update: ' . Dumper($item);
     }
 
     foreach my $listener (@{ $self->listeners }) {
@@ -366,17 +370,17 @@ sub _post_request {
 
   my $res = $self->ua->post($url, form => $form_args)->result;
 
-  if ($res->is_success) { 
+  if ($res->is_success) {
     return $res->json->{result};
   }
   elsif ($res->is_error) {
     # This can be non-fatal error: api change.
-    cluck "Failed to post: " . $res->message;
+    cluck 'Failed to post: ' . $res->message;
     return 0; # to handle this as false in upper layers
   }
   else {
     # This must be something fatal for sure, because either is_success or is_error must be set by Mojo
-    confess "Not sure what went wrong";
+    confess 'Not sure what went wrong';
   }
 }
 
@@ -560,7 +564,7 @@ Note that not all methods have yet been implemented.
 
 Justin Hawkins <justin@eatmorecode.com>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE AND COPYRIGHT
 
 This software is copyright (c) 2019 by Justin Hawkins.
 

@@ -31,6 +31,7 @@ Teapot::Bot::Object::LoginUrl - The base class for Telegram 'LoginUrl' type obje
 version 0.021
 
 =head1 DESCRIPTION
+The base class for Telegram 'LoginUrl' type objects.
 
 See L<https://core.telegram.org/bots/api#loginurl> for details of the
 attributes available for L<Teapot::Bot::Object::LoginUrl> objects.
@@ -39,7 +40,7 @@ attributes available for L<Teapot::Bot::Object::LoginUrl> objects.
 
 Justin Hawkins <justin@eatmorecode.com>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE AND COPYRIGHT
 
 This software is copyright (c) 2019 by Justin Hawkins.
 

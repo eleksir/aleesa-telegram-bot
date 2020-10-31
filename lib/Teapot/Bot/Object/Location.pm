@@ -9,8 +9,7 @@ has 'longitude';
 has 'latitude';
 
 sub fields {
-  return { scalar => [qw/longitude latitude/],
-         };
+  return { scalar => [qw/longitude latitude/] };
 }
 
 1;
@@ -23,13 +22,14 @@ __END__
 
 =head1 NAME
 
-Teapot::Bot::Object::Location - The base class for Telegram message 'Location' type.
+Teapot::Bot::Object::Location - The base class for Telegram message 'Location' type
 
 =head1 VERSION
 
 version 0.021
 
 =head1 DESCRIPTION
+The base class for Telegram message 'Location' type.
 
 See L<https://core.telegram.org/bots/api#location> for details of the
 attributes available for L<Teapot::Bot::Object::Location> objects.
@@ -38,7 +38,7 @@ attributes available for L<Teapot::Bot::Object::Location> objects.
 
 Justin Hawkins <justin@eatmorecode.com>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE AND COPYRIGHT
 
 This software is copyright (c) 2019 by Justin Hawkins.
 

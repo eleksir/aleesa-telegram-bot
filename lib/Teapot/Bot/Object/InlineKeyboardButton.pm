@@ -17,11 +17,11 @@ has 'callback_game'; # CallbackGame
 has 'pay';
 
 sub fields {
-  return { 'scalar' => [qw/text url callback_data switch_inline_query
-                           switch_inline_query_current_chat switch_inline_query_current_chat
-                           pay/],
-  'Teapot::Bot::Object::LoginUrl'    => [qw/login_url/],
-  'Teapot::Bot::Object::CallbackGame'=> [qw/callback_game/],
+  return { 'scalar'                            => [qw/text url callback_data switch_inline_query
+                                                      switch_inline_query_current_chat switch_inline_query_current_chat
+                                                      pay/],
+           'Teapot::Bot::Object::LoginUrl'     => [qw/login_url/],
+           'Teapot::Bot::Object::CallbackGame' => [qw/callback_game/],
          };
 }
 
@@ -42,6 +42,7 @@ Teapot::Bot::Object::InlineKeyboardButton - The base class for Telegram 'InlineK
 version 0.021
 
 =head1 DESCRIPTION
+The base class for Telegram 'InlineKeyboardButton' type objects.
 
 See L<https://core.telegram.org/bots/api#inlinekeyboardbutton> for details of the
 attributes available for L<Teapot::Bot::Object::InlineKeyboardButton> objects.
@@ -50,7 +51,7 @@ attributes available for L<Teapot::Bot::Object::InlineKeyboardButton> objects.
 
 Justin Hawkins <justin@eatmorecode.com>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE AND COPYRIGHT
 
 This software is copyright (c) 2019 by Justin Hawkins.
 

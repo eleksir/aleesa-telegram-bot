@@ -30,6 +30,7 @@ Teapot::Bot::Object::EncryptedCredentials - The base class for Telegram 'Encrypt
 version 0.021
 
 =head1 DESCRIPTION
+The base class for Telegram 'EncryptedCredentials' type objects.
 
 See L<https://core.telegram.org/bots/api#encryptedcredentials> for details of the
 attributes available for L<Teapot::Bot::Object::EncryptedCredentials> objects.
@@ -38,7 +39,7 @@ attributes available for L<Teapot::Bot::Object::EncryptedCredentials> objects.
 
 Justin Hawkins <justin@eatmorecode.com>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE AND COPYRIGHT
 
 This software is copyright (c) 2019 by Justin Hawkins.
 

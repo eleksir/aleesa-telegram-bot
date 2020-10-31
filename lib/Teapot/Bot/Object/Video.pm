@@ -15,8 +15,8 @@ has 'mime_type';
 has 'file_size';
 
 sub fields {
-  return { scalar                             => [qw/file_id width height duration
-                                                     mime_type file_size /],
+  return {
+           scalar                           => [qw/file_id width height duration mime_type file_size/],
            'Teapot::Bot::Object::PhotoSize' => [qw/thumb/]
          };
 }
@@ -31,13 +31,14 @@ __END__
 
 =head1 NAME
 
-Teapot::Bot::Object::Video - The base class for Telegram 'Video' object.
+Teapot::Bot::Object::Video - The base class for Telegram 'Video' object
 
 =head1 VERSION
 
 version 0.021
 
 =head1 DESCRIPTION
+The base class for Telegram 'Video' object.
 
 See L<https://core.telegram.org/bots/api#video> for details of the
 attributes available for L<Teapot::Bot::Object::Video> objects.
@@ -46,7 +47,7 @@ attributes available for L<Teapot::Bot::Object::Video> objects.
 
 Justin Hawkins <justin@eatmorecode.com>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE AND COPYRIGHT
 
 This software is copyright (c) 2019 by Justin Hawkins.
 

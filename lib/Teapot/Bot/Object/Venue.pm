@@ -13,9 +13,10 @@ has 'foursquare_id';
 has 'foursquare_type';
 
 sub fields {
-  return { 'scalar'                           => [qw/title address
-                                                     foursquare_id foursquare_type/],
-            'Teapot::Bot::Object::Location' => [qw/location/] };
+  return {
+           'scalar'                        => [qw/title address foursquare_id foursquare_type/],
+           'Teapot::Bot::Object::Location' => [qw/location/]
+         };
 
 }
 
@@ -36,6 +37,7 @@ Teapot::Bot::Object::Venue - The base class for Telegram 'LoginUrl' type objects
 version 0.021
 
 =head1 DESCRIPTION
+The base class for Telegram 'LoginUrl' type objects.
 
 See L<https://core.telegram.org/bots/api#venue> for details of the
 attributes available for L<Teapot::Bot::Object::Venue> objects.
@@ -44,7 +46,7 @@ attributes available for L<Teapot::Bot::Object::Venue> objects.
 
 Justin Hawkins <justin@eatmorecode.com>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE AND COPYRIGHT
 
 This software is copyright (c) 2019 by Justin Hawkins.
 

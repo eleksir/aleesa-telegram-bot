@@ -152,31 +152,38 @@ __END__
 
 =head1 NAME
 
-Teapot::Bot::Object::Message - The base class for the Telegram type "Message".
+Teapot::Bot::Object::Message - The base class for the Telegram type "Message"
 
 =head1 VERSION
 
 version 0.021
 
 =head1 DESCRIPTION
+The base class for the Telegram type "Message".
 
 See L<https://core.telegram.org/bots/api#message> for details of the
 attributes available for L<Teapot::Bot::Object::Message> objects.
 
 =head1 METHODS
 
-=head2
+=head2 reply
 
 A convenience method to reply to a message with text.
 
 Will return the L<Teapot::Bot::Object::Message> object representing the message
 sent.
 
+=head2 typing
+
+Sends notification to chat that bot is "typing" something.
+
+Returns nothing that should be checked.
+
 =head1 AUTHOR
 
 Justin Hawkins <justin@eatmorecode.com>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE AND COPYRIGHT
 
 This software is copyright (c) 2019 by Justin Hawkins.
 

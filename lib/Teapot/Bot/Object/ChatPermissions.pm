@@ -25,7 +25,7 @@ sub fields {
           'scalar'                           => [qw/can_send_messages can_send_media_messages can_send_polls
                                                     can_send_other_messages can_add_web_page_previews can_change_info
                                                     can_invite_users can_pin_messages/]
-        };
+         };
 }
 
 1;
@@ -45,6 +45,7 @@ Teapot::Bot::Object::ChatPermissions - The base class for Telegram 'ChatPermissi
 version 0.021
 
 =head1 DESCRIPTION
+The base class for Telegram 'ChatPermissions' type objects.
 
 See L<https://core.telegram.org/bots/api#chatpermissions> for details of the
 attributes available for L<Teapot::Bot::Object::ChatPermissions> objects.
@@ -53,7 +54,7 @@ attributes available for L<Teapot::Bot::Object::ChatPermissions> objects.
 
 Sergei Fedosov <eleksir@gmail.com>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE AND COPYRIGHT
 
 This software is copyright (c) 2020 Sergei Fedosov <eleksir@gmail.com>.
 

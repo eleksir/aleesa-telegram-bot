@@ -15,7 +15,11 @@ __END__
 
 =head1 NAME
 
-Teapot::Bot - A base class to make your very own Telegram bot
+Teapot::Bot
+
+=head1 DESCRIPTION
+
+A base class to make your very own Telegram bot
 
 =head1 VERSION
 
@@ -70,6 +74,13 @@ and you've got yourself a stew, baby! Or a bot, anyway.
 Note that for the bot to see messages that do not start with a leading '/', you will need to use
 the C<'/setprivacy'> command on Telegram's C<@botfather> interface to change the privacy settings.
 
+=head1 DEPENDENCIES
+
+IO::Socket::SSL
+Log::Any
+Mojolicious
+Test::Exception
+
 =head1 EXAMPLES
 
 This distribution's C<ex/> directory contains some complete examples that may be
@@ -79,7 +90,7 @@ instructive to look at.
 
 Justin Hawkins <justin@eatmorecode.com>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE AND COPYRIGHT
 
 This software is copyright (c) 2019 by Justin Hawkins.
 

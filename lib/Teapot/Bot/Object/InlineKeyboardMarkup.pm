@@ -9,12 +9,11 @@ $Teapot::Bot::Object::InlineKeyboardMarkup::VERSION = '0.021';
 has 'inline_keyboard';
 
 sub fields {
-  return { 'Teapot::Bot::Object::InlineKeyboardButton' => [qw/inline_keyboard/],
-         };
+  return { 'Teapot::Bot::Object::InlineKeyboardButton' => [qw/inline_keyboard/] };
 }
 
 sub array_of_arrays {
-  qw/inline_keyboard/;
+  return qw/inline_keyboard/;
 }
 
 1;
@@ -34,6 +33,7 @@ Teapot::Bot::Object::InlineKeyboardMarkup - The base class for Telegram 'InlineK
 version 0.021
 
 =head1 DESCRIPTION
+The base class for Telegram 'InlineKeyboardMarkup' type objects.
 
 See L<https://core.telegram.org/bots/api#inlinekeyboardmarkup> for details of the
 attributes available for L<Teapot::Bot::Object::InlineKeyboardMarkup> objects.
@@ -42,7 +42,7 @@ attributes available for L<Teapot::Bot::Object::InlineKeyboardMarkup> objects.
 
 Justin Hawkins <justin@eatmorecode.com>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE AND COPYRIGHT
 
 This software is copyright (c) 2019 by Justin Hawkins.
 

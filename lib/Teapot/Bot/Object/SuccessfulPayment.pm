@@ -15,10 +15,10 @@ has 'telegram_payment_charge_id';
 has 'provider_payment_charge_id';
 
 sub fields {
-  return { scalar => [qw/currency total_amount invoice_payload shipping_option_id
-                         telegram_payment_charge_id provider_payment_charge_id/],
-       # 'Teapot::Bot::Object::OrderInfo' => [qw/order_info/],
-
+  return {
+           scalar                           => [qw/currency total_amount invoice_payload shipping_option_id
+                                                   telegram_payment_charge_id provider_payment_charge_id/],
+#          'Teapot::Bot::Object::OrderInfo' => [qw/order_info/],
          };
 }
 
@@ -39,6 +39,7 @@ Teapot::Bot::Object::SuccessfulPayment - The base class for Telegram 'Successful
 version 0.021
 
 =head1 DESCRIPTION
+The base class for Telegram 'SuccessfulPayment' type objects.
 
 See L<https://core.telegram.org/bots/api#successfulpayment> for details of the
 attributes available for L<Teapot::Bot::Object::SuccessfulPayment> objects.
@@ -47,7 +48,7 @@ attributes available for L<Teapot::Bot::Object::SuccessfulPayment> objects.
 
 Justin Hawkins <justin@eatmorecode.com>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE AND COPYRIGHT
 
 This software is copyright (c) 2019 by Justin Hawkins.
 

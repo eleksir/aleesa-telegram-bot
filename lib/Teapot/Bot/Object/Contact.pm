@@ -11,7 +11,8 @@ has 'last_name';
 has 'user_id';
 
 sub fields {
-  return { scalar => [qw/phone_number first_name last_name user_id/],
+  return {
+           scalar => [qw/phone_number first_name last_name user_id/],
          };
 }
 
@@ -25,22 +26,23 @@ __END__
 
 =head1 NAME
 
-Teapot::Bot::Object::Contact - The base class for Telegram 'Contact' objects.
+Teapot::Bot::Object::Contact - The base class for Telegram 'Contact' objects
 
 =head1 VERSION
 
 version 0.021
 
 =head1 DESCRIPTION
+The base class for Telegram 'Contact' objects.
 
-See L<https://core.telegram.org/bots/api#chat> for details of the
+See L<https://core.telegram.org/bots/api#contact> for details of the
 attributes available for L<Teapot::Bot::Object::Contact> objects.
 
 =head1 AUTHOR
 
 Justin Hawkins <justin@eatmorecode.com>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE AND COPYRIGHT
 
 This software is copyright (c) 2019 by Justin Hawkins.
 

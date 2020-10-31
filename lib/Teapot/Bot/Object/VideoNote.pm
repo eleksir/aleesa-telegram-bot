@@ -15,9 +15,9 @@ has 'thumb'; #PhotoSize
 has 'file_size';
 
 sub fields {
-  return { scalar                             => [qw/file_id length duration mime_type file_size/],
+  return {
+           scalar                           => [qw/file_id length duration mime_type file_size/],
            'Teapot::Bot::Object::PhotoSize' => [qw/thumb /],
-
          };
 }
 
@@ -38,6 +38,7 @@ Teapot::Bot::Object::VideoNote - The base class for Telegram 'VideoNote' type ob
 version 0.021
 
 =head1 DESCRIPTION
+The base class for Telegram 'VideoNote' type object.
 
 See L<https://core.telegram.org/bots/api#videonote> for details of the
 attributes available for L<Teapot::Bot::Object::VideoNote> objects.
@@ -46,7 +47,7 @@ attributes available for L<Teapot::Bot::Object::VideoNote> objects.
 
 Justin Hawkins <justin@eatmorecode.com>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE AND COPYRIGHT
 
 This software is copyright (c) 2019 by Justin Hawkins.
 
