@@ -5,7 +5,12 @@
 It is based on Perl modules [Telegram::Bot][1] and [Hailo][2] as conversation
 generator.
 
-Config located in **data/config.json**, sample config provided as
+I have to fork [Telegram::Bot][1] and add some of new methods that are already
+appear in [Telegram API][3], but author seems to abandon lib. Also i decide to
+rename it to avoid collision in future, now it is Teapot::Bot and is bundled
+with bot. When lib become mature enough, maybe i release it separately.
+
+Bot config located in **data/config.json**, sample config provided as
 **data/sample_config.json**.
 
 Bot can be run via **bin/aleesa-telegam-bot** and acts as daemon.
@@ -27,25 +32,6 @@ bash bootstrap.sh
 
 and all libraries should be downloaded, built, tested and installed.
 
-## N.B.
-
-If bot is unable to post to channel due to limited permissions, it will die.
-It is possible to change this behavior by patching Telegram/Bot/Brain.pm:
-
-```diff
---- Brain.pm	2019-07-01 04:04:17.000000000 +0300
-+++ Brain.pm.new	2020-09-05 22:25:20.941373455 +0300
-@@ -237,8 +237,9 @@
- 
-   my $res = $self->ua->post($url, form => $form_args)->result;
-   if    ($res->is_success) { return $res->json->{result}; }
--  elsif ($res->is_error)   { die "Failed to post: " . $res->message; }
--  else                     { die "Not sure what went wrong"; }
-+  elsif ($res->is_error)   { warn "Failed to post: " . $res->message; }
-+  else                     { warn "Not sure what went wrong"; }
-+  return "";
- }
-```
-
 [1]: https://metacpan.org/pod/Telegram::Bot
 [2]: https://metacpan.org/pod/Hailo
+[3]: https://core.telegram.org/bots/api
