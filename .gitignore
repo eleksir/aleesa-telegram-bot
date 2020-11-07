@@ -3,4 +3,5 @@ data/config.json
 data/cache
 data/telegrambot-brains
 data/lat
+aleesa-telegram-bot.pid
 TODO

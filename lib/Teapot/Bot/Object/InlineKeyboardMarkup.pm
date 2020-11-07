@@ -4,7 +4,7 @@ package Teapot::Bot::Object::InlineKeyboardMarkup;
 use Mojo::Base 'Teapot::Bot::Object::Base';
 use Teapot::Bot::Object::InlineKeyboardButton;
 
-$Teapot::Bot::Object::InlineKeyboardMarkup::VERSION = '0.021';
+$Teapot::Bot::Object::InlineKeyboardMarkup::VERSION = '0.022';
 
 has 'inline_keyboard';
 
@@ -30,7 +30,7 @@ Teapot::Bot::Object::InlineKeyboardMarkup - The base class for Telegram 'InlineK
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 DESCRIPTION
 The base class for Telegram 'InlineKeyboardMarkup' type objects.

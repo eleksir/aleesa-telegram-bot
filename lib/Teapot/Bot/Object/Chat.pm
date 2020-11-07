@@ -6,7 +6,7 @@ use Teapot::Bot::Object::ChatPhoto;
 use Teapot::Bot::Object::Message;
 use Teapot::Bot::Object::ChatPermissions;
 
-$Teapot::Bot::Object::Chat::VERSION = '0.021';
+$Teapot::Bot::Object::Chat::VERSION = '0.022';
 
 has 'id';
 has 'type';
@@ -59,7 +59,7 @@ Teapot::Bot::Object::Chat - The base class for Telegram 'Chat' type objects
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 DESCRIPTION
 The base class for Telegram 'Chat' type objects.

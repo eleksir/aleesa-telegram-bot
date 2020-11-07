@@ -2,7 +2,7 @@ package Teapot::Bot::Object::CallbackGame;
 # ABSTRACT: The base class for Telegram message 'CallbackGame' type.
 
 use Mojo::Base 'Teapot::Bot::Object::Base';
-$Teapot::Bot::Object::CallbackGame::VERSION = '0.021';
+$Teapot::Bot::Object::CallbackGame::VERSION = '0.022';
 
 # https://core.telegram.org/bots/api#callbackgame
 # "A placeholder, currently holds no information. Use BotFather to set up your game"
@@ -25,7 +25,7 @@ Teapot::Bot::Object::CallbackGame - The base class for Telegram message 'Callbac
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 DESCRIPTION
 The base class for Telegram message 'CallbackGame' type.

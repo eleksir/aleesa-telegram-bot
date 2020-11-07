@@ -3,7 +3,7 @@ package Teapot::Bot::Object::EncryptedCredentials;
 
 use Mojo::Base 'Teapot::Bot::Object::Base';
 
-$Teapot::Bot::Object::EncryptedCredentials::VERSION = '0.021';
+$Teapot::Bot::Object::EncryptedCredentials::VERSION = '0.022';
 
 has 'data';
 has 'hash';
@@ -27,7 +27,7 @@ Teapot::Bot::Object::EncryptedCredentials - The base class for Telegram 'Encrypt
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 DESCRIPTION
 The base class for Telegram 'EncryptedCredentials' type objects.

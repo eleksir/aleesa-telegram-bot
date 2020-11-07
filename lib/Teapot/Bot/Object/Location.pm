@@ -3,7 +3,7 @@ package Teapot::Bot::Object::Location;
 
 use Mojo::Base 'Teapot::Bot::Object::Base';
 
-$Teapot::Bot::Object::Location::VERSION = '0.021';
+$Teapot::Bot::Object::Location::VERSION = '0.022';
 
 has 'longitude';
 has 'latitude';
@@ -26,7 +26,7 @@ Teapot::Bot::Object::Location - The base class for Telegram message 'Location' t
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 DESCRIPTION
 The base class for Telegram message 'Location' type.

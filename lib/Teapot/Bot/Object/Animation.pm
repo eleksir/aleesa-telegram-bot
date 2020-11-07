@@ -5,7 +5,7 @@ use Mojo::Base 'Teapot::Bot::Object::Base';
 use Teapot::Bot::Object::PhotoSize;
 use Carp qw/croak/;
 
-$Teapot::Bot::Object::Animation::VERSION = '0.021';
+$Teapot::Bot::Object::Animation::VERSION = '0.022';
 
 has 'file_id';
 has 'width';
@@ -37,7 +37,7 @@ Teapot::Bot::Object::Animation - The base class for Telegram message 'Animation'
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 DESCRIPTION
 The base class for Telegram message 'Animation' type.

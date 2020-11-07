@@ -3,7 +3,7 @@ package Teapot::Bot::Object::ChatPhoto;
 
 use Mojo::Base 'Teapot::Bot::Object::Base';
 
-$Teapot::Bot::Object::ChatPhoto::VERSION = '0.021';
+$Teapot::Bot::Object::ChatPhoto::VERSION = '0.022';
 
 has 'small_file_id';
 has 'big_file_id';
@@ -28,7 +28,7 @@ Teapot::Bot::Object::ChatPhoto - The base class for Telegram 'ChatPhoto' type ob
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 DESCRIPTION
 The base class for Telegram 'ChatPhoto' type objects.

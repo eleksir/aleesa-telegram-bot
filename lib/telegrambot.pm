@@ -10,7 +10,6 @@ use Data::Dumper;
 use open qw(:std :utf8);
 use File::Path qw( mkpath );
 use Hailo;
-use Encode;
 use Mojo::Base 'Teapot::Bot::Brain';
 
 use conf qw(loadConf);

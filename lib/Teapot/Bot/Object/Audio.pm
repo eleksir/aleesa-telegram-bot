@@ -3,7 +3,7 @@ package Teapot::Bot::Object::Audio;
 
 use Mojo::Base 'Teapot::Bot::Object::Base';
 
-$Teapot::Bot::Object::Audio::VERSION = '0.021';
+$Teapot::Bot::Object::Audio::VERSION = '0.022';
 
 has 'file_id';
 has 'duration';
@@ -33,7 +33,7 @@ Teapot::Bot::Object::Audio - The base class for Telegram 'Audio' type objects
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 DESCRIPTION
 The base class for Telegram 'Audio' type objects.

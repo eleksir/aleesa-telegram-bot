@@ -3,7 +3,7 @@ package Teapot::Bot::Object::LoginUrl;
 
 use Mojo::Base 'Teapot::Bot::Object::Base';
 
-$Teapot::Bot::Object::LoginUrl::VERSION = '0.021';
+$Teapot::Bot::Object::LoginUrl::VERSION = '0.022';
 
 has 'url';
 has 'forward_text';
@@ -28,7 +28,7 @@ Teapot::Bot::Object::LoginUrl - The base class for Telegram 'LoginUrl' type obje
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 DESCRIPTION
 The base class for Telegram 'LoginUrl' type objects.

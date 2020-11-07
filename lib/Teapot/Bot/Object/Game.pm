@@ -7,7 +7,7 @@ use Teapot::Bot::Object::PhotoSize;
 use Teapot::Bot::Object::Animation;
 use Teapot::Bot::Object::MessageEntity;
 
-$Teapot::Bot::Object::Game::VERSION = '0.021';
+$Teapot::Bot::Object::Game::VERSION = '0.022';
 
 has 'title';
 has 'description';
@@ -41,7 +41,7 @@ Teapot::Bot::Object::Game - The base class for Telegram message 'Game' type
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 DESCRIPTION
 The base class for Telegram message 'Game' type.

@@ -4,7 +4,7 @@ package Teapot::Bot::Object::Poll;
 use Mojo::Base 'Teapot::Bot::Object::Base';
 use Teapot::Bot::Object::PollOption;
 
-$Teapot::Bot::Object::Poll::VERSION = '0.021';
+$Teapot::Bot::Object::Poll::VERSION = '0.022';
 
 has 'id';
 has 'question';
@@ -36,7 +36,7 @@ Teapot::Bot::Object::Poll - The base class for Telegram 'Poll' type objects
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 DESCRIPTION
 The base class for Telegram 'Poll' type objects

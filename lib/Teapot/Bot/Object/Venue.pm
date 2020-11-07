@@ -4,7 +4,7 @@ package Teapot::Bot::Object::Venue;
 use Mojo::Base 'Teapot::Bot::Object::Base';
 use Teapot::Bot::Object::Location;
 
-$Teapot::Bot::Object::Venue::VERSION = '0.021';
+$Teapot::Bot::Object::Venue::VERSION = '0.022';
 
 has 'location'; #Location
 has 'title';
@@ -34,7 +34,7 @@ Teapot::Bot::Object::Venue - The base class for Telegram 'LoginUrl' type objects
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 DESCRIPTION
 The base class for Telegram 'LoginUrl' type objects.

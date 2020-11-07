@@ -18,7 +18,7 @@ use Data::Dumper;
 
 use Teapot::Bot::Object::Message;
 
-$Teapot::Bot::Brain::VERSION = '0.021';
+$Teapot::Bot::Brain::VERSION = '0.022';
 
 # base class for building telegram robots with Mojolicious
 has longpoll_time => 60;
@@ -399,7 +399,7 @@ Teapot::Bot::Brain - A base class to make your very own Telegram bot
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 

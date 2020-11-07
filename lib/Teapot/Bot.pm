@@ -2,7 +2,7 @@ package Teapot::Bot;
 
 use strict;
 use warnings;
-$Teapot::Bot::VERSION = '0.021';
+$Teapot::Bot::VERSION = '0.022';
 # ABSTRACT: A base class to make your very own Telegram bot
 
 1;
@@ -23,7 +23,7 @@ A base class to make your very own Telegram bot
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 

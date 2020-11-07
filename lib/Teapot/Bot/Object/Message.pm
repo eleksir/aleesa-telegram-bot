@@ -30,7 +30,7 @@ use Teapot::Bot::Object::InlineKeyboardMarkup;
 
 use Data::Dumper;
 
-$Teapot::Bot::Object::Message::VERSION = '0.021';
+$Teapot::Bot::Object::Message::VERSION = '0.022';
 
 # basic message stuff
 has 'message_id';
@@ -156,7 +156,7 @@ Teapot::Bot::Object::Message - The base class for the Telegram type "Message"
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 DESCRIPTION
 The base class for the Telegram type "Message".

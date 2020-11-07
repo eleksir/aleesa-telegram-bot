@@ -5,7 +5,7 @@ package Teapot::Bot::Object::VideoNote;
 use Mojo::Base 'Teapot::Bot::Object::Base';
 use Teapot::Bot::Object::PhotoSize;
 
-$Teapot::Bot::Object::VideoNote::VERSION = '0.021';
+$Teapot::Bot::Object::VideoNote::VERSION = '0.022';
 
 has 'file_id';
 has 'length';
@@ -35,7 +35,7 @@ Teapot::Bot::Object::VideoNote - The base class for Telegram 'VideoNote' type ob
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 DESCRIPTION
 The base class for Telegram 'VideoNote' type object.

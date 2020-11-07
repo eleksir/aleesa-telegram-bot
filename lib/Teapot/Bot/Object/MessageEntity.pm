@@ -4,7 +4,7 @@ package Teapot::Bot::Object::MessageEntity;
 use Mojo::Base 'Teapot::Bot::Object::Base';
 use Teapot::Bot::Object::User;
 
-$Teapot::Bot::Object::MessageEntity::VERSION = '0.021';
+$Teapot::Bot::Object::MessageEntity::VERSION = '0.022';
 
 has 'type';
 has 'offset';
@@ -34,7 +34,7 @@ Teapot::Bot::Object::MessageEntity - The base class for Telegram 'MessageEntity'
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 DESCRIPTION
 The base class for Telegram 'MessageEntity' type objects.

@@ -3,7 +3,7 @@ package Teapot::Bot::Object::Contact;
 
 use Mojo::Base 'Teapot::Bot::Object::Base';
 
-$Teapot::Bot::Object::Contact::VERSION = '0.021';
+$Teapot::Bot::Object::Contact::VERSION = '0.022';
 
 has 'phone_number';
 has 'first_name';
@@ -30,7 +30,7 @@ Teapot::Bot::Object::Contact - The base class for Telegram 'Contact' objects
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 DESCRIPTION
 The base class for Telegram 'Contact' objects.
