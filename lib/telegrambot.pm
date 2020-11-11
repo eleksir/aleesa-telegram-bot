@@ -330,10 +330,12 @@ sub __on_msg {
 				my $send_args;
 				$send_args->{text} = << 'MYHELP';
 ```
-!help | !помощь     - список команд
-!w город | !п город - погода в указанном городе
-!ping | !пинг       - попинговать бота
-!lat | !лат         - сгенерировать фразу из крылатых латинских выражений
+!help | !помощь       - список команд
+!w город | !п город   - погода в указанном городе
+!ping | !пинг         - попинговать бота
+!lat | !лат           - сгенерировать фразу из крылатых латинских выражений
+!karma | !карма фраза - посмотреть карму фразы
+фраза-- | фраза++     - убавить или добавить карму фразе
 ```
 Но на самом деле я бот больше для общения, чем для исполнения команд.
 Поговоришь со мной?
@@ -355,6 +357,12 @@ MYHELP
 				$reply = weather ($city);
 			} elsif (length ($text) == 4 && (substr ($text, 1, 3) eq 'lat' || substr ($text, 1, 3) eq 'лат')) {
 				$reply = latAnswer();
+			} elsif ((length($text) > 8) || (substr ($text, 1, 6) eq 'karma ') || (substr ($text, 1, 6) eq 'карма ')) {
+				my $mytext = substr ($text, 7);
+				$mytext = trim ($mytext);
+				$reply = karmaGet ($chatid, $mytext);
+			} elsif ((length($text) > 8) || (substr ($text, 1, 6) eq 'karma ') || (substr ($text, 1, 6) eq 'карма ')) {
+				$reply = 'Простите, что? Карма пустоты?';
 			}
 		} elsif (
 				($text eq $qname) or
@@ -376,6 +384,15 @@ MYHELP
 			} elsif ((lc ($text) =~ /.+ ${qtname}[\,|\!|\?|\.| ]/) or (lc ($text) =~ / $qtname$/)) {
 				$phrase = $text;
 				$reply = $hailo->{$msg->chat->id}->reply ($phrase);
+			} elsif ((substr ($text, -2) eq '++') && (substr ($text, -2) eq '--')) {
+				my @arr = split(/\n/, $text);
+
+				if ($#arr < 1) {
+					$reply = kermaSet ($chatid, $phrase, substr ($text, -2));
+				} else {
+					# just message in chat
+					$hailo->{$msg->chat->id}->learn ($text);
+				}
 			# just message in chat
 			} else {
 				$hailo->{$msg->chat->id}->learn ($text);

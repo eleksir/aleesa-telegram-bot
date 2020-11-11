@@ -3,6 +3,7 @@ requires 'Cwd::utf8';
 requires 'DB_File';
 requires 'Digest::MD5';
 requires 'Data::Dumper';
+requires 'Digest::SHA1';
 requires 'File::Basename';
 requires 'File::Path';
 requires 'Hailo';
