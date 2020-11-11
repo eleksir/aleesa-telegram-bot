@@ -231,7 +231,7 @@ sub sendPhoto {
   # request
   croak 'No photo supplied in sendPhoto()' unless $args->{photo};
   if (-e $args->{photo}) {
-    $send_args->{photo} = { photo => { file => $args->{photo} } };
+    $send_args->{photo} = { file => $args->{photo} };
   }
   else {
     $send_args->{photo} = $args->{photo};
