@@ -103,8 +103,18 @@ sub getChatMember {
   my $args = shift || {};
 
   my $send_args = {};
-  croak 'No chat_id supplied to getChatMember()' unless $args->{chat_id};
-  croak 'No user_id supplied to getChatMember()' unless $args->{user_id};
+
+  unless ($args->{chat_id}) {
+    cluck 'No chat_id supplied to getChatMember()';
+    return {'error' => 1};
+  }
+
+  unless ($args->{user_id}) {
+    cluck 'No user_id supplied to getChatMember()';
+    return {'error' => 1};
+  }
+
+
   $send_args->{chat_id} = $args->{chat_id};
   $send_args->{user_id} = $args->{user_id};
 
@@ -127,7 +137,12 @@ sub getChat {
   my $args = shift || {};
 
   my $send_args = {};
-  croak 'No chat_id supplied to getChat()' unless $args->{chat_id};
+
+  unless ($args->{chat_id}) {
+    cluck 'No chat_id supplied to getChat()';
+    return {'error' => 1};
+  }
+
   $send_args->{chat_id} = $args->{chat_id};
 
   my $token = $self->token || croak 'No token supplied to getChat()?';
@@ -149,10 +164,19 @@ sub sendMessage {
   my $args = shift || {};
 
   my $send_args = {};
-  croak 'No chat_id supplied in sendMessage()' unless $args->{chat_id};
+
+  unless ($args->{chat_id}) {
+    cluck 'No chat_id supplied in sendMessage()';
+    return {'error' => 1};
+  }
+
   $send_args->{chat_id} = $args->{chat_id};
 
-  croak 'No text supplied in sendMessage()' unless $args->{text};
+  unless ($args->{text}) {
+    cluck 'No text supplied in sendMessage()';
+    return {'error' => 1};
+  }
+
   $send_args->{text}    = $args->{text};
 
   # these are optional, send if they are supplied
@@ -169,7 +193,8 @@ sub sendMessage {
            ref($reply_markup) ne 'Teapot::Bot::Object::ReplyKeyboardMarkup'  &&
              ref($reply_markup) ne 'Teapot::Bot::Object::ReplyKeyboardRemove'  &&
                ref($reply_markup) ne 'Teapot::Bot::Object::ForceReply' ) {
-      croak 'Incorrect reply_markup in sendMessage()';
+      cluck 'Incorrect reply_markup in sendMessage()';
+      return {'error' => 1};
     }
 
     $send_args->{reply_markup} = $reply_markup;
@@ -192,13 +217,26 @@ sub forwardMessage {
   my $self = shift;
   my $args = shift || {};
   my $send_args = {};
-  croak 'No chat_id supplied in forwardMessage()' unless $args->{chat_id};
+
+  unless ($args->{chat_id}) {
+    cluck 'No chat_id supplied in forwardMessage()';
+    return {'error' => 1};
+  }
+
   $send_args->{chat_id} = $args->{chat_id};
 
-  croak 'No from_chat_id supplied in forwardMessage()' unless $args->{from_chat_id};
+  unless ($args->{from_chat_id}) {
+    cluck 'No from_chat_id supplied in forwardMessage()';
+    return {'error' => 1};
+  }
+
   $send_args->{from_chat_id} = $args->{from_chat_id};
 
-  croak 'No message_id supplied in forwardMessage()' unless $args->{message_id};
+  unless ($args->{message_id}) {
+    cluck 'No message_id supplied in forwardMessage()';
+    return {'error' => 1};
+  }
+
   $send_args->{message_id} = $args->{message_id};
 
   # these are optional, send if they are supplied
@@ -222,14 +260,22 @@ sub sendPhoto {
   my $args = shift || {};
   my $send_args = {};
 
-  croak 'No chat_id supplied to sendPhoto()' unless $args->{chat_id};
+  unless ($args->{chat_id}) {
+    cluck 'No chat_id supplied to sendPhoto()';
+    return {'error' => 1};
+  }
+
   $send_args->{chat_id} = $args->{chat_id};
 
   # photo can be a string (which might be either a URL for telegram servers
   # to fetch, or a file_id string) or a file on disk to upload - we need
   # to handle that last case here as it changes the way we create the HTTP
   # request
-  croak 'No photo supplied in sendPhoto()' unless $args->{photo};
+  unless ($args->{photo}) {
+    cluck 'No photo supplied in sendPhoto()';
+    return {'error' => 1};
+  }
+
   if (-e $args->{photo}) {
     $send_args->{photo} = { file => $args->{photo} };
   }
@@ -255,7 +301,11 @@ sub sendChatAction {
   my $args = shift || {};
   my $send_args = {};
 
-  croak 'No chat_id supplied in sendChatAction()' unless $args->{chat_id};
+  unless ($args->{chat_id}) {
+    cluck 'No chat_id supplied in sendChatAction()';
+    return {'error' => 1};
+  }
+
   $send_args->{chat_id} = $args->{chat_id};
 
   unless (defined $args->{action}) {
@@ -352,6 +402,7 @@ sub _process_message {
     # don't handle yet
     if (! $update) {
       cluck 'Do not know how to handle this update: ' . Dumper($item);
+      return;
     }
 
     foreach my $listener (@{ $self->listeners }) {
