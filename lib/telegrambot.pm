@@ -16,6 +16,7 @@ use conf qw(loadConf);
 use botlib qw(weather logger trim randomCommonPhrase);
 use telegramlib qw(visavi);
 use lat qw(latAnswer);
+use karma qw(karmaSet karmaGet);
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(run_telegrambot);
@@ -357,12 +358,11 @@ MYHELP
 				$reply = weather ($city);
 			} elsif (length ($text) == 4 && (substr ($text, 1, 3) eq 'lat' || substr ($text, 1, 3) eq 'лат')) {
 				$reply = latAnswer();
-			} elsif ((length($text) > 8) || (substr ($text, 1, 6) eq 'karma ') || (substr ($text, 1, 6) eq 'карма ')) {
+			} elsif ((length ($text) >= 7) && ((substr ($text, 1, 6) eq 'karma ') || (substr ($text, 1, 6) eq 'карма '))) {
 				my $mytext = substr ($text, 7);
+				chomp ($mytext);
 				$mytext = trim ($mytext);
 				$reply = karmaGet ($chatid, $mytext);
-			} elsif ((length($text) > 8) || (substr ($text, 1, 6) eq 'karma ') || (substr ($text, 1, 6) eq 'карма ')) {
-				$reply = 'Простите, что? Карма пустоты?';
 			}
 		} elsif (
 				($text eq $qname) or
@@ -384,11 +384,11 @@ MYHELP
 			} elsif ((lc ($text) =~ /.+ ${qtname}[\,|\!|\?|\.| ]/) or (lc ($text) =~ / $qtname$/)) {
 				$phrase = $text;
 				$reply = $hailo->{$msg->chat->id}->reply ($phrase);
-			} elsif ((substr ($text, -2) eq '++') && (substr ($text, -2) eq '--')) {
+			} elsif ((substr ($text, -2) eq '++') || (substr ($text, -2) eq '--')) {
 				my @arr = split(/\n/, $text);
 
 				if ($#arr < 1) {
-					$reply = kermaSet ($chatid, $phrase, substr ($text, -2));
+					$reply = karmaSet ($chatid, substr ($text, 0, -2), substr ($text, -2));
 				} else {
 					# just message in chat
 					$hailo->{$msg->chat->id}->learn ($text);

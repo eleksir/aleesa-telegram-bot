@@ -15,5 +15,8 @@
     },
     "lat" : {
         "brain": "data/lat/lat.sqlite"
+    },
+    "karma" : {
+        "dir": "data/karma"
     }
 }

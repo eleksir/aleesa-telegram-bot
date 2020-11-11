@@ -6,7 +6,7 @@ use warnings;
 use utf8;
 use open qw(:std :utf8);
 use English qw( -no_match_vars );
-use Digest::SHA1;
+use Digest::SHA qw(sha1_base64);
 use DB_File;
 
 use vars qw/$VERSION/;
@@ -15,8 +15,6 @@ our @EXPORT_OK = qw(karmaSet karmaGet);
 
 $VERSION = '1.0';
 
-use File::Basename qw(dirname);
-use File::Path qw(mkpath);
 use conf qw(loadConf);
 use botlib qw(logger);
 
@@ -30,14 +28,25 @@ sub karmaSet (@) {
 	my $phrase = shift;
 	my $action = shift;
 	my $score = 0;
-	my $karmafile = sprintf "$karmadir/%s.db", sha1_base64 ($chatid);
+	# sha1* does not understand utf8, so explicitly construct string cost of decimal numbers only 
+	my $karmafile = join ('', unpack ('C*', $chatid));
+	$karmafile = sha1_base64 ($karmafile);
+	# sha1 string can contain slashes, so make a bit longer string consist of only decimal numbers
+	$karmafile = join ('', unpack ('C*', $karmafile));
+	$karmafile = sprintf '%s/%s.db', $karmadir, $karmafile;
+
+	if (($phrase eq '') || ($phrase =~ /^ +$/)) {
+		$phrase = '';
+	}
+
 	# init hash, store phrase and score
-	tie my %karma, 'DB_File', $karmafile or do {
+	tie my %karma, 'DB_File', $karmafile || do {
 		logger "Something nasty happen when cachedata ties to its data: $OS_ERROR";
 		return sprintf 'Карма %s составляет 0', $phrase;
 	};
 
-	my $sha1_phrase = sha1($phrase);
+	# bdb does not understand utf8, so tied hash too, we do not want store original phrase anyway
+	my $sha1_phrase = sha1_base64 (join ('', unpack ('C*', $phrase)));
 
 	if (defined $karma{$sha1_phrase}) {
 		if ($action eq '++') {
@@ -50,17 +59,27 @@ sub karmaSet (@) {
 	} else {
 		if ($action eq '++') {
 			$karma{$sha1_phrase} = 1;
+			$score = 1;
 		} else {
 			$karma{$sha1_phrase} = -1;
+			$score = -1;
 		}
 	}
 
 	untie %karma;
 
-	if ($score < 0 && (($score % $max) - 1) == 0)) {
-		return sprintf 'Зарегистрировано пробитие дна, карма %s составляет %d', $phrase, $score;
+	if ($score < -1 && (($score % (0 - $max)) + 1) == 0) {
+		if ($phrase eq '') {
+			return sprintf 'Зарегистрировано пробитие дна, карма пустоты составляет %d', $score;
+		} else {
+			return sprintf 'Зарегистрировано пробитие дна, карма %s составляет %d', $phrase, $score;
+		}
 	} else {
-		return sprintf 'Карма %s составляет %d', $phrase, $score;
+		if ($phrase eq '') {
+			return sprintf 'Карма пустоты составляет %d', $score;
+		} else {
+			return sprintf 'Карма %s составляет %d', $phrase, $score;
+		}
 	}
 }
 
@@ -68,15 +87,25 @@ sub karmaSet (@) {
 sub karmaGet (@) {
 	my $chatid = shift;
 	my $phrase = shift;
+	# sha1* does not understand utf8, so explicitly construct string cost of decimal numbers only 
+	my $karmafile = join ('', unpack ('C*', $chatid));
+	$karmafile = sha1_base64 ($karmafile);
+	# sha1 string can contain slashes, so make a bit longer string consist of only decimal numbers
+	$karmafile = join ('', unpack ('C*', $karmafile));
+	$karmafile = sprintf '%s/%s.db', $karmadir, $karmafile;
 
-	my $karmafile = sprintf "$karmadir/%s.db", sha1_base64 ($chatid);
+	if (($phrase eq '') || ($phrase =~ /^ +$/)) {
+		$phrase = '';
+	}
+
 	# init hash, store phrase and score
-	tie my %karma, 'DB_File', $karmafile or do {
+	tie my %karma, 'DB_File', $karmafile || do {
 		logger "Something nasty happen when karma ties to its data: $OS_ERROR";
 		return sprintf 'Карма %s составляет 0', $phrase;
 	};
 
-	my $sha1_phrase = sha1 ($phrase);
+	# bdb does not understand utf8, so tied hash too, we do not want store original phrase anyway
+	my $sha1_phrase = sha1_base64 (join ('', unpack ('C*', $phrase)));
 	my $score = $karma{$sha1_phrase};
 	untie %karma;
 
@@ -84,7 +113,11 @@ sub karmaGet (@) {
 		$score = 0;
 	}
 
-	return sprintf 'Карма %s составляет %d', $phrase, $score;
+	if ($phrase eq '') {
+		return sprintf 'Карма пустоты составляет %d', $score;
+	} else {
+		return sprintf 'Карма %s составляет %d', $phrase, $score;
+	}
 }
 
 1;
