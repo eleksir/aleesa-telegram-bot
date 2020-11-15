@@ -8,15 +8,13 @@ use vars qw/$VERSION/;
 use utf8;
 use Data::Dumper;
 use open qw(:std :utf8);
-use File::Path qw( mkpath );
+use File::Path qw(mkpath);
 use Hailo;
 use Mojo::Base 'Teapot::Bot::Brain';
 
 use conf qw(loadConf);
-use botlib qw(weather logger trim randomCommonPhrase);
+use botlib qw(weather logger trim randomCommonPhrase command);
 use telegramlib qw(visavi);
-use lat qw(latAnswer);
-use karma qw(karmaSet karmaGet);
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(run_telegrambot);
@@ -220,19 +218,27 @@ sub __on_msg {
 		my $csign = quotemeta ($c->{telegrambot}->{csign});
 		my $reply = 'Давайте ещё пообщаемся, а то я ещё не научилась от вас плохому.';
 
-		# TODO: Process commands in separate sub, they are same for public and private chats.
 		if (substr ($text, 0, 1) eq $c->{telegrambot}->{csign}) {
-			if (substr ($text, 1) eq 'ping') {
-				$reply = 'Pong.';
-			} elsif (substr ($text, 1) eq 'пинг') {
-				$reply = 'Понг.';
-			} elsif (substr ($text, 1, 2) eq 'w ' || substr ($text, 1, 2) eq 'п ') {
-				my $city = substr ($text, 2);
-				$reply = weather ($city);
-			} elsif ((length ($text) == 4) && (substr ($text, 1, 3) eq 'lat' || substr ($text, 1, 2) eq 'лат')) {
-				$reply = latAnswer();
-			} else {
-				$reply = 'Чего?';
+			if (substr ($text, 1) eq 'help') {
+				my $send_args;
+				$send_args->{text} = << 'MYHELP';
+```
+!help | !помощь       - список команд
+!w город | !п город   - погода в указанном городе
+!ping | !пинг         - попинговать бота
+!lat | !лат           - сгенерировать фразу из крылатых латинских выражений
+!karma | !карма фраза - посмотреть карму фразы
+фраза-- | фраза++     - убавить или добавить карму фразе
+```
+Но на самом деле я бот больше для общения, чем для исполнения команд.
+Поговоришь со мной?
+MYHELP
+				$send_args->{parse_mode} = 'Markdown';
+				$send_args->{chat_id} = $userid;
+				Teapot::Bot::Brain::sendMessage ($self, $send_args);
+				return;
+			} esle {
+				$reply = command($text, $userid);
 			}
 		} else {
 			my $str = $hailo->{$msg->chat->id}->learn_reply ($text);
@@ -259,10 +265,12 @@ sub __on_msg {
 			}
 		}
 
-		$msg->typing();
-		sleep 1;
-		logger sprintf ("Private chat bot reply to $vis_a_vi: %s", $reply);
-		$msg->reply ($reply);
+		if (defined $reply) {
+			$msg->typing();
+			sleep 1;
+			logger sprintf ("Private chat bot reply to $vis_a_vi: %s", $reply);
+			$msg->reply ($reply);
+		}
 # group chat
 	} elsif (($msg->chat->type eq 'supergroup') or ($msg->chat->type eq 'group')) {
 		my $reply;
@@ -320,23 +328,19 @@ sub __on_msg {
 			# figure out reply :)
 			$reply = $hailo->{$msg->chat->id}->learn_reply ($phrase);
 		# simple commands
-		# TODO: Process commands in separate sub, they are same for public and private chats.
 		# TODO: Log commands and answers
 		} elsif (substr ($text, 0, 1) eq $c->{telegrambot}->{csign}) {
 			if (substr ($text, 1) eq 'help') {
-				unless ($can_talk) {
-					return ;
-				}
-
 				my $send_args;
 				$send_args->{text} = << 'MYHELP';
 ```
-!help | !помощь       - список команд
-!w город | !п город   - погода в указанном городе
-!ping | !пинг         - попинговать бота
-!lat | !лат           - сгенерировать фразу из крылатых латинских выражений
-!karma | !карма фраза - посмотреть карму фразы
-фраза-- | фраза++     - убавить или добавить карму фразе
+!help | !помощь           - список команд
+!ver | !version | !версия - что-то про версию ПО
+!w город | !п город       - погода в указанном городе
+!ping | !пинг             - попинговать бота
+!lat | !лат               - сгенерировать фразу из крылатых латинских выражений
+!karma | !карма фраза     - посмотреть карму фразы
+фраза-- | фраза++         - убавить или добавить карму фразе
 ```
 Но на самом деле я бот больше для общения, чем для исполнения команд.
 Поговоришь со мной?
@@ -345,24 +349,8 @@ MYHELP
 				$send_args->{chat_id} = $chatid;
 				Teapot::Bot::Brain::sendMessage ($self, $send_args);
 				return;
-			} elsif (substr ($text, 1) eq 'ping') {
-				$reply = 'Pong.';
-			} elsif (substr ($text, 1) eq 'пинг') {
-				$reply = 'Понг.';
-			} elsif (substr ($text, 1) eq 'pong') {
-				$reply = 'Wat?';
-			} elsif (substr ($text, 1) eq 'понг') {
-				$reply = 'Шта?';
-			} elsif (substr ($text, 1, 2) eq 'w ' || substr ($text, 1, 2) eq 'п ') {
-				my $city = substr ($text, 3);
-				$reply = weather ($city);
-			} elsif (length ($text) == 4 && (substr ($text, 1, 3) eq 'lat' || substr ($text, 1, 3) eq 'лат')) {
-				$reply = latAnswer();
-			} elsif ((length ($text) >= 7) && ((substr ($text, 1, 6) eq 'karma ') || (substr ($text, 1, 6) eq 'карма '))) {
-				my $mytext = substr ($text, 7);
-				chomp ($mytext);
-				$mytext = trim ($mytext);
-				$reply = karmaGet ($chatid, $mytext);
+			} else {
+				$reply = command ($text, $chatid);
 			}
 		} elsif (
 				($text eq $qname) or

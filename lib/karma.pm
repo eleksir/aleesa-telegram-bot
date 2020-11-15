@@ -8,6 +8,7 @@ use open qw(:std :utf8);
 use English qw( -no_match_vars );
 use Digest::SHA qw(sha1_base64);
 use DB_File;
+use Carp qw(cluck);
 
 use vars qw/$VERSION/;
 use Exporter qw(import);
@@ -16,7 +17,6 @@ our @EXPORT_OK = qw(karmaSet karmaGet);
 $VERSION = '1.0';
 
 use conf qw(loadConf);
-use botlib qw(logger);
 
 my $c = loadConf();
 my $karmadir = $c->{karma}->{dir};
@@ -41,7 +41,7 @@ sub karmaSet (@) {
 
 	# init hash, store phrase and score
 	tie my %karma, 'DB_File', $karmafile || do {
-		logger "Something nasty happen when cachedata ties to its data: $OS_ERROR";
+		cluck "Something nasty happen when cachedata ties to its data: $OS_ERROR";
 		return sprintf 'Карма %s составляет 0', $phrase;
 	};
 
@@ -100,7 +100,7 @@ sub karmaGet (@) {
 
 	# init hash, store phrase and score
 	tie my %karma, 'DB_File', $karmafile || do {
-		logger "Something nasty happen when karma ties to its data: $OS_ERROR";
+		cluck "Something nasty happen when karma ties to its data: $OS_ERROR";
 		return sprintf 'Карма %s составляет 0', $phrase;
 	};
 

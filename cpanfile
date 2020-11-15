@@ -18,6 +18,4 @@ requires 'Log::Any';
 requires 'Mojo::Base';
 requires 'Mojo::IOLoop';
 requires 'Mojo::UserAgent';
-#requires 'Telegram::Bot';
-#requires 'Test::Exception';
 requires 'URI::URL';

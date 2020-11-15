@@ -7,6 +7,7 @@ use warnings;
 use utf8;
 use open qw(:std :utf8);
 use English qw( -no_match_vars );
+use Carp qw(cluck);
 
 use vars qw/$VERSION/;
 use Exporter qw(import);
@@ -29,7 +30,7 @@ sub train () {
 
 	unless (-d $braindir) {
 		mkpath ($braindir) or do {
-			logger "Unable to create $braindir: $OS_ERROR";
+			cluck "Unable to create $braindir: $OS_ERROR";
 			exit 1;
 		};
 	}
@@ -52,12 +53,12 @@ sub latAnswer () {
 	my $braindir = dirname ($brain);
 
 	unless (-d $braindir) {
-		logger ("No lat module data: $braindir is absent! Train lat first.");
+		cluck "No lat module data: $braindir is absent! Train lat first.";
 		return '';
 	}
 
 	unless (-f $brain) {
-		logger ("No lat module data: $brain is absent! Train lat first.");
+		cluck "No lat module data: $brain is absent! Train lat first.";
 		return '';
 	}
 

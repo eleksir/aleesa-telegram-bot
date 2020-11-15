@@ -15,11 +15,13 @@ use Digest::MD5 qw(md5_base64);
 use DB_File;
 
 use conf qw(loadConf);
+use lat qw(latAnswer);
+use karma qw(karmaSet karmaGet);
 
 use vars qw/$VERSION/;
 
 use Exporter qw(import);
-our @EXPORT_OK = qw(weather logger trim randomCommonPhrase);
+our @EXPORT_OK = qw(weather logger trim randomCommonPhrase command);
 
 $VERSION = '1.0';
 
@@ -241,6 +243,40 @@ sub randomCommonPhrase {
 	);
 
 	return $myphrase[rand ($#myphrase -1)];
+}
+
+sub command {
+	my $text = shift;
+	my $chatid = shift;
+	my $reply;
+
+	if (substr ($text, 1) eq 'ping') {
+		$reply = 'Pong.';
+	} elsif (substr ($text, 1) eq 'пинг') {
+		$reply = 'Понг.';
+	} elsif (substr ($text, 1) eq 'pong') {
+		$reply = 'Wat?';
+	} elsif (substr ($text, 1) eq 'понг') {
+		$reply = 'Шта?';
+	} elsif (substr ($text, 1) eq 'ver' || substr ($text, 1) eq 'version' || substr ($text, 1) eq 'версия') {
+		$reply = 'Версия:  Нуль.Чего-то_там.Чего-то_там';
+	} elsif (substr ($text, 1, 2) eq 'w ' || substr ($text, 1, 2) eq 'п ') {
+		my $city = substr ($text, 3);
+		$reply = weather ($city);
+	} elsif (substr ($text, 1) eq 'lat'  ||  substr ($text, 1) eq 'лат') {
+		$reply = latAnswer();
+	} elsif (substr ($text, 1, 6) eq 'karma '  ||  substr ($text, 1, 6) eq 'карма '  ||  substr($text, 1) eq 'karma'  ||  substr($text, $1) eq 'карма') {
+		my $mytext = substr ($text, 7);
+
+		if ($mytext ne '') {
+			chomp ($mytext);
+			$mytext = trim ($mytext);
+		}
+
+		$reply = karmaGet ($chatid, $mytext);
+	}
+
+	return $reply;
 }
 
 1;
