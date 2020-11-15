@@ -13,7 +13,7 @@ with bot. When lib become mature enough, maybe i release it separately.
 Bot config located in **data/config.json**, sample config provided as
 **data/sample_config.json**.
 
-Bot can be run via **bin/aleesa-telegam-bot** and acts as daemon.
+Bot can be run via **bin/aleesa-telegram-bot** and acts as daemon.
 
 ## Installation
 
