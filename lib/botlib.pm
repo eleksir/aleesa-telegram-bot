@@ -266,11 +266,14 @@ sub command {
 	} elsif (substr ($text, 1) eq 'lat'  ||  substr ($text, 1) eq 'лат') {
 		$reply = latAnswer();
 	} elsif (substr ($text, 1, 6) eq 'karma '  ||  substr ($text, 1, 6) eq 'карма '  ||  substr($text, 1) eq 'karma'  ||  substr($text, $1) eq 'карма') {
-		my $mytext = substr ($text, 7);
+		my $mytext = '';
 
-		if ($mytext ne '') {
+		if (length($text) >= 7) {
+			$mytext = substr ($text, 7);
 			chomp ($mytext);
 			$mytext = trim ($mytext);
+		} else {
+			$mytext = '';
 		}
 
 		$reply = karmaGet ($chatid, $mytext);

@@ -15,6 +15,7 @@ use Mojo::Base 'Teapot::Bot::Brain';
 use conf qw(loadConf);
 use botlib qw(weather logger trim randomCommonPhrase command);
 use telegramlib qw(visavi);
+use karma qw(karmaSet);
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(run_telegrambot);
@@ -219,7 +220,7 @@ sub __on_msg {
 		my $reply = 'Давайте ещё пообщаемся, а то я ещё не научилась от вас плохому.';
 
 		if (substr ($text, 0, 1) eq $c->{telegrambot}->{csign}) {
-			if (substr ($text, 1) eq 'help') {
+			if (substr ($text, 1) eq 'help'  ||  substr ($text, 1) eq 'помощь') {
 				my $send_args;
 				$send_args->{text} = << 'MYHELP';
 ```
@@ -237,30 +238,44 @@ MYHELP
 				$send_args->{chat_id} = $userid;
 				Teapot::Bot::Brain::sendMessage ($self, $send_args);
 				return;
-			} esle {
+			} else {
 				$reply = command($text, $userid);
 			}
 		} else {
-			my $str = $hailo->{$msg->chat->id}->learn_reply ($text);
+			my $just_message_in_chat = 0;
 
-			if (defined ($str) && $str ne '') {
-				$reply = $str;
-				# TODO: move it to telegramlib.pm/botlib.pm!
-				$phrase = trim ($text);
+			if (substr ($text, -2) eq '++'  ||  substr ($text, -2) eq '--') {
+				my @arr = split(/\n/, $text);
 
-				while ($phrase =~ /[\.|\,|\?|\!]$/) {
-					chop $phrase;
+				if ($#arr < 1) {
+					$reply = karmaSet ($chatid, substr ($text, 0, -2), substr ($text, -2));
+				} else {
+					$just_message_in_chat = 1;
 				}
+			}
 
-				$phrase = lc ($phrase);
+			if ($just_message_in_chat) {
+				my $str = $hailo->{$msg->chat->id}->learn_reply ($text);
 
-				if (lc ($reply) eq $phrase) {
-					$reply = randomCommonPhrase();
-				} elsif (lc ($reply) eq substr ($phrase, 0, -1)) {
-					# in case of trailing dot
-					$reply = randomCommonPhrase();
-				} elsif (substr (lc ($reply), 0, -1) eq $phrase) {
-					$reply = randomCommonPhrase();
+				if (defined ($str) && $str ne '') {
+					$reply = $str;
+					# TODO: move it to telegramlib.pm/botlib.pm!
+					$phrase = trim ($text);
+
+					while ($phrase =~ /[\.|\,|\?|\!]$/) {
+						chop $phrase;
+					}
+
+					$phrase = lc ($phrase);
+
+					if (lc ($reply) eq $phrase) {
+						$reply = randomCommonPhrase();
+					} elsif (lc ($reply) eq substr ($phrase, 0, -1)) {
+						# in case of trailing dot
+						$reply = randomCommonPhrase();
+					} elsif (substr (lc ($reply), 0, -1) eq $phrase) {
+						$reply = randomCommonPhrase();
+					}
 				}
 			}
 		}
@@ -330,7 +345,7 @@ MYHELP
 		# simple commands
 		# TODO: Log commands and answers
 		} elsif (substr ($text, 0, 1) eq $c->{telegrambot}->{csign}) {
-			if (substr ($text, 1) eq 'help') {
+			if (substr ($text, 1) eq 'help'  ||  substr ($text, 1) eq 'помощь') {
 				my $send_args;
 				$send_args->{text} = << 'MYHELP';
 ```
@@ -372,7 +387,7 @@ MYHELP
 			} elsif ((lc ($text) =~ /.+ ${qtname}[\,|\!|\?|\.| ]/) or (lc ($text) =~ / $qtname$/)) {
 				$phrase = $text;
 				$reply = $hailo->{$msg->chat->id}->reply ($phrase);
-			} elsif ((substr ($text, -2) eq '++') || (substr ($text, -2) eq '--')) {
+			} elsif (substr ($text, -2) eq '++'  ||  substr ($text, -2) eq '--') {
 				my @arr = split(/\n/, $text);
 
 				if ($#arr < 1) {
