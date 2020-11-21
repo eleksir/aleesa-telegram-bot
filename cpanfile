@@ -10,7 +10,6 @@ requires 'Hailo';
 requires 'HTTP::Tiny';
 requires 'IO::Socket::SSL';
 requires 'JSON';
-requires 'JSON::PP';
 requires 'JSON::XS';
 requires 'List::Util';
 requires 'local::lib';

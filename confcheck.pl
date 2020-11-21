@@ -7,7 +7,7 @@ use utf8;
 use open qw(:std :utf8);
 use English qw( -no_match_vars );
 use lib qw(./lib ./vendor_perl ./vendor_perl/lib/perl5);
-use JSON::PP;
+use JSON::XS;
 
 use version; our $VERSION = qv(1.0);
 
@@ -28,9 +28,10 @@ if ($readlen != $len) {
 }
 
 close C;                                             ## no critic (InputOutput::RequireCheckedSyscalls)
-$c = decode_json ($json);
+$c = JSON::XS->new->utf8->relaxed;
+my $data = $c->decode ($json);
 
-my $j = JSON::PP->new->pretty->canonical->indent_length (4); ## no critic (ValuesAndExpressions::ProhibitLongChainsOfMethodCalls)
-print $j->encode ($c);                               ## no critic (InputOutput::RequireCheckedSyscalls)
+my $j = JSON::XS->new->pretty();
+print $j->encode ($data);                            ## no critic (InputOutput::RequireCheckedSyscalls)
 
 # vim: set ft=perl noet ai ts=4 sw=4 sts=4:
