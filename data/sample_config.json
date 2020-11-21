@@ -1,6 +1,10 @@
 {
     "user" : "nobody",
     "debug_log" : "/var/log/aleesa-telegram-bot/debug.log",
+    "friday" : {
+        "dir" : "data/friday",
+        "src" : "data/friday.txt"
+    },
     "telegrambot" : {
         "name" : "mybot",
         "tname" : "@my_bot",

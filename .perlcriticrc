@@ -86,3 +86,6 @@ verbose     = 8
 # Considering this as "soft" requirement. For modules that is (or will be)
 # stand-alone libs well formed documentation is highly desired.
 lib_sections    = NAME | VERSION | DESCRIPTION | AUTHOR | LICENSE AND COPYRIGHT
+
+[-InputOutput::RequireBriefOpen]
+# Yes, i do!

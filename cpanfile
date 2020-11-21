@@ -1,6 +1,7 @@
 requires 'Carp';
 requires 'Cwd::utf8';
 requires 'DB_File';
+requires 'SQLite_File';
 requires 'Digest::MD5';
 requires 'Data::Dumper';
 requires 'Digest::SHA';

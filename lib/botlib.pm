@@ -17,6 +17,7 @@ use DB_File;
 use conf qw(loadConf);
 use lat qw(latAnswer);
 use karma qw(karmaSet karmaGet);
+use friday qw(friday);
 
 use vars qw/$VERSION/;
 
@@ -277,6 +278,8 @@ sub command {
 		}
 
 		$reply = karmaGet ($chatid, $mytext);
+	} elsif (substr ($text, 1) eq 'friday'  ||  substr ($text, 1) eq 'пятница') {
+		$reply = friday();
 	}
 
 	return $reply;
