@@ -18,7 +18,8 @@
         "appid": "get_it_on_openweathermap.org"
     },
     "lat" : {
-        "brain": "data/lat/lat.sqlite"
+        "brain": "data/lat/lat.sqlite",
+        "src": "data/lat.txt"
     },
     "karma" : {
         "dir": "data/karma"

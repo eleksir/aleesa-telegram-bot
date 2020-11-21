@@ -23,8 +23,8 @@ use botlib qw(logger);
 
 my $c = loadConf();
 my $brain = $c->{lat}->{brain};
+my $srcfile = $c->{lat}->{src};
 
-# swallow phrase and return answer
 sub train () {
 	my $braindir = dirname ($brain);
 
@@ -41,7 +41,7 @@ sub train () {
 		order => 2
 	);
 
-	$lat->train('data/phrases.txt');
+	$lat->train($srcfile);
 	my ($tokens, $expressions) = ($lat->stats())[0,1];
 	printf "Total tokens: %s\nTotal expressins: %s\n", $tokens, $expressions;
 	$lat->save();
