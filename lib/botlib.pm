@@ -262,15 +262,15 @@ sub command {
 		$reply = 'Шта?';
 	} elsif (substr ($text, 1) eq 'ver' || substr ($text, 1) eq 'version' || substr ($text, 1) eq 'версия') {
 		$reply = 'Версия:  Нуль.Чего-то_там.Чего-то_там';
-	} elsif (substr ($text, 1, 2) eq 'w ' || substr ($text, 1, 2) eq 'п ') {
+	} elsif (length ($text) >= 2 && (substr ($text, 1, 2) eq 'w ' || substr ($text, 1, 2) eq 'п ')) {
 		my $city = substr ($text, 3);
 		$reply = weather ($city);
 	} elsif (substr ($text, 1) eq 'lat'  ||  substr ($text, 1) eq 'лат') {
 		$reply = latAnswer ();
-	} elsif (substr ($text, 1, 6) eq 'karma '  ||  substr ($text, 1, 6) eq 'карма '  ||  substr($text, 1) eq 'karma'  ||  substr($text, $1) eq 'карма') {
+	} elsif ((length ($text) >= 6 && (substr ($text, 1, 6) eq 'karma ' || substr ($text, 1, 6) eq 'карма '))  ||  substr($text, 1) eq 'karma'  ||  substr($text, 1) eq 'карма') {
 		my $mytext = '';
 
-		if (length($text) >= 7) {
+		if (length($text) > 6) {
 			$mytext = substr ($text, 7);
 			chomp ($mytext);
 			$mytext = trim ($mytext);

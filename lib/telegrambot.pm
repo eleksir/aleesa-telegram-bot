@@ -41,10 +41,10 @@ sub __cron {
 #   fortune mod
 	my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime (time);
 
-	if ($hour = 8 && ($min >= 0 && $min <= 14)) {
+	if ($hour == 8 && ($min >= 0 && $min <= 14)) {
 		foreach my $enabledfortunechat (fortune_toggle_list()) {
 			my $send_args;
-			$send_args->{text} = sptintf "Сегодняшний день пройдёт под эгидой фразы:\n%s", fortune();
+			$send_args->{text} = sprintf "Сегодняшний день пройдёт под эгидой фразы:\n%s", fortune();
 			$send_args->{chat_id} = $enabledfortunechat;
 			Teapot::Bot::Brain::sendMessage ($self, $send_args);
 		}

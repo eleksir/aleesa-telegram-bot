@@ -42,7 +42,7 @@ sub seed () {
 	while (my $fortunefile = readdir ($srcdirhandle)) {
 		my $srcfile = sprintf '%s/%s', $srcdir, $fortunefile;
 		next unless (-f $srcfile);
-		next if (m/[\.|\$|\@]/);
+		next if ($fortunefile =~ m/\./);
 		open (my $fh, '<', $srcfile)  ||  croak "Unable to open $srcfile, $OS_ERROR\n";
 		# set correct phrase delimiter
 		local $INPUT_RECORD_SEPARATOR = "\n%\n";
@@ -145,7 +145,7 @@ sub fortune_status ($) {
 	if (defined $state && $state) {
 		$phrase .= 'показываtтся.';
 	} else {
-		$phrase .= 'yt показываtтся.';
+		$phrase .= 'не показывается.';
 	}
 
 	untie %toggle;
