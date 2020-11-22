@@ -16,6 +16,7 @@ use conf qw(loadConf);
 use botlib qw(weather logger trim randomCommonPhrase command);
 use telegramlib qw(visavi);
 use karma qw(karmaSet);
+use fortune qw(fortune fortune_toggle_list);
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(run_telegrambot);
@@ -34,10 +35,21 @@ my $can_talk = 0;
 
 has token => $c->{telegrambot}->{token};
 
-# i promise, i'll make use of this sub
-sub __cron {                                         ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+sub __cron {
 	my $self = shift;
-# noop
+
+#   fortune mod
+	my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime (time);
+
+	if ($hour = 8 && ($min >= 0 && $min <= 14)) {
+		foreach my $enabledfortunechat (fortune_toggle_list()) {
+			my $send_args;
+			$send_args->{text} = sptintf "Сегодняшний день пройдёт под эгидой фразы:\n%s", fortune();
+			$send_args->{chat_id} = $enabledfortunechat;
+			Teapot::Bot::Brain::sendMessage ($self, $send_args);
+		}
+	}
+
 	return;
 }
 
@@ -225,6 +237,12 @@ sub __on_msg {
 				$send_args->{text} = << 'MYHELP';
 ```
 !help | !помощь           - список команд
+!f | !ф                   - рандомная фраза из сборника цитат fortune_mod
+!fortune | !фортунка      - рандомная фраза из сборника цитат fortune_mod
+!f # | !ф #               - где 1 - вкл, 0 - выкл фортунку с утра
+!fortune # | !фортунка #  - где 1 - вкл, 0 - выкл фортунку с утра
+!f ? | !ф ?               - показываем ли с утра фортунку для чата
+!fortune ? | !фортунка ?  - показываем ли с утра фортунку для чата
 !friday | пятница         - а не пятница ли сегодня?
 !lat | !лат               - сгенерировать фразу из крылатых латинских выражений
 !ping | !пинг             - попинговать бота
@@ -352,6 +370,12 @@ MYHELP
 				$send_args->{text} = << 'MYHELP';
 ```
 !help | !помощь           - список команд
+!f | !ф                   - рандомная фраза из сборника цитат fortune_mod
+!fortune | !фортунка      - рандомная фраза из сборника цитат fortune_mod
+!f # | !ф #               - где 1 - вкл, 0 - выкл фортунку с утра
+!fortune # | !фортунка #  - где 1 - вкл, 0 - выкл фортунку с утра
+!f ? | !ф ?               - показываем ли с утра фортунку для чата
+!fortune ? | !фортунка ?  - показываем ли с утра фортунку для чата
 !friday | пятница         - а не пятница ли сегодня?
 !lat | !лат               - сгенерировать фразу из крылатых латинских выражений
 !ping | !пинг             - попинговать бота
@@ -452,7 +476,7 @@ sub init {
 
 	my $self = shift;
 	$self->add_listener (\&__on_msg);
-	# $self->add_repeating_task(900, \&__cron);
+	$self->add_repeating_task(900, \&__cron);
 	return;
 }
 

@@ -18,6 +18,7 @@ use conf qw(loadConf);
 use lat qw(latAnswer);
 use karma qw(karmaSet karmaGet);
 use friday qw(friday);
+use fortune qw(fortune fortune_toggle fortune_status);
 
 use vars qw/$VERSION/;
 
@@ -265,7 +266,7 @@ sub command {
 		my $city = substr ($text, 3);
 		$reply = weather ($city);
 	} elsif (substr ($text, 1) eq 'lat'  ||  substr ($text, 1) eq 'лат') {
-		$reply = latAnswer();
+		$reply = latAnswer ();
 	} elsif (substr ($text, 1, 6) eq 'karma '  ||  substr ($text, 1, 6) eq 'карма '  ||  substr($text, 1) eq 'karma'  ||  substr($text, $1) eq 'карма') {
 		my $mytext = '';
 
@@ -279,7 +280,15 @@ sub command {
 
 		$reply = karmaGet ($chatid, $mytext);
 	} elsif (substr ($text, 1) eq 'friday'  ||  substr ($text, 1) eq 'пятница') {
-		$reply = friday();
+		$reply = friday ();
+	} elsif (substr ($text, 1) eq 'fortune'  ||  substr ($text, 1) eq 'фортунка'  ||  substr ($text, 1) eq 'f'  ||  substr ($text, 1) eq 'ф') {
+		$reply = fortune ();
+	} elsif (substr ($text, 1) eq 'f 1'  ||  substr ($text, 1) eq 'fortune 1'  ||  substr ($text, 1) eq 'фортунка 1'  ||  substr ($text, 1) eq 'ф 1') {
+		$reply = fortune_toggle ($chatid, 1);
+	} elsif (substr ($text, 1) eq 'f 0'  ||  substr ($text, 1) eq 'fortune 0'  ||  substr ($text, 1) eq 'фортунка 0'  ||  substr ($text, 1) eq 'ф 0') {
+		$reply = fortune_toggle ($chatid, 0);
+	} elsif (substr ($text, 1) eq 'f ?'  ||  substr ($text, 1) eq 'fortune ?'  ||  substr ($text, 1) eq 'фортунка ?'  ||  substr ($text, 1) eq 'ф ?') {
+		$reply = fortune_status ($chatid);
 	}
 
 	return $reply;
