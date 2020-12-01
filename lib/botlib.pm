@@ -60,6 +60,8 @@ sub logger {
 sub trim {
 	my $str = shift;
 
+	return $str if ($str eq '');
+
 	while (substr ($str, 0, 1) =~ /^\s$/xms) {
 		$str = substr ($str, 1);
 	}

@@ -268,7 +268,7 @@ MYHELP
 				my @arr = split(/\n/, $text);
 
 				if ($#arr < 1) {
-					$reply = karmaSet ($chatid, substr ($text, 0, -2), substr ($text, -2));
+					$reply = karmaSet ($chatid, trim (substr ($text, 0, -2)), substr ($text, -2));
 				} else {
 					$just_message_in_chat = 1;
 				}
@@ -418,7 +418,7 @@ MYHELP
 				my @arr = split(/\n/, $text);
 
 				if ($#arr < 1) {
-					$reply = karmaSet ($chatid, substr ($text, 0, -2), substr ($text, -2));
+					$reply = karmaSet ($chatid, trim (substr ($text, 0, -2)), substr ($text, -2));
 				} else {
 					# just message in chat
 					$hailo->{$msg->chat->id}->learn ($text);
