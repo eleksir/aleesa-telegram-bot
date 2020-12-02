@@ -361,7 +361,7 @@ MYHELP
 			$phrase =~ s/$pat2//g;
 
 			# figure out reply :)
-			$reply = $hailo->{$msg->chat->id}->learn_reply ($phrase);
+			$reply = $hailo->{$msg->chat->id}->learn_reply ($phrase) if (length ($phrase) > 3);
 		# simple commands
 		# TODO: Log commands and answers
 		} elsif (substr ($text, 0, 1) eq $c->{telegrambot}->{csign}) {
