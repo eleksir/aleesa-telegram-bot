@@ -12,7 +12,7 @@ use JSON::XS;
 use version; our $VERSION = qv(1.0);
 
 my $c = 'data/config.json';
-open (my $C, '<', $c) or die "No conf at $c: $OS_ERROR\n"; ## no critic (InputOutput::RequireBriefOpen)
+open (my $C, '<', $c) or die "No conf at $c: $OS_ERROR\n";
 my $len = (stat ($c)) [7];
 my $json;
 my $readlen = read ($C, $json, $len);

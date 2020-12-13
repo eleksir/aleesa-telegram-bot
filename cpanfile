@@ -15,6 +15,8 @@ requires 'JSON::XS';
 requires 'List::Util';
 requires 'local::lib';
 requires 'Log::Any';
+requires 'Log::Any::Adapter';
+requires 'Log::Any::For::Std';
 requires 'Mojo::Base';
 requires 'Mojo::IOLoop';
 requires 'Mojo::UserAgent';

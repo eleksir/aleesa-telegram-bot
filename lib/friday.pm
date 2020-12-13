@@ -8,17 +8,15 @@ use utf8;
 use open qw(:std :utf8);
 use English qw( -no_match_vars );
 use Carp qw(cluck croak);
-
-use vars qw/$VERSION/;
-use Exporter qw(import);
-our @EXPORT_OK = qw(seed friday);
-
-$VERSION = '1.0';
-
 use SQLite_File;
 use MIME::Base64;
 use File::Path qw(mkpath);
 use conf qw(loadConf);
+
+use vars qw/$VERSION/;
+use Exporter qw(import);
+our @EXPORT_OK = qw(seed friday);
+$VERSION = '1.0';
 
 my $c = loadConf();
 my $dir = $c->{friday}->{dir};
@@ -69,7 +67,7 @@ sub friday () {
 	my $backingfile = sprintf '%s/%s.sqlite', $dir, $dow[$today];
 
 	tie my @array, 'SQLite_File', $backingfile  ||  do {
-		cluck "Unable to tie to $backingfile: $OS_ERROR\n";
+		cluck "[ERROR] Unable to tie to $backingfile: $OS_ERROR\n";
 		return '';
 	};
 

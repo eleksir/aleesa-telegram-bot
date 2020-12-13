@@ -8,17 +8,15 @@ use utf8;
 use open qw(:std :utf8);
 use English qw( -no_match_vars );
 use Carp qw(cluck croak);
-
-use vars qw/$VERSION/;
-use Exporter qw(import);
-our @EXPORT_OK = qw(seed fortune fortune_toggle fortune_toggle_list fortune_status);
-
-$VERSION = '1.0';
-
 use SQLite_File;
 use MIME::Base64;
 use File::Path qw(mkpath);
 use conf qw(loadConf);
+
+use vars qw/$VERSION/;
+use Exporter qw(import);
+our @EXPORT_OK = qw(seed fortune fortune_toggle fortune_toggle_list fortune_status);
+$VERSION = '1.0';
 
 my $c = loadConf();
 my $dir = $c->{fortune}->{dir};
@@ -32,10 +30,10 @@ sub seed () {
 	my $backingfile = sprintf '%s/fortune.sqlite', $dir;
 
 	if (-f $backingfile) {
-		unlink $backingfile   ||  croak "Unable to remove $backingfile: $OS_ERROR\n";
+		unlink $backingfile   ||  croak "Unable to remove $backingfile: $OS_ERROR";
 	}
 
-	tie my @fortune, 'SQLite_File', $backingfile  ||  croak "Unable to tie to $backingfile: $OS_ERROR\n";
+	tie my @fortune, 'SQLite_File', $backingfile  ||  croak "Unable to tie to $backingfile: $OS_ERROR";
 
 	opendir (my $srcdirhandle, $srcdir)  ||  croak "Unable to open $srcdir: $OS_ERROR";
 
@@ -43,7 +41,7 @@ sub seed () {
 		my $srcfile = sprintf '%s/%s', $srcdir, $fortunefile;
 		next unless (-f $srcfile);
 		next if ($fortunefile =~ m/\./);
-		open (my $fh, '<', $srcfile)  ||  croak "Unable to open $srcfile, $OS_ERROR\n";
+		open (my $fh, '<', $srcfile)  ||  croak "Unable to open $srcfile, $OS_ERROR";
 		# set correct phrase delimiter
 		local $INPUT_RECORD_SEPARATOR = "\n%\n";
 
@@ -65,7 +63,7 @@ sub fortune () {
 	my $backingfile = sprintf '%s/fortune.sqlite', $dir;
 
 	tie my @array, 'SQLite_File', $backingfile  ||  do {
-		cluck "Unable to tie to $backingfile: $OS_ERROR\n";
+		cluck "[ERROR] Unable to tie to $backingfile: $OS_ERROR";
 		return '';
 	};
 
@@ -83,7 +81,7 @@ sub fortune_toggle (@) {
 
 	unless (-d $dir) {
 		mkpath ($dir)  ||  do {
-			cluck "Unable to create $dir: $OS_ERROR";
+			cluck "[ERROR] Unable to create $dir: $OS_ERROR";
 			return;
 		};
 	}
@@ -91,7 +89,7 @@ sub fortune_toggle (@) {
 	my $backingfile = sprintf '%s/chats.sqlite', $dir;
 
 	tie my %toggle, 'SQLite_File', $backingfile  ||  do {
-		cluck "Unable to tie to $backingfile: $OS_ERROR\n";
+		cluck "[ERROR] Unable to tie to $backingfile: $OS_ERROR";
 		return;
 	};
 
@@ -128,7 +126,7 @@ sub fortune_status ($) {
 
 	unless (-d $dir) {
 		mkpath ($dir)  ||  do {
-			cluck "Unable to create $dir: $OS_ERROR";
+			cluck "[ERROR] Unable to create $dir: $OS_ERROR";
 			return;
 		};
 	}
@@ -136,7 +134,7 @@ sub fortune_status ($) {
 	my $backingfile = sprintf '%s/chats.sqlite', $dir;
 
 	tie my %toggle, 'SQLite_File', $backingfile  ||  do {
-		cluck "Unable to tie to $backingfile: $OS_ERROR\n";
+		cluck "[ERROR] Unable to tie to $backingfile: $OS_ERROR\n";
 		return;
 	};
 
@@ -154,13 +152,17 @@ sub fortune_status ($) {
 
 sub fortune_toggle_list () {
 	unless (-d $dir) {
-		mkpath ($dir)  ||  croak "Unable to create $dir: $OS_ERROR";
+		mkpath ($dir)  ||  do {
+			cluck "[ERROR] Unable to create $dir: $OS_ERROR";
+			my @empty = ();
+			return @empty;
+		}
 	}
 
 	my $backingfile = sprintf '%s/chats.sqlite', $dir;
 
 	tie my %toggle, 'SQLite_File', $backingfile  ||  do {
-		cluck "Unable to tie to $backingfile: $OS_ERROR\n";
+		cluck "[ERROR] Unable to tie to $backingfile: $OS_ERROR";
 		my @empty = ();
 		return @empty;
 	};

@@ -24,5 +24,4 @@ use lib ("$workdir/lib", "$workdir/vendor_perl", "$workdir/vendor_perl/lib/perl5
 use friday qw(seed);
 
 seed ();
-
 exit 0;

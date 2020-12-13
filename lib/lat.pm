@@ -8,18 +8,15 @@ use utf8;
 use open qw(:std :utf8);
 use English qw( -no_match_vars );
 use Carp qw(cluck);
-
-use vars qw/$VERSION/;
-use Exporter qw(import);
-our @EXPORT_OK = qw(train latAnswer);
-
-$VERSION = '1.0';
-
 use Hailo;
 use File::Basename qw(dirname);
 use File::Path qw(mkpath);
 use conf qw(loadConf);
-use botlib qw(logger);
+
+use vars qw/$VERSION/;
+use Exporter qw(import);
+our @EXPORT_OK = qw(train latAnswer);
+$VERSION = '1.0';
 
 my $c = loadConf();
 my $brain = $c->{lat}->{brain};
@@ -44,7 +41,7 @@ sub train () {
 	$lat->train($srcfile);
 	my ($tokens, $expressions) = ($lat->stats())[0,1];
 	printf "Total tokens: %s\nTotal expressins: %s\n", $tokens, $expressions;
-	$lat->save();
+	$lat->save ();
 	return;
 }
 
@@ -53,12 +50,12 @@ sub latAnswer () {
 	my $braindir = dirname ($brain);
 
 	unless (-d $braindir) {
-		cluck "No lat module data: $braindir is absent! Train lat first.";
+		cluck "[ERROR] No lat module data: $braindir is absent! Train lat first.";
 		return '';
 	}
 
 	unless (-f $brain) {
-		cluck "No lat module data: $brain is absent! Train lat first.";
+		cluck "[ERROR] No lat module data: $brain is absent! Train lat first.";
 		return '';
 	}
 

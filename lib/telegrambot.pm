@@ -4,23 +4,21 @@ package telegrambot;
 use 5.018;
 use strict;
 use warnings;
-use vars qw/$VERSION/;
 use utf8;
 use Data::Dumper;
 use open qw(:std :utf8);
+use Carp qw(carp);
 use File::Path qw(mkpath);
 use Hailo;
 use Mojo::Base 'Teapot::Bot::Brain';
-
 use conf qw(loadConf);
-use botlib qw(weather logger trim randomCommonPhrase command);
-use telegramlib qw(visavi);
+use botlib qw(weather trim randomCommonPhrase command);
 use karma qw(karmaSet);
 use fortune qw(fortune fortune_toggle_list);
 
+use vars qw/$VERSION/;
 use Exporter qw(import);
 our @EXPORT_OK = qw(run_telegrambot);
-
 $VERSION = '1.0';
 
 my $c = loadConf();
@@ -42,9 +40,9 @@ sub __cron {
 	my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime (time);
 
 	if ($hour == 8 && ($min >= 0 && $min <= 14)) {
-		foreach my $enabledfortunechat (fortune_toggle_list()) {
+		foreach my $enabledfortunechat (fortune_toggle_list ()) {
 			my $send_args;
-			$send_args->{text} = sprintf "Сегодняшний день пройдёт под эгидой фразы:\n%s", fortune();
+			$send_args->{text} = sprintf "Сегодняшний день пройдёт под эгидой фразы:\n%s", fortune ();
 			$send_args->{chat_id} = $enabledfortunechat;
 			Teapot::Bot::Brain::sendMessage ($self, $send_args);
 		}
@@ -134,20 +132,23 @@ sub __on_msg {
 			}
 
 			if ($me->{'status'} eq 'administrator') {
-				logger "I can talk in group chat $chatname ($chatid)";
+				carp "[DEBUG] I can talk in group chat $chatname ($chatid)" if $c->{debug};
 				$can_talk = 1;
 			} else {
-				logger "I can talk in group chat $chatname ($chatid)" if ($group_talk);
-				logger "I can not talk in group chat $chatname ($chatid)" unless ($group_talk);
+				if ($c->{debug}) {
+					carp "[DEBUG] I can talk in group chat $chatname ($chatid)" if ($group_talk);
+					carp "[DEBUG] I can not talk in group chat $chatname ($chatid)" unless ($group_talk);
+				}
+
 				$can_talk = $group_talk;
 			}
 		} else {
 			# private chat, so definely bot can talk
-			logger "I can talk in private chat $chatname ($chatid)";
+			carp "[DEBUG] I can talk in private chat $chatname ($chatid)" if $c->{debug};
 			$can_talk = 1;
 		}
 	} else {
-		logger 'Unable to get chatid';
+		carp '[INFO] Unable to get chatid';
 	}
 
 	# according api user must have username and/or first_name and/or last_name at least one of these fields
@@ -158,7 +159,7 @@ sub __on_msg {
 		if ($msg->from->can ('first_name') && defined ($msg->from->first_name)) {
 			$fullname = $msg->from->first_name;
 
-			if ($msg->from->can('last_name') && defined ($msg->from->last_name)) {
+			if ($msg->from->can ('last_name') && defined ($msg->from->last_name)) {
 				$fullname .= ' ' . $msg->from->last_name;
 			}
 		} elsif ($msg->from->can ('last_name') && defined ($msg->from->last_name)) {
@@ -178,14 +179,14 @@ sub __on_msg {
 
 		if (defined ($username)) {
 			if (defined ($fullname)) {
-				logger "Newcommer in $chatname ($chatid): \@$username, $fullname ($userid)";
+				carp "[DEBUG] Newcommer in $chatname ($chatid): \@$username, $fullname ($userid)" if $c->{debug};
 				$send_args->{text} = "Дратути, [$fullname](tg://user?id=$userid). Представьтес, пожалуйста, и расскажите, что вас сюда привело.";
 			} else {
-				logger "Newcommer in $chatname ($chatid): \@$username ($userid)";
+				carp "[DEBUG] Newcommer in $chatname ($chatid): \@$username ($userid)" if $c->{debug};
 				$send_args->{text} = "Дратути, [$username](tg://user?id=$userid). Представьтес, пожалуйста, и расскажите, что вас сюда привело.";
 			}
 		} else {
-			logger "Newcommer in $chatname ($chatid): $fullname ($userid)";
+			carp "[DEBUG] Newcommer in $chatname ($chatid): $fullname ($userid)" if $c->{debug};
 			$send_args->{text} = "Дратути, [$fullname](tg://user?id=$userid). Представьтес, пожалуйста, и расскажите, что вас сюда привело.";
 		}
 
@@ -193,7 +194,7 @@ sub __on_msg {
 		sleep (int ( rand (2) + 1));
 
 		for (0..(4 + int (rand (3)))) {
-			$msg->typing();
+			$msg->typing ();
 			sleep(3);
 			sleep 3 unless ($_);
 		}
@@ -215,9 +216,9 @@ sub __on_msg {
 		);
 
 		if ($chatid < 0) {
-			logger "Initialized brain for public chat $chatname ($chatid): $brainname";
+			carp "[INFO] Initialized brain for public chat $chatname ($chatid): $brainname";
 		} else {
-			logger "Initialized for private chat $chatname ($chatid): $brainname";
+			carp "[INFO] Initialized for private chat $chatname ($chatid): $brainname";
 		}
 	}
 
@@ -227,7 +228,7 @@ sub __on_msg {
 		return unless ($msg->can ('text') && defined ($msg->text));
 
 		my $text = $msg->text;
-		logger sprintf ('Private chat %s say to bot: %s', $vis_a_vi, $text);
+		carp sprintf ('[DEBUG] Private chat %s say to bot: %s', $vis_a_vi, $text) if $c->{debug};
 		my $csign = quotemeta ($c->{telegrambot}->{csign});
 		my $reply = 'Давайте ещё пообщаемся, а то я ещё не научилась от вас плохому.';
 
@@ -259,7 +260,7 @@ MYHELP
 				Teapot::Bot::Brain::sendMessage ($self, $send_args);
 				return;
 			} else {
-				$reply = command($text, $userid);
+				$reply = command ($text, $userid);
 			}
 		} else {
 			my $just_message_in_chat = 0;
@@ -289,21 +290,21 @@ MYHELP
 					$phrase = lc ($phrase);
 
 					if (lc ($reply) eq $phrase) {
-						$reply = randomCommonPhrase();
+						$reply = randomCommonPhrase ();
 					} elsif (lc ($reply) eq substr ($phrase, 0, -1)) {
 						# in case of trailing dot
-						$reply = randomCommonPhrase();
+						$reply = randomCommonPhrase ();
 					} elsif (substr (lc ($reply), 0, -1) eq $phrase) {
-						$reply = randomCommonPhrase();
+						$reply = randomCommonPhrase ();
 					}
 				}
 			}
 		}
 
 		if (defined $reply) {
-			$msg->typing();
+			$msg->typing ();
 			sleep 1;
-			logger sprintf ("Private chat bot reply to $vis_a_vi: %s", $reply);
+			carp sprintf ("[DEBUG] Private chat bot reply to $vis_a_vi: %s", $reply) if $c->{debug};
 			$msg->reply ($reply);
 		}
 # group chat
@@ -312,7 +313,7 @@ MYHELP
 
 		# detect and log messages without text, noop here
 		unless (defined ($msg->text)) {
-			logger sprintf('No text in message from %s', $vis_a_vi);
+			carp sprintf ('[INFO] No text in message from %s', $vis_a_vi);
 
 			if ($msg->can ('document') && defined ($msg->document)) {
 				if (defined ($msg->document->{'file_name'})) {
@@ -320,21 +321,21 @@ MYHELP
 					$docsize = $msg->document->{'file_size'} if (defined ($msg->document->{'file_size'}));
 					my $type = 'unknown';
 					$type = $msg->document->{'mime_type'} if (defined ($msg->document->{'mime_type'}));
-					logger sprintf ('In public chat %s (%s) %s send document type %s named %s, size %s bytes', $chatname, $chatid, $vis_a_vi, $type, $msg->document->{'file_name'}, $docsize);
+					carp sprintf ('[DEBUG] In public chat %s (%s) %s send document type %s named %s, size %s bytes', $chatname, $chatid, $vis_a_vi, $type, $msg->document->{'file_name'}, $docsize) if $c->{debug};
 				} else {
-					logger sprintf ('In public chat %s (%s) %s send unknown document', $chatname, $chatid, $vis_a_vi);
+					carp sprintf ('In public chat %s (%s) %s send unknown document', $chatname, $chatid, $vis_a_vi) if $c->{debug};
 				}
 			} elsif ($msg->can ('sticker') && defined ($msg->sticker)) {
 				my $set_name = 'unknown';
 				$set_name = $msg->sticker->set_name if ($msg->sticker->can ('set_name') && defined ($msg->sticker->set_name));
 				my $emoji = 'unknown';
 				$emoji = $msg->sticker->emoji if ($msg->sticker->can ('emoji') && defined ($msg->sticker->emoji));
-				logger sprintf ('In public chat %s (%s) %s reacted with sticker %s from pack %s', $chatname, $chatid, $vis_a_vi, $emoji, $set_name);
+				carp sprintf ('[DEBUG] In public chat %s (%s) %s reacted with sticker %s from pack %s', $chatname, $chatid, $vis_a_vi, $emoji, $set_name) if $c->{debug};
 			} elsif ($msg->can ('photo') && defined ($msg->photo)) {
 				# actually it is an array! duh, hate arrays!
-				logger sprintf ('In public chat %s (%s) %s send photo', $chatname, $chatid, $vis_a_vi);
+				carp sprintf ('[DEBUG] In public chat %s (%s) %s send photo', $chatname, $chatid, $vis_a_vi) if $c->{debug};
 			} else {
-				logger Dumper ($msg);
+				carp Dumper ($msg) if $c->{debug};
 			}
 
 			return;
@@ -342,7 +343,7 @@ MYHELP
 
 		# we have text here! so potentially we can chit-chat
 		my $text = $msg->text;
-		logger sprintf ('In public chat %s (%s) %s say: %s', $chatname, $chatid, $vis_a_vi, $text);
+		carp sprintf ('[DEBUG] In public chat %s (%s) %s say: %s', $chatname, $chatid, $vis_a_vi, $text) if $c->{debug};
 		my $qname = quotemeta ($c->{telegrambot}->{name});
 		my $qtname = quotemeta ($c->{telegrambot}->{tname});
 		my $csign = quotemeta ($c->{telegrambot}->{csign});
@@ -352,7 +353,7 @@ MYHELP
 		            defined ($msg->reply_to_message->from) &&
 		                    defined ($msg->reply_to_message->from->username) &&
 		                            ($msg->reply_to_message->from->username eq $myusername)) {
-			logger sprintf ('In public chat %s (%s) %s quote us!', $chatname, $chatid, $vis_a_vi);
+			carp sprintf ('[DEBUG] In public chat %s (%s) %s quote us!', $chatname, $chatid, $vis_a_vi);
 			# remove our name from users reply, just in case
 			my $pat1 = quotemeta ('@' . $myusername);
 			my $pat2 = quotemeta ($myfullname);
@@ -440,23 +441,23 @@ MYHELP
 			$phrase = lc ($phrase);
 
 			if (lc ($reply) eq $phrase) {
-				$reply = randomCommonPhrase();
+				$reply = randomCommonPhrase ();
 			} elsif (lc ($reply) eq substr ($phrase, 0, -1)) {
 				# in case of trailing dot
-				$reply = randomCommonPhrase();
+				$reply = randomCommonPhrase ();
 			} elsif (substr(lc ($reply), 0, -1) eq $phrase) {
-				$reply = randomCommonPhrase();
+				$reply = randomCommonPhrase ();
 			}
 
-			$msg->typing();
+			$msg->typing ();
 			sleep (int (rand (2)));
-			logger sprintf ('In public chat %s (%s) bot reply to %s: %s', $chatname, $chatid, $vis_a_vi, $reply);
+			carp sprintf ('[DEBUG] In public chat %s (%s) bot reply to %s: %s', $chatname, $chatid, $vis_a_vi, $reply) if $c->{debug};
 			$msg->reply ($reply);
 		} else {
 			if ($can_talk) {
-				logger sprintf ('In public chat %s (%s) bot is not required to reply to %s', $chatname, $chatid, $vis_a_vi);
+				carp sprintf ('[DEBUG] In public chat %s (%s) bot is not required to reply to %s', $chatname, $chatid, $vis_a_vi) if $c->{debug};
 			} else {
-				logger sprintf ('In public chat %s (%s) bot can\'t talk, but reply to %s is: %s', $chatname, $chatid, $vis_a_vi, $reply);
+				carp sprintf ('[DEBUG] In public chat %s (%s) bot can\'t talk, but reply to %s is: %s', $chatname, $chatid, $vis_a_vi, $reply) if $c->{debug};
 			}
 		}
 
@@ -476,7 +477,7 @@ sub init {
 
 	my $self = shift;
 	$self->add_listener (\&__on_msg);
-	$self->add_repeating_task(900, \&__cron);
+	$self->add_repeating_task (900, \&__cron);
 	return;
 }
 
@@ -488,6 +489,21 @@ sub run_telegrambot {
 	}
 
 	return;
+}
+
+sub visavi {
+	my ($userid, $username, $fullname) = @_;
+	my $name = '';
+
+	if (defined ($username)) {
+		$name .= '@' . $username;
+		$name .= ', ' . $fullname if (defined ($fullname));
+	} else {
+		$name .= $fullname;
+	}
+
+	$name .= " ($userid)";
+	return $name;
 }
 
 1;

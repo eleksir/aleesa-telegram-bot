@@ -7,13 +7,12 @@ use warnings;
 use utf8;
 use open qw(:std :utf8);
 use English qw( -no_match_vars );
-
+use Carp qw(carp);
 use HTTP::Tiny;
 use URI::URL;
 use JSON::XS qw(decode_json encode_json);
 use Digest::MD5 qw(md5_base64);
 use DB_File;
-
 use conf qw(loadConf);
 use lat qw(latAnswer);
 use karma qw(karmaSet karmaGet);
@@ -21,10 +20,8 @@ use friday qw(friday);
 use fortune qw(fortune fortune_toggle fortune_status);
 
 use vars qw/$VERSION/;
-
 use Exporter qw(import);
-our @EXPORT_OK = qw(weather logger trim randomCommonPhrase command);
-
+our @EXPORT_OK = qw(weather trim randomCommonPhrase command);
 $VERSION = '1.0';
 
 my $c = loadConf();
@@ -35,26 +32,6 @@ sub __urlencode {
 	$str = $urlobj->as_string;
 	$urlobj = undef; undef $urlobj;
 	return $str;
-}
-
-sub logger {
-	my $msg = shift;
-
-	if ($c->{debug_log}) {
-		my @date = localtime();
-		my @month = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
-		my $t = sprintf ('%02s %02d %02d:%02d:%02d ', $month[$date[4]], $date[3], $date[2], $date[1], $date[0]);
-
-		my $mode = '>';
-		$mode = '>>' if (-f $c->{debug_log});
-
-		if (open my $LOG, $mode, $c->{debug_log}) {
-			print $LOG $t . $msg . "\n";             ## no critic (InputOutput::RequireCheckedSyscalls)
-			close $LOG;                              ## no critic (InputOutput::RequireCheckedSyscalls)
-		}
-	}
-
-	return;
 }
 
 sub trim {
@@ -130,12 +107,12 @@ sub __weather {
 
 	# attach to cache data
 	tie my %cachetime, 'DB_File', $c->{openweathermap}->{cachetime} or do {
-		logger "Something nasty happen when cachetime ties to its data: $OS_ERROR";
+		carp "[ERROR] Something nasty happen when cachetime ties to its data: $OS_ERROR";
 		return undef;
 	};
 
 	tie my %cachedata, 'DB_File', $c->{openweathermap}->{cachedata} or do {
-		logger "Something nasty happen when cachedata ties to its data: $OS_ERROR";
+		carp "[ERROR] Something nasty happen when cachedata ties to its data: $OS_ERROR";
 		return undef;
 	};
 
@@ -158,7 +135,7 @@ sub __weather {
 			$fc = eval { decode_json ($r->{content}) };
 
 			if ($EVAL_ERROR) {
-				logger "[WARN] openweathermap returns corrupted json: $EVAL_ERROR";
+				carp "[WARN] openweathermap returns corrupted json: $EVAL_ERROR";
 				untie %cachetime;
 				untie %cachedata;
 				return undef;
