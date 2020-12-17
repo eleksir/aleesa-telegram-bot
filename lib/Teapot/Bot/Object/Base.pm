@@ -3,7 +3,8 @@ package Teapot::Bot::Object::Base;
 
 use Mojo::Base -base;
 use List::Util qw/any/;
-use Carp qw/croak/;
+use Carp qw/croak cluck/;
+use Data::Dumper;
 
 $Teapot::Bot::Object::Base::VERSION = '0.022';
 
@@ -14,6 +15,11 @@ sub arrays { return qw// }  # override if needed
 sub _field_is_array {
   my $self = shift;
   my $field = shift;
+
+  unless (defined $field) {
+    return;
+  }
+
   if (any { /^$field$/ } $self->arrays) {
     return 1;
   }
@@ -25,6 +31,11 @@ sub array_of_arrays {  return qw// } #override if needed
 sub _field_is_array_of_arrays {
   my $self = shift;
   my $field = shift;
+
+  unless (defined $field) {
+    return;
+  }
+
   if (any { /^$field$/ } $self->array_of_arrays) {
     return 1;
   }
@@ -40,11 +51,23 @@ sub create_from_hash {
   my $brain = shift || croak 'No brain supplied to create_from_hash()';
   my $obj   = $class->new(_brain => $brain);
 
+  unless (defined $hash) {
+    cluck "Hash is undef";
+    return $obj;
+  }
+
+  unless (ref ($hash) eq 'HASH') {
+    cluck "Not a hash " . Dumper ($hash);
+    return $obj;
+  }
+
   # deal with each type of field
   foreach my $type (keys %{ $class->fields }) {
     my @fields_of_this_type = @{ $class->fields->{$type} };
 
     foreach my $field (@fields_of_this_type) {
+      # ignore undefined fields (sic!)
+      next if (! defined $field);
 
       # ignore fields for which we have no value in the hash
       next if (! defined $hash->{$field} );
