@@ -353,7 +353,7 @@ MYHELP
 		            defined ($msg->reply_to_message->from) &&
 		                    defined ($msg->reply_to_message->from->username) &&
 		                            ($msg->reply_to_message->from->username eq $myusername)) {
-			carp sprintf ('[DEBUG] In public chat %s (%s) %s quote us!', $chatname, $chatid, $vis_a_vi);
+			carp sprintf ('[DEBUG] In public chat %s (%s) %s quote us!', $chatname, $chatid, $vis_a_vi) if $c->{debug};
 			# remove our name from users reply, just in case
 			my $pat1 = quotemeta ('@' . $myusername);
 			my $pat2 = quotemeta ($myfullname);
