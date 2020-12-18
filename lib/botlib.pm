@@ -18,6 +18,7 @@ use lat qw(latAnswer);
 use karma qw(karmaSet karmaGet);
 use friday qw(friday);
 use fortune qw(fortune fortune_toggle fortune_status);
+use archeologist qw (dig);
 
 use vars qw/$VERSION/;
 use Exporter qw(import);
@@ -227,9 +228,37 @@ sub randomCommonPhrase {
 }
 
 sub command {
+	my $self = shift;
+	my $msg = shift;
 	my $text = shift;
 	my $chatid = shift;
 	my $reply;
+	my $fullname;
+	my $highlight;
+	my $username;
+	my $userid = $msg->from->id;
+	$username = $msg->from->username if ($msg->from->can ('username') && defined($msg->from->username));
+
+	if ($msg->from->can ('first_name') && defined ($msg->from->first_name)) {
+		$fullname = $msg->from->first_name;
+
+		if ($msg->from->can ('last_name') && defined ($msg->from->last_name)) {
+			$fullname .= ' ' . $msg->from->last_name;
+		}
+	} elsif ($msg->from->can ('last_name') && defined ($msg->from->last_name)) {
+		$fullname .= $msg->from->last_name;
+	}
+
+	if (defined ($username)) {
+		if (defined ($fullname)) {
+			$highlight = "[$fullname](tg://user?id=$userid)";
+		} else {
+			$highlight = "[$username](tg://user?id=$userid)";
+		}
+	} else {
+		$highlight = "[$fullname](tg://user?id=$userid)";
+	}
+
 
 	if (substr ($text, 1) eq 'ping') {
 		$reply = 'Pong.';
@@ -268,6 +297,12 @@ sub command {
 		$reply = fortune_toggle ($chatid, 0);
 	} elsif (substr ($text, 1) eq 'f ?'  ||  substr ($text, 1) eq 'fortune ?'  ||  substr ($text, 1) eq 'фортунка ?'  ||  substr ($text, 1) eq 'ф ?') {
 		$reply = fortune_status ($chatid);
+	} elsif (substr ($text, 1) eq 'dig' || substr ($text, 1) eq 'копать') {
+		my $send_args;
+		$send_args->{text} = dig ($highlight);
+		$send_args->{parse_mode} = 'Markdown';
+		$send_args->{chat_id} = $msg->chat->id;
+		Teapot::Bot::Brain::sendMessage ($self, $send_args);
 	}
 
 	return $reply;
