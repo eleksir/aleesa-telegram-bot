@@ -12,7 +12,7 @@ use File::Path qw(mkpath);
 use Hailo;
 use Mojo::Base 'Teapot::Bot::Brain';
 use conf qw(loadConf);
-use botlib qw(weather trim randomCommonPhrase command highlight);
+use botlib qw(weather trim randomCommonPhrase command highlight botsleep);
 use karma qw(karmaSet);
 use fortune qw(fortune fortune_toggle_list);
 
@@ -103,30 +103,8 @@ sub __on_msg {
 
 	# Newcommer event, greet our new member and suggest to introduce themself.
 	if ($msg->can ('new_chat_members') && defined ($msg->new_chat_members)) {
-		if (defined ($username)) {
-			if (defined ($fullname)) {
-				carp "[DEBUG] Newcommer in $chatname ($chatid): \@$username, $fullname ($userid)" if $c->{debug};
-				$phrase = "Дратути, [$fullname](tg://user?id=$userid). Представьтес, пожалуйста, и расскажите, что вас сюда привело.";
-			} else {
-				carp "[DEBUG] Newcommer in $chatname ($chatid): \@$username ($userid)" if $c->{debug};
-				$phrase = "Дратути, [$username](tg://user?id=$userid). Представьтес, пожалуйста, и расскажите, что вас сюда привело.";
-			}
-		} else {
-			carp "[DEBUG] Newcommer in $chatname ($chatid): $fullname ($userid)" if $c->{debug};
-			$phrase = "Дратути, [$fullname](tg://user?id=$userid). Представьтес, пожалуйста, и расскажите, что вас сюда привело.";
-		}
-
-		# let's emulate real human and delay answer
-		sleep (int ( rand (2) + 1));
-
-		for (0..(4 + int (rand (3)))) {
-			$msg->typing ();
-			sleep(3);
-			sleep 3 unless ($_);
-		}
-
-		sleep ( 3 + int ( rand (2)));
-
+		$phrase = "Дратути, $highlight. Представьтес, пожалуйста, и расскажите, что вас сюда привело.";
+		botsleep($msg);
 		$msg->replyMd ($phrase);
 		return;
 	}

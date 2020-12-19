@@ -22,7 +22,7 @@ use archeologist qw (dig);
 
 use vars qw/$VERSION/;
 use Exporter qw(import);
-our @EXPORT_OK = qw(weather trim randomCommonPhrase command highlight);
+our @EXPORT_OK = qw(weather trim randomCommonPhrase command highlight botsleep);
 $VERSION = '1.0';
 
 my $c = loadConf();
@@ -274,6 +274,8 @@ sub command {
 		$reply = fortune_status ($chatid);
 	} elsif (substr ($text, 1) eq 'dig' || substr ($text, 1) eq 'копать') {
 		$reply = dig ($highlight);
+		$msg->typing ();
+		sleep (int ( rand (2) + 1));
 		$msg->replyMd ($reply);
 		return;
 	} elsif (substr ($text, 1) eq 'help'  ||  substr ($text, 1) eq 'помощь') {
@@ -343,6 +345,23 @@ sub highlight {
 
 	return ($userid, $username, $fullname, $highlight, $visavi);
 }
+
+sub botsleep {
+	# TODO: Parametrise this with fuzzy sleep time in seconds
+	my $msg = shift;
+	# let's emulate real human and delay answer
+	sleep (int ( rand (2) + 1));
+
+	for (0..(4 + int (rand (3)))) {
+		$msg->typing ();
+		sleep(3);
+		sleep 3 unless ($_);
+	}
+
+	sleep ( 3 + int ( rand (2)));
+	return;
+}
+
 1;
 
 # vim: set ft=perl noet ai ts=4 sw=4 sts=4:
