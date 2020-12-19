@@ -29,6 +29,7 @@ use Teapot::Bot::Object::PassportData;
 use Teapot::Bot::Object::InlineKeyboardMarkup;
 
 use Data::Dumper;
+use Carp qw(cluck);
 
 $Teapot::Bot::Object::Message::VERSION = '0.022';
 
@@ -134,12 +135,44 @@ sub arrays {
 sub reply {
   my $self = shift;
   my $text = shift;
-  return $self->_brain->sendMessage({chat_id => $self->chat->id, text => $text});
+
+  my $chatid = $self->chat->id;
+
+  if (Teapot::Bot::Object::ChatPermissions::canTalk($self, $chatid)) {
+    return $self->_brain->sendMessage({chat_id => $chatid, text => $text});
+  }
+
+  return {'error' => 1};
+}
+
+sub replyMd {
+  my $self = shift;
+  my $text = shift;
+
+  my $chatid = $self->chat->id;
+
+  if (Teapot::Bot::Object::ChatPermissions::canTalk ($self, $chatid)) {
+    my $send_args;
+    $send_args->{text} = $text;
+    $send_args->{parse_mode} = 'Markdown';
+    $send_args->{chat_id} = $chatid;
+
+    return $self->_brain->sendMessage($send_args);
+  }
+
+  return {'error' => 1};
 }
 
 sub typing {
   my $self = shift;
-  return $self->_brain->sendChatAction({chat_id => $self->chat->id});
+
+  my $chatid = $self->chat->id;
+
+  if (Teapot::Bot::Object::ChatPermissions::canTalk ($self, $chatid)) {
+    return $self->_brain->sendChatAction({chat_id => $chatid});
+  }
+
+  return {'error' => 1};
 }
 
 1;

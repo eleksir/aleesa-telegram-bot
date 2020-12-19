@@ -1,6 +1,6 @@
 package Teapot::Bot::Object::ChatPermissions;
 # ABSTRACT: The base class for Telegram 'ChatPermissions' type objects
-
+use Carp qw(carp);
 use Mojo::Base 'Teapot::Bot::Object::Base';
 
 $Teapot::Bot::Object::ChatPermissions::VERSION = '0.022';
@@ -26,6 +26,53 @@ sub fields {
                                                     can_send_other_messages can_add_web_page_previews can_change_info
                                                     can_invite_users can_pin_messages/]
          };
+}
+
+sub canTalk {
+  my $self = shift;
+  my $chatid = shift;
+
+  my $can_talk = 0;
+
+  if ($chatid < 0) {
+    # group chat
+    my $chatobj = $self->_brain->getChat ({ 'chat_id' => $chatid });
+
+    # on api error, keep silence
+    unless ($chatobj) {
+      carp "Unable to get chat info for $chatid from telegram API";
+      return 0;
+    }
+
+    my $myObj = $self->_brain->getMe ();
+
+    # on api error, keep silence
+    unless ($chatobj) {
+      carp "Unable to get chat info for $chatid from telegram API";
+      return 0;
+    }
+
+    my $myid = $myObj->id;
+    my $me = $self->_brain->getChatMember ({ 'chat_id' => $chatid, 'user_id' => $myid });
+
+    # on api error, keep silence
+    unless ($me) {
+      carp 'Unable to get chat info for bot itself from telegram API';
+      return 0;
+    }
+
+    if ($me->{'status'} eq 'administrator') {
+      $can_talk = 1;
+    } else {
+      my $group_talk = int ($chatobj->{permissions}->{can_send_messages});
+      $can_talk = $group_talk;
+    }
+  } else {
+    # 1 on 1 chat with user
+    $can_talk = 1;
+  }
+
+  return $can_talk;
 }
 
 1;

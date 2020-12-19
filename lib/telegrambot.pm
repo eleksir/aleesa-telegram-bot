@@ -12,7 +12,7 @@ use File::Path qw(mkpath);
 use Hailo;
 use Mojo::Base 'Teapot::Bot::Brain';
 use conf qw(loadConf);
-use botlib qw(weather trim randomCommonPhrase command);
+use botlib qw(weather trim randomCommonPhrase command highlight);
 use karma qw(karmaSet);
 use fortune qw(fortune fortune_toggle_list);
 
@@ -28,8 +28,6 @@ my $myusername;
 my $myfirst_name;
 my $mylast_name;
 my $myfullname;
-# guess it later
-my $can_talk = 0;
 
 has token => $c->{telegrambot}->{token};
 
@@ -57,12 +55,7 @@ sub __on_msg {
 	my $chatid;
 	my $chatname = 'Noname chat';
 	# user sending message info
-	my $userid;
-	my $username;
-	my $fullname;
-	my $vis_a_vi = 'unknown';
-
-	$can_talk = 0;
+	my ($userid, $username, $fullname, $highlight, $vis_a_vi) = highlight ($msg);
 
 	unless ($myid) {
 		my $myObj = Teapot::Bot::Brain::getMe ($self);
@@ -102,92 +95,25 @@ sub __on_msg {
 				$chatname = 'Noname chat';
 			}
 		}
-
-		# because of bot api restriction there is no events about changing permissions
-		# in chat sent to bot so before sending any answer, we should check if we can do so
-
-		# N.B. there is situation when we do not recieve any messages from chat: if we
-		# are in exception list, even if it allows any kind of events for bot
-
-		# If we are just member of chat, it looks like we obey general chat restrictions,
-		# so we need only to query getChat in this case
-		# If we admin, we can get|send messages even if group by itself disallows it.
-
-		# works only for public chats, so id shoud be < 0.
-		if ($chatid < 0) {
-			my $chatobj = Teapot::Bot::Brain::getChat ($self, { 'chat_id' => $chatid });
-
-			unless ($chatobj) {
-				sleep 3;
-				$chatobj = Teapot::Bot::Brain::getChat ($self, { 'chat_id' => $chatid });
-			}
-
-			# actually evaluates to 1 for true and to 0 for false
-			$group_talk = int ($chatobj->{permissions}->{can_send_messages});
-			my $me = Teapot::Bot::Brain::getChatMember ($self, { 'chat_id' => $chatid, 'user_id' => $myid });
-
-			unless ($me) {
-				sleep 3;
-				$me = Teapot::Bot::Brain::getChatMember ($self, { 'chat_id' => $chatid, 'user_id' => $myid });
-			}
-
-			if ($me->{'status'} eq 'administrator') {
-				carp "[DEBUG] I can talk in group chat $chatname ($chatid)" if $c->{debug};
-				$can_talk = 1;
-			} else {
-				if ($c->{debug}) {
-					carp "[DEBUG] I can talk in group chat $chatname ($chatid)" if ($group_talk);
-					carp "[DEBUG] I can not talk in group chat $chatname ($chatid)" unless ($group_talk);
-				}
-
-				$can_talk = $group_talk;
-			}
-		} else {
-			# private chat, so definely bot can talk
-			carp "[DEBUG] I can talk in private chat $chatname ($chatid)" if $c->{debug};
-			$can_talk = 1;
-		}
 	} else {
 		carp '[INFO] Unable to get chatid';
-	}
-
-	# according api user must have username and/or first_name and/or last_name at least one of these fields
-	if ($msg->can ('from') && defined ($msg->from)) {
-		$userid = $msg->from->id; # it must be filled, so do not check it
-		$username = $msg->from->username if ($msg->from->can ('username') && defined($msg->from->username));
-
-		if ($msg->from->can ('first_name') && defined ($msg->from->first_name)) {
-			$fullname = $msg->from->first_name;
-
-			if ($msg->from->can ('last_name') && defined ($msg->from->last_name)) {
-				$fullname .= ' ' . $msg->from->last_name;
-			}
-		} elsif ($msg->from->can ('last_name') && defined ($msg->from->last_name)) {
-			$fullname .= $msg->from->last_name;
-		}
-
-		$vis_a_vi = visavi ($userid, $username, $fullname);
 	}
 
 	my $phrase = '';
 
 	# Newcommer event, greet our new member and suggest to introduce themself.
 	if ($msg->can ('new_chat_members') && defined ($msg->new_chat_members)) {
-		my $send_args;
-		$send_args->{parse_mode} = 'Markdown';
-		$send_args->{chat_id} = $chatid;
-
 		if (defined ($username)) {
 			if (defined ($fullname)) {
 				carp "[DEBUG] Newcommer in $chatname ($chatid): \@$username, $fullname ($userid)" if $c->{debug};
-				$send_args->{text} = "Дратути, [$fullname](tg://user?id=$userid). Представьтес, пожалуйста, и расскажите, что вас сюда привело.";
+				$phrase = "Дратути, [$fullname](tg://user?id=$userid). Представьтес, пожалуйста, и расскажите, что вас сюда привело.";
 			} else {
 				carp "[DEBUG] Newcommer in $chatname ($chatid): \@$username ($userid)" if $c->{debug};
-				$send_args->{text} = "Дратути, [$username](tg://user?id=$userid). Представьтес, пожалуйста, и расскажите, что вас сюда привело.";
+				$phrase = "Дратути, [$username](tg://user?id=$userid). Представьтес, пожалуйста, и расскажите, что вас сюда привело.";
 			}
 		} else {
 			carp "[DEBUG] Newcommer in $chatname ($chatid): $fullname ($userid)" if $c->{debug};
-			$send_args->{text} = "Дратути, [$fullname](tg://user?id=$userid). Представьтес, пожалуйста, и расскажите, что вас сюда привело.";
+			$phrase = "Дратути, [$fullname](tg://user?id=$userid). Представьтес, пожалуйста, и расскажите, что вас сюда привело.";
 		}
 
 		# let's emulate real human and delay answer
@@ -201,7 +127,7 @@ sub __on_msg {
 
 		sleep ( 3 + int ( rand (2)));
 
-		Teapot::Bot::Brain::sendMessage ($self, $send_args);
+		$msg->replyMd ($phrase);
 		return;
 	}
 
@@ -234,8 +160,7 @@ sub __on_msg {
 
 		if (substr ($text, 0, 1) eq $c->{telegrambot}->{csign}) {
 			if (substr ($text, 1) eq 'help'  ||  substr ($text, 1) eq 'помощь') {
-				my $send_args;
-				$send_args->{text} = << 'MYHELP';
+				$reply = << 'MYHELP';
 ```
 !help | !помощь           - список команд
 !dig | !копать            - заняться археологией
@@ -256,9 +181,7 @@ sub __on_msg {
 Но на самом деле я бот больше для общения, чем для исполнения команд.
 Поговоришь со мной?
 MYHELP
-				$send_args->{parse_mode} = 'Markdown';
-				$send_args->{chat_id} = $userid;
-				Teapot::Bot::Brain::sendMessage ($self, $send_args);
+				$msg->replyMd ($reply);
 				return;
 			} else {
 				$reply = command ($self, $msg, $text, $userid);
@@ -281,7 +204,6 @@ MYHELP
 
 				if (defined ($str) && $str ne '') {
 					$reply = $str;
-					# TODO: move it to telegramlib.pm/botlib.pm!
 					$phrase = trim ($text);
 
 					while ($phrase =~ /[\.|\,|\?|\!]$/) {
@@ -368,8 +290,7 @@ MYHELP
 		# TODO: Log commands and answers
 		} elsif (substr ($text, 0, 1) eq $c->{telegrambot}->{csign}) {
 			if (substr ($text, 1) eq 'help'  ||  substr ($text, 1) eq 'помощь') {
-				my $send_args;
-				$send_args->{text} = << 'MYHELP';
+				$reply = << 'MYHELP';
 ```
 !help | !помощь           - список команд
 !dig | !копать            - заняться археологией
@@ -390,9 +311,7 @@ MYHELP
 Но на самом деле я бот больше для общения, чем для исполнения команд.
 Поговоришь со мной?
 MYHELP
-				$send_args->{parse_mode} = 'Markdown';
-				$send_args->{chat_id} = $chatid;
-				Teapot::Bot::Brain::sendMessage ($self, $send_args);
+				$msg->replyMd ($reply);
 				return;
 			} else {
 				$reply = command ($self, $msg, $text, $chatid);
@@ -432,7 +351,7 @@ MYHELP
 			}
 		}
 
-		if (defined ($reply) && $reply ne '' && $can_talk) {
+		if (defined ($reply) && $reply ne '') {
 			# work a bit more on input phrase
 			$phrase = trim ($phrase);
 
@@ -447,7 +366,7 @@ MYHELP
 			} elsif (lc ($reply) eq substr ($phrase, 0, -1)) {
 				# in case of trailing dot
 				$reply = randomCommonPhrase ();
-			} elsif (substr(lc ($reply), 0, -1) eq $phrase) {
+			} elsif (substr (lc ($reply), 0, -1) eq $phrase) {
 				$reply = randomCommonPhrase ();
 			}
 
@@ -456,11 +375,7 @@ MYHELP
 			carp sprintf ('[DEBUG] In public chat %s (%s) bot reply to %s: %s', $chatname, $chatid, $vis_a_vi, $reply) if $c->{debug};
 			$msg->reply ($reply);
 		} else {
-			if ($can_talk) {
-				carp sprintf ('[DEBUG] In public chat %s (%s) bot is not required to reply to %s', $chatname, $chatid, $vis_a_vi) if $c->{debug};
-			} else {
-				carp sprintf ('[DEBUG] In public chat %s (%s) bot can\'t talk, but reply to %s is: %s', $chatname, $chatid, $vis_a_vi, $reply) if $c->{debug};
-			}
+			carp sprintf ('[DEBUG] In public chat %s (%s) bot is not required to reply to %s', $chatname, $chatid, $vis_a_vi) if $c->{debug};
 		}
 
 # should be channel, so we can't talk
@@ -491,21 +406,6 @@ sub run_telegrambot {
 	}
 
 	return;
-}
-
-sub visavi {
-	my ($userid, $username, $fullname) = @_;
-	my $name = '';
-
-	if (defined ($username)) {
-		$name .= '@' . $username;
-		$name .= ', ' . $fullname if (defined ($fullname));
-	} else {
-		$name .= $fullname;
-	}
-
-	$name .= " ($userid)";
-	return $name;
 }
 
 1;

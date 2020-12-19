@@ -22,7 +22,7 @@ use archeologist qw (dig);
 
 use vars qw/$VERSION/;
 use Exporter qw(import);
-our @EXPORT_OK = qw(weather trim randomCommonPhrase command);
+our @EXPORT_OK = qw(weather trim randomCommonPhrase command highlight);
 $VERSION = '1.0';
 
 my $c = loadConf();
@@ -233,32 +233,7 @@ sub command {
 	my $text = shift;
 	my $chatid = shift;
 	my $reply;
-	my $fullname;
-	my $highlight;
-	my $username;
-	my $userid = $msg->from->id;
-	$username = $msg->from->username if ($msg->from->can ('username') && defined($msg->from->username));
-
-	if ($msg->from->can ('first_name') && defined ($msg->from->first_name)) {
-		$fullname = $msg->from->first_name;
-
-		if ($msg->from->can ('last_name') && defined ($msg->from->last_name)) {
-			$fullname .= ' ' . $msg->from->last_name;
-		}
-	} elsif ($msg->from->can ('last_name') && defined ($msg->from->last_name)) {
-		$fullname .= $msg->from->last_name;
-	}
-
-	if (defined ($username)) {
-		if (defined ($fullname)) {
-			$highlight = "[$fullname](tg://user?id=$userid)";
-		} else {
-			$highlight = "[$username](tg://user?id=$userid)";
-		}
-	} else {
-		$highlight = "[$fullname](tg://user?id=$userid)";
-	}
-
+	my ($userid, $username, $fullname, $highlight, $visavi) = highlight ($msg);
 
 	if (substr ($text, 1) eq 'ping') {
 		$reply = 'Pong.';
@@ -308,6 +283,44 @@ sub command {
 	return $reply;
 }
 
+sub highlight {
+	my $msg = shift;
+
+	my $fullname;
+	my $highlight;
+	my $username;
+	my $visavi = '';
+	my $userid = $msg->from->id;
+	$username = $msg->from->username if ($msg->from->can ('username') && defined($msg->from->username));
+
+	if ($msg->from->can ('first_name') && defined ($msg->from->first_name)) {
+		$fullname = $msg->from->first_name;
+
+		if ($msg->from->can ('last_name') && defined ($msg->from->last_name)) {
+			$fullname .= ' ' . $msg->from->last_name;
+		}
+	} elsif ($msg->from->can ('last_name') && defined ($msg->from->last_name)) {
+		$fullname .= $msg->from->last_name;
+	}
+
+	if (defined ($username)) {
+		$visavi .= '@' . $username;
+
+		if (defined ($fullname)) {
+			$highlight = "[$fullname](tg://user?id=$userid)";
+			$visavi .= ', ' . $fullname;
+		} else {
+			$highlight = "[$username](tg://user?id=$userid)";
+		}
+	} else {
+		$highlight = "[$fullname](tg://user?id=$userid)";
+		$visavi .= $fullname;
+	}
+
+	$visavi .= " ($userid)";
+
+	return ($userid, $username, $fullname, $highlight, $visavi);
+}
 1;
 
 # vim: set ft=perl noet ai ts=4 sw=4 sts=4:
