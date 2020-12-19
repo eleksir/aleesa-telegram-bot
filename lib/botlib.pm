@@ -273,11 +273,33 @@ sub command {
 	} elsif (substr ($text, 1) eq 'f ?'  ||  substr ($text, 1) eq 'fortune ?'  ||  substr ($text, 1) eq 'фортунка ?'  ||  substr ($text, 1) eq 'ф ?') {
 		$reply = fortune_status ($chatid);
 	} elsif (substr ($text, 1) eq 'dig' || substr ($text, 1) eq 'копать') {
-		my $send_args;
-		$send_args->{text} = dig ($highlight);
-		$send_args->{parse_mode} = 'Markdown';
-		$send_args->{chat_id} = $msg->chat->id;
-		Teapot::Bot::Brain::sendMessage ($self, $send_args);
+		$reply = dig ($highlight);
+		$msg->replyMd ($reply);
+		return;
+	} elsif (substr ($text, 1) eq 'help'  ||  substr ($text, 1) eq 'помощь') {
+		$reply = << 'MYHELP';
+```
+!help | !помощь           - список команд
+!dig | !копать            - заняться археологией
+!f | !ф                   - рандомная фраза из сборника цитат fortune_mod
+!fortune | !фортунка      - рандомная фраза из сборника цитат fortune_mod
+!f # | !ф #               - где 1 - вкл, 0 - выкл фортунку с утра
+!fortune # | !фортунка #  - где 1 - вкл, 0 - выкл фортунку с утра
+!f ? | !ф ?               - показываем ли с утра фортунку для чата
+!fortune ? | !фортунка ?  - показываем ли с утра фортунку для чата
+!friday | !пятница        - а не пятница ли сегодня?
+!lat | !лат               - сгенерировать фразу из крылатых латинских выражений
+!ping | !пинг             - попинговать бота
+!ver | !version | !версия - что-то про версию ПО
+!w город | !п город       - погода в указанном городе
+!karma | !карма фраза     - посмотреть карму фразы
+фраза-- | фраза++         - убавить или добавить карму фразе
+```
+Но на самом деле я бот больше для общения, чем для исполнения команд.
+Поговоришь со мной?
+MYHELP
+		$msg->replyMd ($reply);
+		return;
 	}
 
 	return $reply;
