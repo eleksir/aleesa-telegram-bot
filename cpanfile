@@ -20,4 +20,5 @@ requires 'Log::Any::For::Std';
 requires 'Mojo::Base';
 requires 'Mojo::IOLoop';
 requires 'Mojo::UserAgent';
+requires 'Text::Fuzzy';
 requires 'URI::URL';

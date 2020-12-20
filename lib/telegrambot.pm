@@ -12,7 +12,7 @@ use File::Path qw(mkpath);
 use Hailo;
 use Mojo::Base 'Teapot::Bot::Brain';
 use conf qw(loadConf);
-use botlib qw(weather trim randomCommonPhrase command highlight botsleep);
+use botlib qw(weather trim randomCommonPhrase command highlight botsleep fmatch);
 use karma qw(karmaSet);
 use fortune qw(fortune fortune_toggle_list);
 
@@ -287,12 +287,7 @@ sub __on_msg {
 
 			$phrase = lc ($phrase);
 
-			if (lc ($reply) eq $phrase) {
-				$reply = randomCommonPhrase ();
-			} elsif (lc ($reply) eq substr ($phrase, 0, -1)) {
-				# in case of trailing dot
-				$reply = randomCommonPhrase ();
-			} elsif (substr (lc ($reply), 0, -1) eq $phrase) {
+			if (fmatch (lc ($reply), $phrase)) {
 				$reply = randomCommonPhrase ();
 			}
 

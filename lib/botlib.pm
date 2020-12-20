@@ -13,6 +13,7 @@ use URI::URL;
 use JSON::XS qw(decode_json encode_json);
 use Digest::MD5 qw(md5_base64);
 use DB_File;
+use Text::Fuzzy qw(distance_edits);
 use conf qw(loadConf);
 use lat qw(latAnswer);
 use karma qw(karmaSet karmaGet);
@@ -22,7 +23,7 @@ use archeologist qw (dig);
 
 use vars qw/$VERSION/;
 use Exporter qw(import);
-our @EXPORT_OK = qw(weather trim randomCommonPhrase command highlight botsleep);
+our @EXPORT_OK = qw(weather trim randomCommonPhrase command highlight botsleep fmatch);
 $VERSION = '1.0';
 
 my $c = loadConf();
@@ -360,6 +361,21 @@ sub botsleep {
 
 	sleep ( 3 + int ( rand (2)));
 	return;
+}
+
+sub fmatch {
+	my $srcphrase = shift;
+	my $answer = shift;
+
+	my ($distance, undef) = distance_edits ($srcphrase, $answer);
+	my $srcphraselen = length $srcphrase;
+	my $distance_max = int ($srcphraselen - ($srcphraselen * (100 - (90 / ($srcphraselen ** 0.5))) * 0.01));
+
+	if ($distance >= $distance_max) {
+		return 0;
+	} else {
+		return 1;
+	}
 }
 
 1;
