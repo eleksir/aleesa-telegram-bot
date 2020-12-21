@@ -7,9 +7,13 @@ $Teapot::Bot::Object::Location::VERSION = '0.022';
 
 has 'longitude';
 has 'latitude';
+has 'horizontal_accuracy';
+has 'live_period';
+has 'heading';
+has 'proximity_alert_radius';
 
 sub fields {
-  return { scalar => [qw/longitude latitude/] };
+  return { scalar => [qw/longitude latitude horizontal_accuracy live_period heading proximity_alert_radius/] };
 }
 
 1;
