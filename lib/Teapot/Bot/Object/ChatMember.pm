@@ -9,7 +9,8 @@ $Teapot::Bot::Object::ChatMember::VERSION = '0.022';
 has 'user';
 has 'status';
 has 'custom_title';              # optional. Owner and administrators only.
-has 'until';                     # optional. Restricted and kicked only.
+has 'is_anonymous';              # Optional. Owner and administrators only.
+
 has 'can_be_edited';             # optional. Administrators only.
 has 'can_post_messages';         # optional. Administrators only.
 has 'can_edit_messages';         # optional. Administrators only.
@@ -25,13 +26,14 @@ has 'can_send_media_messages';   # optional. Restricted only.
 has 'can_send_polls';            # optional. Restricted only.
 has 'can_send_other_messages';   # optional. Restricted only.
 has 'can_add_web_page_previews'; # optional. Restricted only.
+has 'until_date';                # optional. Restricted and kicked only.
 
 sub fields {
   return {
-          'scalar'                    => [qw/status custom_title until can_be_edited can_post_messages can_edit_messages
+          'scalar'                    => [qw/status custom_title is_anonymous can_be_edited can_post_messages can_edit_messages
                                              can_delete_messages can_restrict_members can_promote_members can_change_info
                                              can_invite_users can_pin_messages is_member can_send_messages
-                                             can_send_media_messages can_send_polls can_send_other_messages can_add_web_page_previews/],
+                                             can_send_media_messages can_send_polls can_send_other_messages can_add_web_page_previews until_date/],
           'Teapot::Bot::Object::User' => [qw/user/],
         };
 }
