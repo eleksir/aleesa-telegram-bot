@@ -27,6 +27,8 @@ use Teapot::Bot::Object::Venue;
 use Teapot::Bot::Object::SuccessfulPayment;
 use Teapot::Bot::Object::PassportData;
 use Teapot::Bot::Object::InlineKeyboardMarkup;
+use Teapot::Bot::Object::ProximityAlertTriggered;
+use Teapot::Bot::Object::Dice;
 
 use Data::Dumper;
 use Carp qw(cluck);
@@ -36,16 +38,15 @@ $Teapot::Bot::Object::Message::VERSION = '0.022';
 # basic message stuff
 has 'message_id';
 has 'from';  # User
+has 'sender_chat';  # Chat
 has 'date';
 has 'chat';  # Chat
-
 has 'forward_from'; # User
 has 'forward_from_chat'; # Chat
 has 'forward_from_message_id';
 has 'forward_signature';
 has 'forward_sender_name';
 has 'forward_date';
-
 has 'reply_to_message'; # Message
 has 'via_bot'; # User
 has 'edit_date';
@@ -53,23 +54,22 @@ has 'media_group_id';
 has 'author_signature';
 has 'text';
 has 'entities'; # Array of MessageEntity
-
-has 'caption_entities'; # Array of MessageEntity
-
+has 'animation'; # Animation
 has 'audio'; # Audio
 has 'document'; # Document
-has 'animation'; # Animation
-has 'game'; # Game
 has 'photo'; # Array of PhotoSize
 has 'sticker';  # Sticker
 has 'video'; # Video
-has 'voice'; # Voice
 has 'video_note'; # VideoNote
+has 'voice'; # Voice
 has 'caption';
+has 'caption_entities'; # Array of MessageEntity
 has 'contact'; # Contact
-has 'location'; # Location
-has 'venue'; # Venue
+has 'dice';
+has 'game';
 has 'poll'; # Poll
+has 'venue'; # Venue
+has 'location'; # Location
 has 'new_chat_members'; # Array of User
 has 'left_chat_member'; # User
 has 'new_chat_title';
@@ -85,6 +85,7 @@ has 'invoice'; # Invoice
 has 'successful_payment'; # SuccessfulPayment
 has 'connected_website';
 has 'passport_data'; # PassportData
+has 'proximity_alert_triggered';
 has 'reply_markup'; # Array of InlineKeyboardMarkup
 
 sub fields {
@@ -99,7 +100,7 @@ sub fields {
                                                             migrate_from_chat_id connected_website/],
           'Teapot::Bot::Object::User'                 => [qw/from forward_from via_bot new_chat_members left_chat_member /],
 
-          'Teapot::Bot::Object::Chat'                 => [qw/chat forward_from_chat/],
+          'Teapot::Bot::Object::Chat'                 => [qw/sender_chat chat forward_from_chat/],
           'Teapot::Bot::Object::Message'              => [qw/reply_to_message pinned_message/],
           'Teapot::Bot::Object::MessageEntity'        => [qw/entities caption_entities /],
 
@@ -123,7 +124,8 @@ sub fields {
           'Teapot::Bot::Object::SuccessfulPayment'    => [qw/successful_payment/],
           'Teapot::Bot::Object::PassportData'         => [qw/passport_data/],
           'Teapot::Bot::Object::InlineKeyboardMarkup' => [qw/reply_markup/],
-
+          'Teapot::Bot::Object::ProximityAlertTriggered' => [qw/proximity_alert_triggered/],
+          'Teapot::Bot::Object::Dice'                 => [qw/dice/],
   };
 }
 
