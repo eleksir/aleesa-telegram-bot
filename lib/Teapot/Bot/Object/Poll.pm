@@ -9,17 +9,28 @@ $Teapot::Bot::Object::Poll::VERSION = '0.022';
 has 'id';
 has 'question';
 has 'options'; # Array of PollOption
+has 'total_voter_count';
 has 'is_closed';
+has 'is_anonymous';
+has 'type';
+has 'allows_multiple_answers';
+has 'correct_option_id';
+has 'explanation';
+has 'explanation_entities';
+has 'open_period';
+has 'close_date';
 
 sub fields {
   return {
-           scalar                            => [qw/id question is_closed/],
+           scalar                            => [qw/id question total_voter_count is_closed is_anonymous type
+                                                    allows_multiple_answers correct_option_id explanation
+                                                    explanation_entities open_period close_date/],
            'Teapot::Bot::Object::PollOption' => [qw/options/],
          };
 }
 
 sub arrays {
-  return qw/options/;
+  return qw/options explanation_entities/;
 }
 
 1;
