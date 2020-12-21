@@ -5,6 +5,7 @@ use Mojo::Base 'Teapot::Bot::Object::Base';
 use Teapot::Bot::Object::ChatPhoto;
 use Teapot::Bot::Object::Message;
 use Teapot::Bot::Object::ChatPermissions;
+use Teapot::Bot::Object::ChatLocation;
 
 $Teapot::Bot::Object::Chat::VERSION = '0.022';
 
@@ -23,15 +24,18 @@ has 'permissions';         # Teapot::Bot::Object::ChatPermissions. Optional. Def
 has 'slow_mode_delay';     # Optional. Returned only in getChat.
 has 'sticker_set_name';    # Optional. Returned only in getChat.
 has 'can_set_sticker_set'; # Optional. Returned only in getChat.
+has 'linked_chat_id';      # Optional. greater than 32 bits, smaller than 52 bits
+has 'location';            # Optional. Returned only in getChat.
 
 sub fields {
   return {
           'scalar'                               => [qw/id type title username first_name last_name description 
                                                         invite_link slow_mode_delay sticker_set_name 
-                                                        can_set_sticker_set /],
+                                                        can_set_sticker_set linked_chat_id/],
           'Teapot::Bot::Object::ChatPhoto'       => [qw/photo/],
           'Teapot::Bot::Object::Message'         => [qw/pinned_message/],
           'Teapot::Bot::Object::ChatPermissions' => [qw/permissions/],
+          'Teapot::Bot::Object::ChatLocation'    => [qw/location/],
         };
 }
 
