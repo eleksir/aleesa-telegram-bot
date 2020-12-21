@@ -6,11 +6,13 @@ use Mojo::Base 'Teapot::Bot::Object::Base';
 $Teapot::Bot::Object::ChatPhoto::VERSION = '0.022';
 
 has 'small_file_id';
+has 'small_file_unique_id';
 has 'big_file_id';
+has 'big_file_unique_id';
 
 sub fields {
   return {
-           'scalar' => [qw/small_file_id big_file_id/],
+           'scalar' => [qw/small_file_id small_file_unique_id big_file_id big_file_unique_id/],
          };
 }
 
