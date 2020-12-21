@@ -52,12 +52,12 @@ sub create_from_hash {
   my $obj   = $class->new(_brain => $brain);
 
   unless (defined $hash) {
-    cluck "Hash is undef";
+    cluck 'Hash is undef';
     return $obj;
   }
 
   unless (ref ($hash) eq 'HASH') {
-    cluck "Not a hash " . Dumper ($hash);
+    cluck 'Not a hash ' . Dumper ($hash);
     return $obj;
   }
 
