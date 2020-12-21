@@ -11,10 +11,12 @@ has 'title';
 has 'address';
 has 'foursquare_id';
 has 'foursquare_type';
+has 'google_place_id';
+has 'google_place_type';
 
 sub fields {
   return {
-           'scalar'                        => [qw/title address foursquare_id foursquare_type/],
+           'scalar'                        => [qw/title address foursquare_id foursquare_type google_place_id google_place_type/],
            'Teapot::Bot::Object::Location' => [qw/location/]
          };
 
