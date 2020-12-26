@@ -104,14 +104,14 @@ sub dig {
 	my $success_probability = int (rand 100);
 	my $artifact_age = int (rand 15000);
 
-	if ($find_probability < 15) {
+	if ($find_probability <= 20) {
 		return sprintf 'По уши закопавшись %s, %s, нифига вы не выкопали! Может повезет в другом месте?', $location[int (rand ($#location + 1))], $name;
 	}
 
 	my $phrase = sprintf "Вы начали раскопки %s и усиленно роете лопатами, экскаватором...\n", $location[int (rand ($#location + 1))];
 	$phrase .= "Вам кажется что ваш совочек ударился обо что-то твердое. Может, это клад?!\n\n";
 
-	if ($success_probability < 5) {
+	if ($success_probability <= 20) {
 		$phrase .= sprintf '%s стал лучшим археологом, выкопав %s! возраст артефакта - %s лет!', $name, $artifact[int (rand ($#artifact + 1))], $artifact_age;
 	} else {
 		$phrase .= sprintf "Поздравляю, %s! Вы только что выкопали %s, возраст - %s лет!\n", $name, $artifact[int (rand ($#artifact + 1))], $artifact_age;
