@@ -34,13 +34,19 @@ has token => $c->{telegrambot}->{token};
 sub __cron {
 	my $self = shift;
 
-#   fortune mod
+	# fortune mod
+	my @intro = (
+		'Сегодняшний день пройдёт под эгидой фразы:',
+		'Крылатая фраза на сегодня:',
+		'Сегодняшняя фраза дня:',
+	);
+
 	my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime (time);
 
 	if ($hour == 8 && ($min >= 0 && $min <= 14)) {
 		foreach my $enabledfortunechat (fortune_toggle_list ()) {
 			my $send_args;
-			$send_args->{text} = sprintf "Сегодняшний день пройдёт под эгидой фразы:\n%s", fortune ();
+			$send_args->{text} = sprintf "%s\n%s", $intro[int (rand ($#intro + 1))], fortune ();
 			$send_args->{chat_id} = $enabledfortunechat;
 			Teapot::Bot::Brain::sendMessage ($self, $send_args);
 		}
