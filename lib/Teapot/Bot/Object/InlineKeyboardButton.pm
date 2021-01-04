@@ -18,8 +18,7 @@ has 'pay';
 
 sub fields {
   return { 'scalar'                            => [qw/text url callback_data switch_inline_query
-                                                      switch_inline_query_current_chat switch_inline_query_current_chat
-                                                      pay/],
+                                                      switch_inline_query_current_chat pay/],
            'Teapot::Bot::Object::LoginUrl'     => [qw/login_url/],
            'Teapot::Bot::Object::CallbackGame' => [qw/callback_game/],
          };
