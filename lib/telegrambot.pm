@@ -62,17 +62,17 @@ sub __on_msg {
 	my $chatname = 'Noname chat';
 	# user sending message info
 	my ($userid, $username, $fullname, $highlight, $vis_a_vi) = highlight ($msg);
+	my $csign = $c->{telegrambot}->{csign};
 
 	unless ($myid) {
 		my $myObj = Teapot::Bot::Brain::getMe ($self);
 
 		unless ($myObj) {
-			sleep 3;
-			$myObj = Teapot::Bot::Brain::getMe ($self);
+			carp '[ERROR] Unable to get chatid, API Error?';
+			return;
 		}
 
 		$myid = $myObj->id;
-		# TODO: use these values instead of pre-defined in config!
 		$myusername = $myObj->username;
 		$myfirst_name = $myObj->first_name;
 		$mylast_name = $myObj->last_name;
@@ -103,6 +103,7 @@ sub __on_msg {
 		}
 	} else {
 		carp '[INFO] Unable to get chatid';
+		return;
 	}
 
 	my $phrase = '';
@@ -110,7 +111,7 @@ sub __on_msg {
 	# Newcommer event, greet our new member and suggest to introduce themself.
 	if ($msg->can ('new_chat_members') && defined ($msg->new_chat_members)) {
 		$phrase = "Дратути, $highlight. Представьтес, пожалуйста, и расскажите, что вас сюда привело.";
-		botsleep($msg);
+		botsleep ($msg);
 		$msg->replyMd ($phrase);
 		return;
 	}
@@ -128,25 +129,26 @@ sub __on_msg {
 		if ($chatid < 0) {
 			carp "[INFO] Initialized brain for public chat $chatname ($chatid): $brainname";
 		} else {
-			carp "[INFO] Initialized for private chat $chatname ($chatid): $brainname";
+			carp "[INFO] Initialized brain for private chat $chatname ($chatid): $brainname";
 		}
 	}
 
 # is this a 1-on-1 ?
 	if ($msg->chat->type eq 'private') {
-		# TODO: what about stickers, photos, documents, audio, video, etc... We should log em at least.
-		return unless ($msg->can ('text') && defined ($msg->text));
+		unless (defined $msg->text) {
+			return;
+		}
 
 		my $text = $msg->text;
 		carp sprintf ('[DEBUG] Private chat %s say to bot: %s', $vis_a_vi, $text) if $c->{debug};
-		my $csign = quotemeta ($c->{telegrambot}->{csign});
 		my $reply = 'Давайте ещё пообщаемся, а то я ещё не научилась от вас плохому.';
 
-		if (substr ($text, 0, 1) eq $c->{telegrambot}->{csign}) {
+		if (substr ($text, 0, 1) eq $csign) {
 			$reply = command ($self, $msg, $text, $userid);
 		} else {
 			my $just_message_in_chat = 0;
 
+			# is it karma adjustment?
 			if (substr ($text, -2) eq '++'  ||  substr ($text, -2) eq '--') {
 				my @arr = split(/\n/, $text);
 
@@ -170,12 +172,7 @@ sub __on_msg {
 
 					$phrase = lc ($phrase);
 
-					if (lc ($reply) eq $phrase) {
-						$reply = randomCommonPhrase ();
-					} elsif (lc ($reply) eq substr ($phrase, 0, -1)) {
-						# in case of trailing dot
-						$reply = randomCommonPhrase ();
-					} elsif (substr (lc ($reply), 0, -1) eq $phrase) {
+					if (fmatch (lc ($reply), $phrase)) {
 						$reply = randomCommonPhrase ();
 					}
 				}
@@ -195,39 +192,12 @@ sub __on_msg {
 		# detect and log messages without text, noop here
 		unless (defined ($msg->text)) {
 			carp sprintf ('[INFO] No text in message from %s', $vis_a_vi);
-
-			if ($msg->can ('document') && defined ($msg->document)) {
-				if (defined ($msg->document->{'file_name'})) {
-					my $docsize = 'unknown';
-					$docsize = $msg->document->{'file_size'} if (defined ($msg->document->{'file_size'}));
-					my $type = 'unknown';
-					$type = $msg->document->{'mime_type'} if (defined ($msg->document->{'mime_type'}));
-					carp sprintf ('[DEBUG] In public chat %s (%s) %s send document type %s named %s, size %s bytes', $chatname, $chatid, $vis_a_vi, $type, $msg->document->{'file_name'}, $docsize) if $c->{debug};
-				} else {
-					carp sprintf ('In public chat %s (%s) %s send unknown document', $chatname, $chatid, $vis_a_vi) if $c->{debug};
-				}
-			} elsif ($msg->can ('sticker') && defined ($msg->sticker)) {
-				my $set_name = 'unknown';
-				$set_name = $msg->sticker->set_name if ($msg->sticker->can ('set_name') && defined ($msg->sticker->set_name));
-				my $emoji = 'unknown';
-				$emoji = $msg->sticker->emoji if ($msg->sticker->can ('emoji') && defined ($msg->sticker->emoji));
-				carp sprintf ('[DEBUG] In public chat %s (%s) %s reacted with sticker %s from pack %s', $chatname, $chatid, $vis_a_vi, $emoji, $set_name) if $c->{debug};
-			} elsif ($msg->can ('photo') && defined ($msg->photo)) {
-				# actually it is an array! duh, hate arrays!
-				carp sprintf ('[DEBUG] In public chat %s (%s) %s send photo', $chatname, $chatid, $vis_a_vi) if $c->{debug};
-			} else {
-				carp Dumper ($msg) if $c->{debug};
-			}
-
 			return;
 		}
 
 		# we have text here! so potentially we can chit-chat
 		my $text = $msg->text;
 		carp sprintf ('[DEBUG] In public chat %s (%s) %s say: %s', $chatname, $chatid, $vis_a_vi, $text) if $c->{debug};
-		my $qname = quotemeta ($c->{telegrambot}->{name});
-		my $qtname = quotemeta ($c->{telegrambot}->{tname});
-		my $csign = quotemeta ($c->{telegrambot}->{csign});
 
 		# are they quote something, maybe, us?
 		if (defined ($msg->reply_to_message) &&
@@ -245,17 +215,20 @@ sub __on_msg {
 			# figure out reply :)
 			$reply = $hailo->{$msg->chat->id}->learn_reply ($phrase) if (length ($phrase) > 3);
 		# simple commands
-		# TODO: Log commands and answers
-		} elsif (substr ($text, 0, 1) eq $c->{telegrambot}->{csign}) {
+		} elsif (substr ($text, 0, 1) eq $csign) {
 			$reply = command ($self, $msg, $text, $chatid);
 		} elsif (
-				($text eq $qname) or
-				($text eq sprintf ('%s', $qtname)) or
-				($text eq sprintf ("@%s_bot", $qname)) or # :(
-				($text eq sprintf ('%s ', $qtname))
+				($text eq $myusername) or
+				($text eq '@' . $myusername) or
+				($text eq '@' . $myusername . ' ') or
+				($text eq $myfullname) or
+				($text eq $myfullname . ' ')
 			) {
 				$reply = 'Чего?';
 		} else {
+			my $qname = quotemeta ('@' . $myusername);
+			my $qtname = quotemeta $myfullname;
+
 			# phrase directed to bot
 			if ((lc ($text) =~ /^${qname}[\,|\:]? (.+)/) or (lc ($text) =~ /^${qtname}[\,|\:]? (.+)/)){
 				$phrase = $1;
@@ -268,6 +241,7 @@ sub __on_msg {
 			} elsif ((lc ($text) =~ /.+ ${qtname}[\,|\!|\?|\.| ]/) or (lc ($text) =~ / $qtname$/)) {
 				$phrase = $text;
 				$reply = $hailo->{$msg->chat->id}->reply ($phrase);
+			# karma agjustment
 			} elsif (substr ($text, -2) eq '++'  ||  substr ($text, -2) eq '--') {
 				my @arr = split(/\n/, $text);
 
