@@ -17,6 +17,7 @@ requires 'local::lib';
 requires 'Log::Any';
 requires 'Log::Any::Adapter';
 requires 'Log::Any::For::Std';
+requires 'Math::Random::Secure';
 requires 'Mojo::Base';
 requires 'Mojo::IOLoop';
 requires 'Mojo::UserAgent';

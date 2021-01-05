@@ -5,19 +5,18 @@ use 5.018;
 use strict;
 use warnings;
 use utf8;
-use open qw(:std :utf8);
-use English qw( -no_match_vars );
+use open qw (:std :utf8);
+use English qw ( -no_match_vars );
 use JSON::XS;
 
-use vars qw/$VERSION/;
-use Exporter qw(import);
-our @EXPORT_OK = qw(loadConf);
-$VERSION = '1.0';
+use version; our $VERSION = qw (1.0);
+use Exporter qw (import);
+our @EXPORT_OK = qw (loadConf);
 
 sub loadConf {
 	my $c = 'data/config.json';
 	open my $CH, '<', $c or die "[FATAL] No conf at $c: $OS_ERROR\n";
-	my $len = (stat ($c)) [7];
+	my $len = (stat $c) [7];
 	my $json;
 	my $readlen = read $CH, $json, $len;
 

@@ -5,18 +5,17 @@ use 5.018;
 use strict;
 use warnings;
 use utf8;
-use open qw(:std :utf8);
-use English qw( -no_match_vars );
-use Carp qw(cluck croak);
+use open qw (:std :utf8);
+use English qw ( -no_match_vars );
+use Carp qw (cluck croak);
+use File::Path qw (make_path);
+use Math::Random::Secure qw (irand);
 use SQLite_File;
-use MIME::Base64;
-use File::Path qw(mkpath);
-use conf qw(loadConf);
+use conf qw (loadConf);
 
-use vars qw/$VERSION/;
+use version; our $VERSION = qw (1.0);
 use Exporter qw(import);
 our @EXPORT_OK = qw(seed fortune fortune_toggle fortune_toggle_list fortune_status);
-$VERSION = '1.0';
 
 my $c = loadConf();
 my $dir = $c->{fortune}->{dir};
@@ -24,7 +23,7 @@ my $srcdir = $c->{fortune}->{srcdir};
 
 sub seed () {
 	unless (-d $dir) {
-		mkpath ($dir)  ||  croak "Unable to create $dir: $OS_ERROR";
+		make_path ($dir)  ||  croak "Unable to create $dir: $OS_ERROR";
 	}
 
 	my $backingfile = sprintf '%s/fortune.sqlite', $dir;
@@ -39,14 +38,21 @@ sub seed () {
 
 	while (my $fortunefile = readdir ($srcdirhandle)) {
 		my $srcfile = sprintf '%s/%s', $srcdir, $fortunefile;
-		next unless (-f $srcfile);
-		next if ($fortunefile =~ m/\./);
+
+		unless (-f $srcfile) {
+			next;
+		}
+
+		if ($fortunefile =~ m/\./) {
+			next;
+		}
+
 		open (my $fh, '<', $srcfile)  ||  croak "Unable to open $srcfile, $OS_ERROR";
 		# set correct phrase delimiter
 		local $INPUT_RECORD_SEPARATOR = "\n%\n";
 
 		while (readline $fh) {
-			my $phrase = substr($_, 0, -3);
+			my $phrase = substr $_, 0, -3;
 			push @fortune, $phrase;
 		}
 
@@ -67,7 +73,7 @@ sub fortune () {
 		return '';
 	};
 
-	my $phrase = $array[int (rand ($#array - 1))];
+	my $phrase = $array[irand ($#array + 1)];
 	# decode?
 	utf8::decode $phrase;
 	untie @array;
@@ -80,7 +86,7 @@ sub fortune_toggle (@) {
 	my $phrase = 'Фортунка с утра ';
 
 	unless (-d $dir) {
-		mkpath ($dir)  ||  do {
+		make_path ($dir)  ||  do {
 			cluck "[ERROR] Unable to create $dir: $OS_ERROR";
 			return;
 		};
@@ -125,7 +131,7 @@ sub fortune_status ($) {
 	my $phrase = 'Фортунка с утра ';
 
 	unless (-d $dir) {
-		mkpath ($dir)  ||  do {
+		make_path ($dir)  ||  do {
 			cluck "[ERROR] Unable to create $dir: $OS_ERROR";
 			return;
 		};
@@ -141,7 +147,7 @@ sub fortune_status ($) {
 	my $state = $toggle{$chatid};
 
 	if (defined $state && $state) {
-		$phrase .= 'показываtтся.';
+		$phrase .= 'показывается.';
 	} else {
 		$phrase .= 'не показывается.';
 	}
@@ -152,7 +158,7 @@ sub fortune_status ($) {
 
 sub fortune_toggle_list () {
 	unless (-d $dir) {
-		mkpath ($dir)  ||  do {
+		make_path ($dir)  ||  do {
 			cluck "[ERROR] Unable to create $dir: $OS_ERROR";
 			my @empty = ();
 			return @empty;

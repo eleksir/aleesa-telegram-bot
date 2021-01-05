@@ -9,7 +9,7 @@ use English qw( -no_match_vars );
 use lib qw(./lib ./vendor_perl ./vendor_perl/lib/perl5);
 use JSON::XS;
 
-use version; our $VERSION = qv(1.0);
+use version; our $VERSION = qw (1.0);
 
 my $c = 'data/config.json';
 open (my $C, '<', $c) or die "No conf at $c: $OS_ERROR\n";

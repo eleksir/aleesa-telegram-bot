@@ -5,27 +5,26 @@ use 5.018;
 use strict;
 use warnings;
 use utf8;
-use open qw(:std :utf8);
-use English qw( -no_match_vars );
-use Carp qw(cluck croak);
+use open qw (:std :utf8);
+use English qw ( -no_match_vars );
+use Carp qw (cluck croak);
+use File::Path qw (make_path);
+use Math::Random::Secure qw (irand);
 use SQLite_File;
-use MIME::Base64;
-use File::Path qw(mkpath);
-use conf qw(loadConf);
+use conf qw (loadConf);
 
-use vars qw/$VERSION/;
-use Exporter qw(import);
-our @EXPORT_OK = qw(seed friday);
-$VERSION = '1.0';
+use version; our $VERSION = qw (1.0);
+use Exporter qw (import);
+our @EXPORT_OK = qw (seed friday);
 
-my $c = loadConf();
+my $c = loadConf ();
 my $dir = $c->{friday}->{dir};
 my $srcfile = $c->{friday}->{src};
 my @dow = qw (monday tuesday wednesday thursday friday saturday sunday);
 
 sub seed () {
 	unless (-d $dir) {
-		mkpath ($dir)  ||  croak "Unable to create $dir: $OS_ERROR";
+		make_path ($dir)  ||  croak "Unable to create $dir: $OS_ERROR";
 	}
 
 	my $friday;
@@ -43,27 +42,41 @@ sub seed () {
 	open (my $fh, '<', $srcfile)  ||  croak "Unable to open $srcfile, $OS_ERROR\n";
 
 	while (readline $fh) {
-		next unless  m/ \|\| /xmsg;
+		unless (m/ \|\| /xmsg) {
+			next;
+		}
+
 		chomp();
 		my ($phrase, $days) = split(/ \|\| /);
 		my @daylist = split(//, $days);
 
 		foreach my $day (@daylist) {
-			next unless (defined $day);
-			next unless ($day =~ /^\d$/);
-			push @{$friday->[$day - 1]}, $phrase if (defined $phrase && ($phrase ne '') && ($phrase !~ m/^\s+$/xmsg));
+			unless (defined $day) {
+				next;
+			}
+
+			unless ($day =~ /^\d$/) {
+				next;
+			}
+
+			if (defined $phrase && ($phrase ne '') && ($phrase !~ m/^\s+$/xmsg)) {
+				push @{$friday->[$day - 1]}, $phrase;
+			}
 		}
 	}
 
 	close $fh;  ## no critic (InputOutput::RequireCheckedSyscalls, InputOutput::RequireCheckedOpen)
-	for (0..$#dow) { untie $friday->[$_]; }
+
+	for (0..$#dow) {
+		untie $friday->[$_];
+	}
 
 	return;
 }
 
 # just return answer
 sub friday () {
-	my $today = (localtime(time))[6] - 1;
+	my $today = (localtime (time))[6] - 1;
 	my $backingfile = sprintf '%s/%s.sqlite', $dir, $dow[$today];
 
 	tie my @array, 'SQLite_File', $backingfile  ||  do {
@@ -71,8 +84,7 @@ sub friday () {
 		return '';
 	};
 
-	my $phrase = $array[int (rand ($#array - 1))];
-	# decode?
+	my $phrase = $array[irand ($#array + 1)];
 	utf8::decode $phrase;
 	untie @array;
 	return $phrase;

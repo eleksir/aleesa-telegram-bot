@@ -4,17 +4,17 @@ use 5.018;
 use strict;
 use warnings;
 use utf8;
-use open qw(:std :utf8);
-use English qw( -no_match_vars );
-use Digest::SHA qw(sha1_base64);
+use open qw (:std :utf8);
+use English qw ( -no_match_vars );
+use Carp qw (cluck);
+use Digest::SHA qw (sha1_base64);
 use DB_File;
-use Carp qw(cluck);
-use conf qw(loadConf);
+use File::Path qw (make_path);
+use conf qw (loadConf);
 
-use vars qw/$VERSION/;
-use Exporter qw(import);
+use version; our $VERSION = qw (1.0);
+use Exporter qw (import);
 our @EXPORT_OK = qw(karmaSet karmaGet);
-$VERSION = '1.0';
 
 my $c = loadConf();
 my $karmadir = $c->{karma}->{dir};
@@ -28,13 +28,20 @@ sub karmaSet (@) {
 	my $score = 0;
 	# sha1* does not understand utf8, so explicitly construct string cost of decimal numbers only 
 	my $karmafile = join ('', unpack ('C*', $chatid));
-	$karmafile = sha1_base64 ($karmafile);
+	$karmafile = sha1_base64 $karmafile;
 	# sha1 string can contain slashes, so make a bit longer string consist of only decimal numbers
 	$karmafile = join ('', unpack ('C*', $karmafile));
 	$karmafile = sprintf '%s/%s.db', $karmadir, $karmafile;
 
 	if (($phrase eq '') || ($phrase =~ /^ +$/)) {
 		$phrase = '';
+	}
+
+	unless (-d $karmadir) {
+		make_path ($karmadir) or do {
+			cluck "Unable to create $karmadir: $OS_ERROR";
+			return sprintf 'Карма %s составляет 0', $phrase;
+		};
 	}
 
 	# init hash, store phrase and score
@@ -87,13 +94,20 @@ sub karmaGet (@) {
 	my $phrase = shift;
 	# sha1* does not understand utf8, so explicitly construct string cost of decimal numbers only 
 	my $karmafile = join ('', unpack ('C*', $chatid));
-	$karmafile = sha1_base64 ($karmafile);
+	$karmafile = sha1_base64 $karmafile;
 	# sha1 string can contain slashes, so make a bit longer string consist of only decimal numbers
 	$karmafile = join ('', unpack ('C*', $karmafile));
 	$karmafile = sprintf '%s/%s.db', $karmadir, $karmafile;
 
 	if (($phrase eq '') || ($phrase =~ /^ +$/)) {
 		$phrase = '';
+	}
+
+	unless (-d $karmadir) {
+		make_path ($karmadir) or do {
+			cluck "Unable to create $karmadir: $OS_ERROR";
+			return sprintf 'Карма %s составляет 0', $phrase;
+		};
 	}
 
 	# init hash, store phrase and score

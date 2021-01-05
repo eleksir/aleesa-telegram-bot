@@ -6,9 +6,9 @@ It is based on Perl modules [Telegram::Bot][1] and [Hailo][2] as conversation
 generator.
 
 I have to fork [Telegram::Bot][1] and add some of new methods that are already
-appear in [Telegram API][3], but author seems to abandon lib. Also i decide to
-rename it to avoid collision in future, now it is Teapot::Bot and is bundled
-with bot. When lib become mature enough, maybe i release it separately.
+appear in [Telegram API][3], but author seems to abandon lib. Also, I decide to
+rename it to avoid collision in the future, now it is Teapot::Bot and is bundled
+with bot. When lib become mature enough, maybe I release it separately.
 
 Bot config located in **data/config.json**, sample config provided as
 **data/sample_config.json**.
@@ -24,7 +24,7 @@ You'll need "Development Tools" or similar group of packages, perl, perl-devel,
 perl-local-lib, perl-app-cpanm, sqlite-devel, zlib-devel, openssl-devel,
 libdb4-devel (Berkeley DB devel), make.
 
-After installng required dependencies it is possible to run:
+After installing required dependencies it is possible to run:
 
 ```bash
 bash bootstrap.sh

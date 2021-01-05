@@ -6,8 +6,7 @@ use warnings;
 use utf8;
 use open qw(:std :utf8);
 use English qw( -no_match_vars );
-use vars qw/$VERSION/;
-$VERSION = '1.0';
+use version; our $VERSION = qw (1.0);
 
 my $workdir;
 

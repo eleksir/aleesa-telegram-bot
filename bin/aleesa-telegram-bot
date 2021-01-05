@@ -4,32 +4,36 @@ use 5.018;
 use strict;
 use warnings;
 use utf8;
-use open qw(:std :utf8);
-use English qw( -no_match_vars );
+use open qw (:std :utf8);
+use English qw ( -no_match_vars );
 
-use version; our $VERSION = qw(1.0);
+use version; our $VERSION = qw (1.0);
 
 my $workdir;
 
 # before we run, change working dir
 BEGIN {
-	use Cwd qw(chdir abs_path);
+	use Cwd qw (chdir abs_path);
 	my @CWD = split /\//xms, abs_path ($PROGRAM_NAME);
-	if ($#CWD > 1) { $#CWD = $#CWD - 2; }
+
+	if ($#CWD > 1) {
+		$#CWD = $#CWD - 2;
+	}
+
 	$workdir = join '/', @CWD;
 	chdir $workdir;
 }
 
 use lib ("$workdir/lib", "$workdir/vendor_perl", "$workdir/vendor_perl/lib/perl5");
 no Cwd;
-use Cwd::utf8 qw(chdir abs_path);
-use POSIX qw(setgid setuid setsid);
-use File::Path qw(make_path);
-use File::Basename qw(basename dirname);
+use Cwd::utf8 qw (chdir abs_path);
+use File::Basename qw (basename dirname);
+use File::Path qw (make_path);
 use Log::Any::Adapter;
 use Log::Any::For::Std;
-use conf qw(loadConf);
-use telegrambot qw(run_telegrambot);
+use POSIX qw (setgid setuid setsid);
+use conf qw (loadConf);
+use telegrambot qw (run_telegrambot);
 
 sub daemonize;
 sub __fork;
@@ -41,8 +45,12 @@ my $runAsUid = $UID;
 my $piddir = '/var/run/' . basename (abs_path ($PROGRAM_NAME));
 my $C = loadConf ();
 my $logfile;
-if (defined $C->{'log'}) { $logfile = $C->{'log'}; }
-elsif (defined $C->{'debug_log'}) {$logfile = $C->{'debug_log'}; }
+
+if (defined $C->{'log'}) {
+	$logfile = $C->{'log'};
+} elsif (defined $C->{'debug_log'}) {
+	$logfile = $C->{'debug_log'};
+}
 
 # if we run under root, create pid dir and set correct owner for it, same for debug log if it is defined
 if ($UID == 0) {
@@ -72,10 +80,8 @@ if ($UID == 0) {
 							uid   => $uid,
 							group => $gid
 					}
-			);
+			) or die "Unable to create $logdir: $OS_ERROR\n";
 		}
-
-		die "Unable to create $logdir" unless (-d $logdir); ## no critic (ErrorHandling::RequireCarping)
 	}
 
 # drop privs
@@ -137,14 +143,25 @@ sub daemonize {
 
 sub __fork {
 	my $pid = fork;
-	unless (defined $pid) { die "[FATAL] Can't fork: $OS_ERROR\n"; }
-	exit if ($pid != 0);
+
+	unless (defined $pid) {
+		die "[FATAL] Can't fork: $OS_ERROR\n";
+	}
+
+	if ($pid != 0) {
+		exit;
+	}
+
 	return;
 }
 
 sub __signal_handler {
 	warn "[INFO] Caught a signal $OS_ERROR\n";
-	unlink $pidfile if (-f $pidfile);
+
+	if (-f $pidfile) {
+		unlink $pidfile;
+	}
+
 	exit 0;
 }
 

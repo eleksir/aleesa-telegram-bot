@@ -6,22 +6,23 @@ use strict;
 use warnings;
 use utf8;
 use Data::Dumper;
-use open qw(:std :utf8);
-use Carp qw(carp);
-use File::Path qw(mkpath);
+use open qw (:std :utf8);
+use English qw ( -no_match_vars );
+use Carp qw (cluck carp);
+use File::Path qw (make_path);
 use Hailo;
 use Mojo::Base 'Teapot::Bot::Brain';
-use conf qw(loadConf);
-use botlib qw(weather trim randomCommonPhrase command highlight botsleep fmatch);
-use karma qw(karmaSet);
-use fortune qw(fortune fortune_toggle_list);
+use botlib qw (randomCommonPhrase command highlight botsleep);
+use conf qw (loadConf);
+use fortune qw (fortune fortune_toggle_list);
+use karma qw (karmaSet);
+use util qw (trim fmatch);
 
-use vars qw/$VERSION/;
-use Exporter qw(import);
-our @EXPORT_OK = qw(run_telegrambot);
-$VERSION = '1.0';
+use version; our $VERSION = qw (1.0);
+use Exporter qw (import);
+our @EXPORT_OK = qw (run_telegrambot);
 
-my $c = loadConf();
+my $c = loadConf ();
 my $hailo;
 my $myid;
 my $myusername;
@@ -241,7 +242,7 @@ sub __on_msg {
 			} elsif ((lc ($text) =~ /.+ ${qtname}[\,|\!|\?|\.| ]/) or (lc ($text) =~ / $qtname$/)) {
 				$phrase = $text;
 				$reply = $hailo->{$msg->chat->id}->reply ($phrase);
-			# karma agjustment
+			# karma adjustment
 			} elsif (substr ($text, -2) eq '++'  ||  substr ($text, -2) eq '--') {
 				my @arr = split(/\n/, $text);
 
@@ -289,11 +290,16 @@ sub __on_msg {
 
 # setup our bot
 sub init {
-	unless (-d $c->{telegrambot}->{braindir}) {
-		mkpath ($c->{telegrambot}->{braindir}, 0, 0755); ## no critic (ValuesAndExpressions::ProhibitLeadingZeros)
+	my $self = shift;
+	my $braindir = $c->{telegrambot}->{braindir};
+
+	unless (-d $braindir) {
+		make_path ($braindir, 0, 0755) or do { ## no critic (ValuesAndExpressions::ProhibitLeadingZeros)
+			cluck "Unable to create $braindir: $OS_ERROR";
+			exit 1;
+		};
 	}
 
-	my $self = shift;
 	$self->add_listener (\&__on_msg);
 	$self->add_repeating_task (900, \&__cron);
 	return;

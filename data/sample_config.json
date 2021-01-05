@@ -10,16 +10,13 @@
         "srcdir" : "data/fortune_src"
     },
     "telegrambot" : {
-        "name" : "mybot",
-        "tname" : "@my_bot",
         "csign" : "!",
         "token" : "get_it_from_botfather",
         "braindir": "data/telegrambot-brains"
     },
     "openweathermap" : {
-        "cachetime": "data/cache/openweathermap.Id-Timestamp.db",
-        "cachedata": "data/cache/openweathermap.Id-Data.db",
-        "appid": "get_it_on_openweathermap.org"
+        "appid": "get_it_on_openweathermap.org",
+        "cachedir" : "data/cache"
     },
     "lat" : {
         "brain": "data/lat/lat.sqlite",
