@@ -114,7 +114,7 @@ sub __on_msg {
 		my @members = '';
 
 		foreach my $member (@{$msg->new_chat_members}) {
-			$member_str = '[';
+			my $member_str = '[';
 
 			if ($member->can ('first_name') && defined ($member->first_name)) {
 				$member_str .= $member->first_name;

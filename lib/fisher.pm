@@ -99,12 +99,12 @@ sub fish {
 		'на крышу дома',
 	);
 
-	my @material = {
+	my @material = (
 		'бамбуковую',
 		'фиберглассовую',
 		'карбоновую',
 		'композитную',
-	}
+	);
 
 	my $find_probability = irand 100;
 	my $success_probability = irand 100;
