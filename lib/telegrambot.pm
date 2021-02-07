@@ -111,7 +111,30 @@ sub __on_msg {
 
 	# Newcommer event, greet our new member and suggest to introduce themself.
 	if ($msg->can ('new_chat_members') && defined ($msg->new_chat_members)) {
-		$phrase = "Дратути, $highlight. Представьтес, пожалуйста, и расскажите, что вас сюда привело.";
+		my @members = '';
+
+		foreach my $member (@{$msg->new_chat_members}) {
+			$member_str = '[';
+
+			if ($member->can ('first_name') && defined ($member->first_name)) {
+				$member_str .= $member->first_name;
+
+				if ($member->can ('last_name') && defined ($member->last_name)) {
+					$member_str .= ' ' . $member->first_name;
+				}
+			} else {
+				if ($member->can ('last_name') && defined ($member->last_name)) {
+					$member_str .= ' ' . $member->first_name;
+				} else {
+					$member_str .= '@' . $member->username;
+				}
+			}
+
+			$member_str .= sprintf '](tg://user?id=%s)', $member->id;
+			push @members, $member_str;
+		};
+
+		$phrase = sprintf 'Дратути, %s. Представьтес, пожалуйста, и расскажите, что вас сюда привело.', join (', ', @members);
 		botsleep ($msg);
 		$msg->replyMd ($phrase);
 		return;
