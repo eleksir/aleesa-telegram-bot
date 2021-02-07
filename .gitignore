@@ -1,3 +1,4 @@
+_Deparsed_XSubs.pm
 .idea/**
 .vscode/**
 aleesa-telegram-bot.pid
@@ -8,5 +9,4 @@ data/friday/**
 data/karma/**
 data/telegrambot-brains/**
 data/lat/**
-vendor_perl
-_Deparsed_XSubs.pm
+vendor_perl/**

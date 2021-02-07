@@ -12,6 +12,7 @@ use Math::Random::Secure qw (irand);
 
 use conf qw (loadConf);
 use archeologist qw (dig);
+use fisher qw (fish);
 use fortune qw (fortune fortune_toggle fortune_status);
 use friday qw (friday);
 use karma qw (karmaSet karmaGet);
@@ -102,12 +103,20 @@ sub command {
 		sleep (int ( rand (2) + 1));
 		$msg->replyMd ($reply);
 		return;
+	} elsif (substr ($text, 1) eq 'fish' || substr ($text, 1) eq 'fishing' || substr ($text, 1) eq 'рыба' || substr ($text, 1) eq 'рыбка' || substr ($text, 1) eq 'рыбалка' ) {
+		$reply = fish ($highlight);
+		$msg->typing ();
+		sleep (int ( rand (2) + 1));
+		$msg->replyMd ($reply);
+		return;
 	} elsif (substr ($text, 1) eq 'help'  ||  substr ($text, 1) eq 'помощь') {
 		$reply = << "MYHELP";
 ```
 ${csign}help | ${csign}помощь             - список команд
 ${csign}cat | ${csign}кис                 - кошечка
 ${csign}dig | ${csign}копать              - заняться археологией
+${csign}fish | ${csign}рыба | ${csign}рыбка      - порыбачить
+${csign}fishing | ${csign}рыбалка         - порыбачить
 ${csign}f | ${csign}ф                     - рандомная фраза из сборника цитат fortune_mod
 ${csign}fortune | ${csign}фортунка        - рандомная фраза из сборника цитат fortune_mod
 ${csign}f # | ${csign}ф #                 - где 1 - вкл, 0 - выкл фортунку с утра

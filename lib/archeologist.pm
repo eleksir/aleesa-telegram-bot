@@ -100,9 +100,9 @@ sub dig {
 		'на просторах Украины',
 	);
 
-	my $find_probability = irand 101;
-	my $success_probability = irand 101;
-	my $artifact_age = irand 15001;
+	my $find_probability = irand 100;
+	my $success_probability = irand 100;
+	my $artifact_age = irand 15000;
 
 	if ($find_probability <= 20) {
 		return sprintf 'По уши закопавшись %s, %s, нифига вы не выкопали! Может повезет в другом месте?', $location[irand ($#location + 1)], $name;
