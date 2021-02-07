@@ -70,7 +70,7 @@ sub command {
 	} elsif (substr ($text, 1) eq 'cat'  ||  substr ($text, 1) eq 'кис') {
 		$reply = kitty ();
 		$msg->typing ();
-		sleep (int ( rand (2) + 1));
+		sleep (irand (2) + 1);
 		$msg->replyMd ($reply);
 		return;
 	} elsif (substr ($text, 1) eq 'lat'  ||  substr ($text, 1) eq 'лат') {
@@ -90,7 +90,9 @@ sub command {
 	} elsif (substr ($text, 1) eq 'friday'  ||  substr ($text, 1) eq 'пятница') {
 		$reply = friday ();
 	} elsif (substr ($text, 1) eq 'fortune'  ||  substr ($text, 1) eq 'фортунка'  ||  substr ($text, 1) eq 'f'  ||  substr ($text, 1) eq 'ф') {
-		$reply = fortune ();
+		$reply = sprintf "```\n%s\n```\n", trim (fortune ());
+		$msg->replyMd ($reply);
+		return;
 	} elsif (substr ($text, 1) eq 'f 1'  ||  substr ($text, 1) eq 'fortune 1'  ||  substr ($text, 1) eq 'фортунка 1'  ||  substr ($text, 1) eq 'ф 1') {
 		$reply = fortune_toggle ($chatid, 1);
 	} elsif (substr ($text, 1) eq 'f 0'  ||  substr ($text, 1) eq 'fortune 0'  ||  substr ($text, 1) eq 'фортунка 0'  ||  substr ($text, 1) eq 'ф 0') {
@@ -100,13 +102,13 @@ sub command {
 	} elsif (substr ($text, 1) eq 'dig' || substr ($text, 1) eq 'копать') {
 		$reply = dig ($highlight);
 		$msg->typing ();
-		sleep (int ( rand (2) + 1));
+		sleep (irand (2) + 1);
 		$msg->replyMd ($reply);
 		return;
 	} elsif (substr ($text, 1) eq 'fish' || substr ($text, 1) eq 'fishing' || substr ($text, 1) eq 'рыба' || substr ($text, 1) eq 'рыбка' || substr ($text, 1) eq 'рыбалка' ) {
 		$reply = fish ($highlight);
 		$msg->typing ();
-		sleep (int ( rand (2) + 1));
+		sleep (irand (2) + 1);
 		$msg->replyMd ($reply);
 		return;
 	} elsif (substr ($text, 1) eq 'help'  ||  substr ($text, 1) eq 'помощь') {
@@ -187,15 +189,15 @@ sub botsleep {
 	# TODO: Parametrise this with fuzzy sleep time in seconds
 	my $msg = shift;
 	# let's emulate real human and delay answer
-	sleep (int ( rand (2) + 1));
+	sleep (irand (2) + 1);
 
-	for (0..(4 + int (rand (3)))) {
+	for (0..(4 + irand (3))) {
 		$msg->typing ();
 		sleep 3;
 		sleep 3 unless ($_);
 	}
 
-	sleep ( 3 + int ( rand (2)));
+	sleep ( 3 + irand (2));
 	return;
 }
 

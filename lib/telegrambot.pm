@@ -11,6 +11,7 @@ use English qw ( -no_match_vars );
 use Carp qw (cluck carp);
 use File::Path qw (make_path);
 use Hailo;
+use Math::Random::Secure qw (irand);
 use Mojo::Base 'Teapot::Bot::Brain';
 use botlib qw (randomCommonPhrase command highlight botsleep);
 use conf qw (loadConf);
@@ -47,8 +48,9 @@ sub __cron {
 	if ($hour == 8 && ($min >= 0 && $min <= 14)) {
 		foreach my $enabledfortunechat (fortune_toggle_list ()) {
 			my $send_args;
-			$send_args->{text} = sprintf "%s\n%s", $intro[int (rand ($#intro + 1))], fortune ();
+			$send_args->{text} = sprintf "%s\n```\n%s\n```\n", $intro[irand ($#intro + 1)], trim (fortune ());
 			$send_args->{chat_id} = $enabledfortunechat;
+			$send_args->{parse_mode} = 'Markdown';
 			Teapot::Bot::Brain::sendMessage ($self, $send_args);
 		}
 	}
@@ -296,7 +298,7 @@ sub __on_msg {
 			}
 
 			$msg->typing ();
-			sleep (int (rand (2)));
+			sleep (irand (2));
 			carp sprintf ('[DEBUG] In public chat %s (%s) bot reply to %s: %s', $chatname, $chatid, $vis_a_vi, $reply) if $c->{debug};
 			$msg->reply ($reply);
 		} else {
