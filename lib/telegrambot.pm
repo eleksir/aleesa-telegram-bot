@@ -122,11 +122,11 @@ sub __on_msg {
 				$member_str .= $member->first_name;
 
 				if ($member->can ('last_name') && defined ($member->last_name)) {
-					$member_str .= ' ' . $member->first_name;
+					$member_str .= ' ' . $member->last_name;
 				}
 			} else {
 				if ($member->can ('last_name') && defined ($member->last_name)) {
-					$member_str .= ' ' . $member->first_name;
+					$member_str .= ' ' . $member->last_name;
 				} else {
 					$member_str .= '@' . $member->username;
 				}
