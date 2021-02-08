@@ -14,10 +14,10 @@ use SQLite_File;
 use conf qw (loadConf);
 
 use version; our $VERSION = qw (1.0);
-use Exporter qw(import);
-our @EXPORT_OK = qw(seed fortune fortune_toggle fortune_toggle_list fortune_status);
+use Exporter qw (import);
+our @EXPORT_OK = qw (seed fortune fortune_toggle fortune_toggle_list fortune_status);
 
-my $c = loadConf();
+my $c = loadConf ();
 my $dir = $c->{fortune}->{dir};
 my $srcdir = $c->{fortune}->{srcdir};
 
@@ -43,7 +43,7 @@ sub seed () {
 			next;
 		}
 
-		if ($fortunefile =~ m/\./) {
+		if ($fortunefile =~ m/^\.+$/) {
 			next;
 		}
 

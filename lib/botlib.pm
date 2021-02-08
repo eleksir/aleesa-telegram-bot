@@ -52,7 +52,7 @@ sub command {
 	my $text = shift;
 	my $chatid = shift;
 	my $reply;
-	my ($userid, $username, $fullname, $highlight, $visavi) = highlight ($msg);
+	my ($userid, $username, $fullname, $highlight, $visavi) = highlight $msg;
 
 	if (substr ($text, 1) eq 'ping') {
 		$reply = 'Pong.';
@@ -65,8 +65,8 @@ sub command {
 	} elsif (substr ($text, 1) eq 'ver' || substr ($text, 1) eq 'version' || substr ($text, 1) eq 'версия') {
 		$reply = 'Версия:  Нуль.Чего-то_там.Чего-то_там';
 	} elsif (length ($text) >= 2 && (substr ($text, 1, 2) eq 'w ' || substr ($text, 1, 2) eq 'п ')) {
-		my $city = substr ($text, 3);
-		$reply = weather ($city);
+		my $city = substr $text, 3;
+		$reply = weather $city;
 	} elsif (substr ($text, 1) eq 'cat'  ||  substr ($text, 1) eq 'кис') {
 		$reply = kitty ();
 		$msg->typing ();
@@ -79,9 +79,9 @@ sub command {
 		my $mytext = '';
 
 		if (length($text) > 6) {
-			$mytext = substr ($text, 7);
-			chomp ($mytext);
-			$mytext = trim ($mytext);
+			$mytext = substr $text, 7;
+			chomp $mytext;
+			$mytext = trim $mytext;
 		} else {
 			$mytext = '';
 		}
@@ -100,13 +100,13 @@ sub command {
 	} elsif (substr ($text, 1) eq 'f ?'  ||  substr ($text, 1) eq 'fortune ?'  ||  substr ($text, 1) eq 'фортунка ?'  ||  substr ($text, 1) eq 'ф ?') {
 		$reply = fortune_status ($chatid);
 	} elsif (substr ($text, 1) eq 'dig' || substr ($text, 1) eq 'копать') {
-		$reply = dig ($highlight);
+		$reply = dig $highlight;
 		$msg->typing ();
 		sleep (irand (2) + 1);
 		$msg->replyMd ($reply);
 		return;
 	} elsif (substr ($text, 1) eq 'fish' || substr ($text, 1) eq 'fishing' || substr ($text, 1) eq 'рыба' || substr ($text, 1) eq 'рыбка' || substr ($text, 1) eq 'рыбалка' ) {
-		$reply = fish ($highlight);
+		$reply = fish $highlight;
 		$msg->typing ();
 		sleep (irand (2) + 1);
 		$msg->replyMd ($reply);
@@ -166,10 +166,10 @@ sub highlight {
 		$fullname .= $msg->from->last_name;
 	}
 
-	if (defined ($username)) {
+	if (defined $username) {
 		$visavi .= '@' . $username;
 
-		if (defined ($fullname)) {
+		if (defined $fullname) {
 			$highlight = "[$fullname](tg://user?id=$userid)";
 			$visavi .= ', ' . $fullname;
 		} else {

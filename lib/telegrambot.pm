@@ -64,7 +64,7 @@ sub __on_msg {
 	my $chatid;
 	my $chatname = 'Noname chat';
 	# user sending message info
-	my ($userid, $username, $fullname, $highlight, $vis_a_vi) = highlight ($msg);
+	my ($userid, $username, $fullname, $highlight, $vis_a_vi) = highlight $msg;
 	my $csign = $c->{telegrambot}->{csign};
 
 	unless ($myid) {
@@ -93,7 +93,6 @@ sub __on_msg {
 
 	if ($msg->chat->can ('id') && defined ($msg->chat->id)) {
 		$chatid = $msg->chat->id;
-		my $group_talk = 0;
 
 		if ($msg->chat->can ('username') && defined ($msg->chat->username)) {
 			$chatname = $msg->chat->username ;
@@ -142,14 +141,14 @@ sub __on_msg {
 			$phrase = sprintf 'Дратути, %s. Представьтес, пожалуйста, и расскажите, что вас сюда привело.', $members[0];
 		}
 
-		botsleep ($msg);
+		botsleep $msg;
 		$msg->replyMd ($phrase);
 		return;
 	}
 
 # lazy init chat-bot brains
-	unless (defined ($hailo->{$chatid})) {
-		my $brainname = sprintf ('%s/%s.brain.sqlite', $c->{telegrambot}->{braindir}, $chatid);
+	unless (defined $hailo->{$chatid}) {
+		my $brainname = sprintf '%s/%s.brain.sqlite', $c->{telegrambot}->{braindir}, $chatid;
 
 		$hailo->{$chatid} = Hailo->new (
 # we'll got file like this: data/telegrambot-brains/-1001332512695.brain.sqlite
@@ -181,7 +180,7 @@ sub __on_msg {
 
 			# is it karma adjustment?
 			if (substr ($text, -2) eq '++'  ||  substr ($text, -2) eq '--') {
-				my @arr = split(/\n/, $text);
+				my @arr = split /\n/, $text;
 
 				if ($#arr < 1) {
 					$reply = karmaSet ($chatid, trim (substr ($text, 0, -2)), substr ($text, -2));
@@ -195,13 +194,13 @@ sub __on_msg {
 
 				if (defined ($str) && $str ne '') {
 					$reply = $str;
-					$phrase = trim ($text);
+					$phrase = trim $text;
 
 					while ($phrase =~ /[\.|\,|\?|\!]$/) {
 						chop $phrase;
 					}
 
-					$phrase = lc ($phrase);
+					$phrase = lc $phrase;
 
 					if (fmatch (lc ($reply), $phrase)) {
 						$reply = randomCommonPhrase ();
@@ -221,7 +220,7 @@ sub __on_msg {
 		my $reply;
 
 		# detect and log messages without text, noop here
-		unless (defined ($msg->text)) {
+		unless (defined $msg->text) {
 			carp sprintf ('[INFO] No text in message from %s', $vis_a_vi);
 			return;
 		}
@@ -238,7 +237,7 @@ sub __on_msg {
 			carp sprintf ('[DEBUG] In public chat %s (%s) %s quote us!', $chatname, $chatid, $vis_a_vi) if $c->{debug};
 			# remove our name from users reply, just in case
 			my $pat1 = quotemeta ('@' . $myusername);
-			my $pat2 = quotemeta ($myfullname);
+			my $pat2 = quotemeta $myfullname;
 			$phrase = $text;
 			$phrase =~ s/$pat1//g;
 			$phrase =~ s/$pat2//g;
@@ -274,7 +273,7 @@ sub __on_msg {
 				$reply = $hailo->{$msg->chat->id}->reply ($phrase);
 			# karma adjustment
 			} elsif (substr ($text, -2) eq '++'  ||  substr ($text, -2) eq '--') {
-				my @arr = split(/\n/, $text);
+				my @arr = split /\n/, $text;
 
 				if ($#arr < 1) {
 					$reply = karmaSet ($chatid, trim (substr ($text, 0, -2)), substr ($text, -2));
@@ -290,20 +289,20 @@ sub __on_msg {
 
 		if (defined ($reply) && $reply ne '') {
 			# work a bit more on input phrase
-			$phrase = trim ($phrase);
+			$phrase = trim $phrase;
 
 			while ($phrase =~ /[\.|\,|\?|\!]$/) {
 				chop $phrase;
 			}
 
-			$phrase = lc ($phrase);
+			$phrase = lc $phrase;
 
 			if (fmatch (lc ($reply), $phrase)) {
 				$reply = randomCommonPhrase ();
 			}
 
 			$msg->typing ();
-			sleep (irand (2));
+			sleep (irand 2);
 			carp sprintf ('[DEBUG] In public chat %s (%s) bot reply to %s: %s', $chatname, $chatid, $vis_a_vi, $reply) if $c->{debug};
 			$msg->reply ($reply);
 		} else {

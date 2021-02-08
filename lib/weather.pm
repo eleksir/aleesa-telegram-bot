@@ -37,7 +37,7 @@ sub weather {
 			$reply = sprintf ("Погода в городе %s, %s:\n%s, ветер %s %s м/c, температура %s°C, ощущается как %s°C, относительная влажность %s%%, давление %s мм.рт.с",
 				$w->{name},
 				$w->{country},
-				ucfirst ($w->{description}),
+				ucfirst $w->{description},
 				$w->{wind_direction},
 				$w->{wind_speed},
 				$w->{temperature_min},
@@ -49,7 +49,7 @@ sub weather {
 			$reply = sprintf ("Погода в городе %s, %s:\n%s, ветер %s %s м/c, температура %s-%s°C, ощущается как %s°C, относительная влажность %s%%, давление %s мм.рт.ст",
 				$w->{name},
 				$w->{country},
-				ucfirst ($w->{description}),
+				ucfirst $w->{description},
 				$w->{wind_direction},
 				$w->{wind_speed},
 				$w->{temperature_min},
@@ -140,7 +140,7 @@ sub __weather {
 	untie %cachetime;
 	untie %cachedata;
 
-	# TODO: check all of this for existance
+	# TODO: check all of this for existence
 	$w->{'name'} = $fc->{name};
 	$w->{'state'} = $fc->{state};
 	$w->{'country'} = $fc->{sys}->{country};

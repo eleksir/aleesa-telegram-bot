@@ -14,9 +14,9 @@ use conf qw (loadConf);
 
 use version; our $VERSION = qw (1.0);
 use Exporter qw (import);
-our @EXPORT_OK = qw(karmaSet karmaGet);
+our @EXPORT_OK = qw (karmaSet karmaGet);
 
-my $c = loadConf();
+my $c = loadConf ();
 my $karmadir = $c->{karma}->{dir};
 my $max = 5;
 

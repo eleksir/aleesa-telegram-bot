@@ -39,7 +39,7 @@ sub train () {
 
 	$lat->train ($srcfile);
 	my ($tokens, $expressions) = ($lat->stats ())[0,1];
-	printf "Total tokens: %s\nTotal expressins: %s\n", $tokens, $expressions;
+	printf "Total tokens: %s\nTotal expressions: %s\n", $tokens, $expressions;
 	$lat->save ();
 	return;
 }
