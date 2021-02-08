@@ -110,7 +110,7 @@ sub fish {
 	my $success_probability = irand 100;
 	my $weight = irand 7000;
 
-	my $phrase = sprintf "Вы забрасываете %s удочку %s.\nВы чувствуете поклевку и начинаете быстро тащить что-то из воды.\n", $material[irand ($#material + 1)], $location[irand ($#location + 1)];
+	my $phrase = sprintf "Вы забрасываете %s удочку %s.\nВы чувствуете поклевку и начинаете быстро тащить что-то.\n", $material[irand ($#material + 1)], $location[irand ($#location + 1)];
 
 	if ($find_probability <= 20) {
 		$phrase .= sprintf 'Черт, твоя рыбка сорвалась, %s! Не беда, может потом повезет?', $name;
