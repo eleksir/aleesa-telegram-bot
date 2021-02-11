@@ -235,15 +235,22 @@ sub __on_msg {
 		                    defined ($msg->reply_to_message->from->username) &&
 		                            ($msg->reply_to_message->from->username eq $myusername)) {
 			carp sprintf ('[DEBUG] In public chat %s (%s) %s quote us!', $chatname, $chatid, $vis_a_vi) if $c->{debug};
-			# remove our name from users reply, just in case
-			my $pat1 = quotemeta ('@' . $myusername);
-			my $pat2 = quotemeta $myfullname;
-			$phrase = $text;
-			$phrase =~ s/$pat1//g;
-			$phrase =~ s/$pat2//g;
+
+			# do not answer back if someone quote our new member greet
+			if ((substr ($msg->reply_to_message->text, 0, 9) eq 'Дратути, ') &&
+			    (substr ($msg->reply_to_message->text, -61) eq 'Представьтес, пожалуйста, и расскажите, что вас сюда привело.')) {
+				return;
+			} else {
+				# remove our name from users reply, just in case
+				my $pat1 = quotemeta ('@' . $myusername);
+				my $pat2 = quotemeta $myfullname;
+				$phrase = $text;
+				$phrase =~ s/$pat1//g;
+				$phrase =~ s/$pat2//g;
 
 			# figure out reply :)
-			$reply = $hailo->{$msg->chat->id}->learn_reply ($phrase) if (length ($phrase) > 3);
+				$reply = $hailo->{$msg->chat->id}->learn_reply ($phrase) if (length ($phrase) > 3);
+			}
 		# simple commands
 		} elsif (substr ($text, 0, 1) eq $csign) {
 			$reply = command ($self, $msg, $text, $chatid);
