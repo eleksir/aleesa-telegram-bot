@@ -254,6 +254,44 @@ sub forwardMessage {
   }
 }
 
+# TODO: Check that message is no older than 48 hrs
+sub deleteMessage {
+  my $self = shift;
+  my $args = shift || {};
+  my $send_args = {};
+
+  unless ($args->{chat_id}) {
+    cluck 'No chat_id supplied in deleteMessage()';
+    return {'error' => 1};
+  }
+
+  $send_args->{chat_id} = $args->{chat_id};
+
+  unless ($args->{message_id}) {
+    cluck 'No message_id supplied in deleteMessage()';
+    return {'error' => 1};
+  }
+
+  $send_args->{message_id} = $args->{message_id};
+
+  my $token = $self->token || croak 'No token supplied to deleteMessage()?';
+
+  if (Teapot::Bot::Object::ChatMember::canDelete($self, $chatid)) {
+    my $url = "https://api.telegram.org/bot${token}/deleteMessage";
+    my $api_response = $self->_post_request($url, $send_args);
+
+    if ($api_response) {
+      return Teapot::Bot::Object::Message->create_from_hash($api_response, $self);
+    }
+    else {
+      return {'error' => 1};
+    }
+  }
+  else {
+    return {'error' => 1};
+  }
+}
+
 
 sub sendPhoto {
   my $self = shift;
@@ -566,6 +604,14 @@ On error returns hash reference with error set to 1
 =head2 forwardMessage
 
 See L<https://core.telegram.org/bots/api#forwardmessage>.
+
+Returns a L<Teapot::Bot::Object::Message> object.
+
+On error returns hash reference with error set to 1
+
+=head2 deleteMessage
+
+See L<https://core.telegram.org/bots/api#deletemessage>.
 
 Returns a L<Teapot::Bot::Object::Message> object.
 

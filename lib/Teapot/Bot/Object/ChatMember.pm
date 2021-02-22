@@ -3,6 +3,7 @@ package Teapot::Bot::Object::ChatMember;
 
 use Mojo::Base 'Teapot::Bot::Object::Base';
 use Teapot::Bot::Object::User;
+use Carp qw(cluck);
 
 $Teapot::Bot::Object::ChatMember::VERSION = '0.022';
 
@@ -38,6 +39,59 @@ sub fields {
         };
 }
 
+
+sub canDeleteMessage {
+  my $self = shift;
+  my $chatid = shift;
+
+  my $can_delete = 0;
+
+  if ($chatid < 0) {
+    # group chat
+    my $chatobj = $self->_brain->getChat ({ 'chat_id' => $chatid });
+
+    # on api error, keep silence
+    unless ($chatobj) {
+      cluck "Unable to get chat info for $chatid from telegram API";
+      return 0;
+    }
+
+    my $myObj = $self->_brain->getMe ();
+
+    # on api error, keep silence
+    unless ($chatobj) {
+      cluck "Unable to get chat info for $chatid from telegram API";
+      return 0;
+    }
+
+    my $myid = $myObj->id;
+    my $me = $self->_brain->getChatMember ({ 'chat_id' => $chatid, 'user_id' => $myid });
+
+    # on api error, keep silence
+    unless ($me) {
+      cluck 'Unable to get chat info for bot itself from telegram API';
+      return 0;
+    }
+
+    # bot can delete msg if it is group and it is admin there.
+    if ($chatobj->{'type'} eq 'group') {
+      if ($me->{'status'} eq 'administrator') {
+        $can_delete = 1;
+      }
+    # in supergroup bot must be granted with 
+    } elsif ($chatobj->{'type'} eq 'group') || ($chatobj->{'type'} eq 'channel')
+      if ($me->{'can_delete_messages'}) {
+        $can_delete = 1;
+      }
+    }
+  } else {
+    # 1 on 1 chat with user
+    $can_delete = 1;
+  }
+
+  return $can_delete;
+}
+
 1;
 
 __END__
@@ -59,6 +113,14 @@ The base class for Telegram 'ChatMember' type objects.
 
 See L<https://core.telegram.org/bots/api#chatmember> for details of the
 attributes available for L<Teapot::Bot::Object::ChatMember> objects.
+
+=head1 METHODS
+
+=head2 canDeleteMessage
+
+A convenience method to check if bot can delete message in given conversation.
+
+Returns true if the bot can delete the message in given conversation, otherwise false.
 
 =head1 AUTHOR
 
