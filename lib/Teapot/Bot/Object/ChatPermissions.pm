@@ -97,6 +97,14 @@ The base class for Telegram 'ChatPermissions' type objects.
 See L<https://core.telegram.org/bots/api#chatpermissions> for details of the
 attributes available for L<Teapot::Bot::Object::ChatPermissions> objects.
 
+=head1 METHODS
+
+=head2 canTalk
+
+A convenience method to check if bot can talk in given conversation.
+
+Returns true if the bot can talk in given conversation, otherwise false.
+
 =head1 AUTHOR
 
 Sergei Fedosov <eleksir@gmail.com>
