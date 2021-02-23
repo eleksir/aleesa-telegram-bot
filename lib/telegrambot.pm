@@ -221,7 +221,7 @@ sub __on_msg {
 		my $reply;
 
 		if (isCensored $msg) {
-			carp '[INFO] In public chat %s (%s) message from %s was censored', $chatname, $chatid, $vis_a_vi;
+			carp sprintf '[INFO] In public chat %s (%s) message from %s was censored', $chatname, $chatid, $vis_a_vi;
 			$self->deleteMessage ({chat_id => $chatid, message_id => $msg->{message_id}});
 		}
 

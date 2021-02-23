@@ -53,7 +53,7 @@ sub command {
 	my $text = shift;
 	my $chatid = shift;
 	my $reply;
-	my ($userid, $username, $fullname, $highlight, $visavi) = highlight $msg;
+	my ($userid, $username, $fullname, $highlight, $visavi) = highlight ($msg);
 
 	if (substr ($text, 1) eq 'ping') {
 		$reply = 'Pong.';
@@ -130,10 +130,10 @@ MYHELP
 		$msg->replyMd ($reply);
 		return;
 	} elsif (substr ($text, 1) eq 'admin'  ||  substr ($text, 1) eq 'админ') {
-		my $member = $self->getChatMember ($msg->from->id);
+		my $member = $self->getChatMember ({ 'chat_id' => $msg->chat->id, 'user_id' => $msg->from->id });
 
 		# this msg should be shown only if admins of chat request it
-		if ($member->status eq 'administrator') || ($member->status eq 'creator') {
+		if (($member->status eq 'administrator') || ($member->status eq 'creator')) {
 			$reply = << "MYADMIN";
 ```
 ${csign}admin censor type # - где 1 - вкл, 0 - выкл цензуры для означенного типа сообщений
@@ -146,25 +146,26 @@ ${csign}admin fortune       - показываем ли с утра фортун
 ${csign}admin фортунка      - показываем ли с утра фортунку для чата
 ```
 Типы сообщений:
-audio voice photo video video_note animation sticker dice game poll document
+audio voice photo video animation sticker dice game poll document
 MYADMIN
+
 			$msg->replyMd ($reply);
 		}
 
 		return;
-	} elsif ((substr ($text, 1, 5) eq 'admin'  ||  substr ($text, 1, 5) eq 'админ') and (length ($text >= 8))) {
-		my $member = $self->getChatMember ($msg->from->id);
+	} elsif ((substr ($text, 1, 5) eq 'admin'  ||  substr ($text, 1, 5) eq 'админ') && (length ($text) >= 8)) {
+		my $member = $self->getChatMember ({ 'chat_id' => $msg->chat->id, 'user_id' => $msg->from->id });
 
 		# this msg should be shown only if admins of chat request it
-		if ($member->status eq 'administrator') || ($member->status eq 'creator') {
+		if (($member->status eq 'administrator') || ($member->status eq 'creator')) {
 			my $command = trim (substr $text, 7);
 			my ($cmd, $args) = split /\s+/, $command, 2;
 
 			if ($cmd eq '') {
 				return;
 			} elsif ($cmd eq 'censor' || $cmd eq 'ценз') {
-				if (defined $args && args ne '') {
-					my ($msgType, $toggle) = split /\s/, $args;
+				if (defined ($args) && ($args ne '')) {
+					my ($msgType, $toggle) = split /\s/, $args, 2;
 
 					if (defined $toggle) {
 						foreach (@forbiddenMessageTypes) {
@@ -260,9 +261,9 @@ sub botsleep {
 sub isCensored {
 	my $msg = shift;
 
-	$forbidden = getForbiddenTypes ($msg->{chat}->{id});
+	my $forbidden = getForbiddenTypes ($msg->chat->id);
 
-	foreach (keys %{%forbidden}) {
+	foreach (keys %{$forbidden}) {
 		if ($forbidden->{$_} && $msg->can ($_) && (defined $msg->{$_})) {
 			return 1;
 		}

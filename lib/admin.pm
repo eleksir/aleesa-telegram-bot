@@ -14,12 +14,13 @@ use util qw (utf2sha1);
 
 use version; our $VERSION = qw (1.0);
 use Exporter qw (import);
+# to export array we need @ISA here
 our @ISA    = qw / Exporter /; ## no critic (ClassHierarchies::ProhibitExplicitISA)
 our @EXPORT_OK = qw (@forbiddenMessageTypes getForbiddenTypes addForbiddenType delForbiddenType listForbidden fortune_toggle fortune_toggle_list fortune_status);
 
 my $c = loadConf ();
 my $dir = $c->{admin}->{dir};
-my @forbiddenMessageTypes = qw (audio voice photo video video_note animation sticker dice game poll document);
+our @forbiddenMessageTypes = qw (audio voice photo video video_note animation sticker dice game poll document); ## no critic (Variables::ProhibitPackageVars)
 
 sub initCensorDB {
 	my $backingfile = shift;
@@ -27,7 +28,7 @@ sub initCensorDB {
 	tie my %censor, 'SQLite_File', $backingfile  ||  cluck "Unable to tie to $backingfile: $OS_ERROR";
 
 	foreach (@forbiddenMessageTypes) {
-		$censor($_) = 0;
+		$censor{$_} = 0;
 	}
 
 	untie %censor;
@@ -38,16 +39,24 @@ sub initCensorDB {
 sub getForbiddenTypes {
 	my $chatid = shift;
 
+	unless (-d $dir) {
+		unless (make_path $dir) {
+			cluck "Unable to create $dir: $OS_ERROR";
+			return;
+		}
+	}
+
 	my $messageTypes;
 	my $backingfile = utf2sha1 $chatid;
 	$backingfile =~ s/\//-/xmsg;
 	$backingfile = sprintf '%s/censor_%s.db', $dir, $backingfile;
+	my %censor;
 
 	unless (-f $backingfile) {
 		initCensorDB ($backingfile);
 	}
 
-	unless (tie my %censor, 'SQLite_File', $backingfile) {
+	unless (tie %censor, 'SQLite_File', $backingfile) {
 		cluck "Unable to tie to $backingfile: $OS_ERROR";
 		return $messageTypes;
 	}
@@ -83,7 +92,9 @@ sub addForbiddenType {
 		initCensorDB ($backingfile);
 	}
 
-	unless (tie my %censor, 'SQLite_File', $backingfile) {
+	my %censor;
+
+	unless (tie %censor, 'SQLite_File', $backingfile) {
 		cluck "Unable to tie to $backingfile: $OS_ERROR";
 		return;
 	}
@@ -114,7 +125,9 @@ sub delForbiddenType {
 		return;
 	}
 
-	unless (tie my %censor, 'SQLite_File', $backingfile) {
+	my %censor;
+
+	unless (tie %censor, 'SQLite_File', $backingfile) {
 		cluck "Unable to tie to $backingfile: $OS_ERROR";
 		return;
 	}
@@ -128,6 +141,13 @@ sub delForbiddenType {
 sub listForbidden {
 	my $chatid = shift;
 
+	unless (-d $dir) {
+		unless (make_path $dir) {
+			cluck "Unable to create $dir: $OS_ERROR";
+			return;
+		}
+	}
+
 	my @list;
 	my $backingfile = utf2sha1 $chatid;
 	$backingfile =~ s/\//-/xmsg;
@@ -137,8 +157,10 @@ sub listForbidden {
 		initCensorDB ($backingfile);
 	}
 
+	my %censor;
+
 	# FIXME: return list with all types alowed
-	unless (tie my %censor, 'SQLite_File', $backingfile) {
+	unless (tie %censor, 'SQLite_File', $backingfile) {
 		cluck "Unable to tie to $backingfile: $OS_ERROR";
 		return '';
 	}

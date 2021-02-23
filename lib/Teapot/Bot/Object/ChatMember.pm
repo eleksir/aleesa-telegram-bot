@@ -48,7 +48,7 @@ sub canDeleteMessage {
 
   if ($chatid < 0) {
     # group chat
-    my $chatobj = $self->_brain->getChat ({ 'chat_id' => $chatid });
+    my $chatobj = $self->getChat ({ 'chat_id' => $chatid });
 
     # on api error, keep silence
     unless ($chatobj) {
@@ -56,7 +56,7 @@ sub canDeleteMessage {
       return 0;
     }
 
-    my $myObj = $self->_brain->getMe ();
+    my $myObj = $self->getMe ();
 
     # on api error, keep silence
     unless ($chatobj) {
@@ -65,7 +65,7 @@ sub canDeleteMessage {
     }
 
     my $myid = $myObj->id;
-    my $me = $self->_brain->getChatMember ({ 'chat_id' => $chatid, 'user_id' => $myid });
+    my $me = $self->getChatMember ({ 'chat_id' => $chatid, 'user_id' => $myid });
 
     # on api error, keep silence
     unless ($me) {
@@ -78,8 +78,8 @@ sub canDeleteMessage {
       if ($me->{'status'} eq 'administrator') {
         $can_delete = 1;
       }
-    # in supergroup bot must be granted with 
-    } elsif ($chatobj->{'type'} eq 'group') || ($chatobj->{'type'} eq 'channel')
+    # in supergroup bot must be granted with can_delete_messages
+    } elsif (($chatobj->{'type'} eq 'supergroup') || ($chatobj->{'type'} eq 'channel')) {
       if ($me->{'can_delete_messages'}) {
         $can_delete = 1;
       }

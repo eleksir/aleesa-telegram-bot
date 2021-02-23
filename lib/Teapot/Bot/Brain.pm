@@ -276,20 +276,15 @@ sub deleteMessage {
 
   my $token = $self->token || croak 'No token supplied to deleteMessage()?';
 
-  if (Teapot::Bot::Object::ChatMember::canDelete($self, $chatid)) {
+  if (Teapot::Bot::Object::ChatMember::canDeleteMessage($self, $args->{chat_id})) {
     my $url = "https://api.telegram.org/bot${token}/deleteMessage";
-    my $api_response = $self->_post_request($url, $send_args);
-
-    if ($api_response) {
-      return Teapot::Bot::Object::Message->create_from_hash($api_response, $self);
-    }
-    else {
-      return {'error' => 1};
-    }
+    $self->_post_request($url, $send_args);
   }
   else {
     return {'error' => 1};
   }
+
+  return;
 }
 
 
