@@ -11,9 +11,10 @@ use Carp qw (carp);
 use Math::Random::Secure qw (irand);
 
 use conf qw (loadConf);
+use admin qw (@forbiddenMessageTypes getForbiddenTypes addForbiddenType delForbiddenType listForbidden fortune_toggle fortune_status);
 use archeologist qw (dig);
 use fisher qw (fish);
-use fortune qw (fortune fortune_toggle fortune_status);
+use fortune qw (fortune);
 use friday qw (friday);
 use karma qw (karmaSet karmaGet);
 use kitty qw (kitty);
@@ -23,7 +24,7 @@ use weather qw (weather);
 
 use version; our $VERSION = qw (1.0);
 use Exporter qw (import);
-our @EXPORT_OK = qw (randomCommonPhrase command highlight botsleep);
+our @EXPORT_OK = qw (randomCommonPhrase command highlight botsleep isCensored);
 
 my $c = loadConf ();
 my $csign = $c->{telegrambot}->{csign};
@@ -93,12 +94,6 @@ sub command {
 		$reply = sprintf "```\n%s\n```\n", trim (fortune ());
 		$msg->replyMd ($reply);
 		return;
-	} elsif (substr ($text, 1) eq 'f 1'  ||  substr ($text, 1) eq 'fortune 1'  ||  substr ($text, 1) eq 'фортунка 1'  ||  substr ($text, 1) eq 'ф 1') {
-		$reply = fortune_toggle ($chatid, 1);
-	} elsif (substr ($text, 1) eq 'f 0'  ||  substr ($text, 1) eq 'fortune 0'  ||  substr ($text, 1) eq 'фортунка 0'  ||  substr ($text, 1) eq 'ф 0') {
-		$reply = fortune_toggle ($chatid, 0);
-	} elsif (substr ($text, 1) eq 'f ?'  ||  substr ($text, 1) eq 'fortune ?'  ||  substr ($text, 1) eq 'фортунка ?'  ||  substr ($text, 1) eq 'ф ?') {
-		$reply = fortune_status ($chatid);
 	} elsif (substr ($text, 1) eq 'dig' || substr ($text, 1) eq 'копать') {
 		$reply = dig $highlight;
 		$msg->typing ();
@@ -121,10 +116,6 @@ ${csign}fish | ${csign}рыба | ${csign}рыбка      - порыбачить
 ${csign}fishing | ${csign}рыбалка         - порыбачить
 ${csign}f | ${csign}ф                     - рандомная фраза из сборника цитат fortune_mod
 ${csign}fortune | ${csign}фортунка        - рандомная фраза из сборника цитат fortune_mod
-${csign}f # | ${csign}ф #                 - где 1 - вкл, 0 - выкл фортунку с утра
-${csign}fortune # | ${csign}фортунка #    - где 1 - вкл, 0 - выкл фортунку с утра
-${csign}f ? | ${csign}ф ?                 - показываем ли с утра фортунку для чата
-${csign}fortune ? | ${csign}фортунка ?    - показываем ли с утра фортунку для чата
 ${csign}friday | ${csign}пятница          - а не пятница ли сегодня?
 ${csign}lat | ${csign}лат                 - сгенерить фразу из крылатых латинских выражений
 ${csign}ping | ${csign}пинг               - попинговать бота
@@ -138,6 +129,71 @@ ${csign}karma фраза | ${csign}карма фраза - посмотреть 
 MYHELP
 		$msg->replyMd ($reply);
 		return;
+	} elsif (substr ($text, 1) eq 'admin'  ||  substr ($text, 1) eq 'админ') {
+		my $member = $self->getChatMember ($msg->from->id);
+
+		# this msg should be shown only if admins of chat request it
+		if ($member->status eq 'administrator') || ($member->status eq 'creator') {
+			$reply = << "MYADMIN";
+```
+${csign}admin censor type # - где 1 - вкл, 0 - выкл цензуры для означенного типа сообщений
+${csign}админ ценз тип #    - где 1 - вкл, 0 - выкл цензуры для означенного типа сообщений
+${csign}admin censor        - показать список состояния типов сообщений
+${csign}админ ценз          - показать список состояния типов сообщений
+${csign}admin fortune #     - где 1 - вкл, 0 - выкл фортунку с утра
+${csign}admin фортунка #    - где 1 - вкл, 0 - выкл фортунку с утра
+${csign}admin fortune       - показываем ли с утра фортунку для чата
+${csign}admin фортунка      - показываем ли с утра фортунку для чата
+```
+Типы сообщений:
+audio voice photo video video_note animation sticker dice game poll document
+MYADMIN
+			$msg->replyMd ($reply);
+		}
+
+		return;
+	} elsif ((substr ($text, 1, 5) eq 'admin'  ||  substr ($text, 1, 5) eq 'админ') and (length ($text >= 8))) {
+		my $member = $self->getChatMember ($msg->from->id);
+
+		# this msg should be shown only if admins of chat request it
+		if ($member->status eq 'administrator') || ($member->status eq 'creator') {
+			my $command = trim (substr $text, 7);
+			my ($cmd, $args) = split /\s+/, $command, 2;
+
+			if ($cmd eq '') {
+				return;
+			} elsif ($cmd eq 'censor' || $cmd eq 'ценз') {
+				if (defined $args && args ne '') {
+					my ($msgType, $toggle) = split /\s/, $args;
+
+					if (defined $toggle) {
+						foreach (@forbiddenMessageTypes) {
+							if ($msgType eq $_) {
+								if ($toggle == 1) {
+									addForbiddenType ($chatid, $msgType);
+									$reply = "Теперь сообщения с $msgType будут автоматически удаляться";
+								} elsif ($toggle == 0) {
+									delForbiddenType ($chatid, $msgType);
+									$reply = "Теперь сообщения с $msgType будут оставаться";
+								}
+							}
+						}
+					}
+				} else {
+					$reply = listForbidden ($chatid);
+				}
+			} elsif ($cmd eq 'fortune' || $cmd eq 'фортунка') {
+				if (defined $args) {
+					if ($args == 1) {
+						$reply = fortune_toggle ($chatid, 1);
+					} elsif ($args == 0) {
+						$reply = fortune_toggle ($chatid, 0);
+					}
+				} else {
+					$reply = fortune_status ($chatid);
+				}
+			}
+		}
 	}
 
 	return $reply;
@@ -199,6 +255,20 @@ sub botsleep {
 
 	sleep ( 3 + irand (2));
 	return;
+}
+
+sub isCensored {
+	my $msg = shift;
+
+	$forbidden = getForbiddenTypes ($msg->{chat}->{id});
+
+	foreach (keys %{%forbidden}) {
+		if ($forbidden->{$_} && $msg->can ($_) && (defined $msg->{$_})) {
+			return 1;
+		}
+	}
+
+	return 0;
 }
 
 1;

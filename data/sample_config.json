@@ -1,6 +1,9 @@
 {
     "user" : "nobody",
     "debug_log" : "/var/log/aleesa-telegram-bot/debug.log",
+    "admin" : {
+        "dir" : "data/admin"
+    },
     "friday" : {
         "dir" : "data/friday",
         "src" : "data/friday.txt"

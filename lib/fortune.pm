@@ -15,7 +15,7 @@ use conf qw (loadConf);
 
 use version; our $VERSION = qw (1.0);
 use Exporter qw (import);
-our @EXPORT_OK = qw (seed fortune fortune_toggle fortune_toggle_list fortune_status);
+our @EXPORT_OK = qw (seed fortune);
 
 my $c = loadConf ();
 my $dir = $c->{fortune}->{dir};
@@ -78,104 +78,6 @@ sub fortune () {
 	utf8::decode $phrase;
 	untie @array;
 	return $phrase;
-}
-
-sub fortune_toggle (@) {
-	my $chatid = shift;
-	my $action = shift // undef;
-	my $phrase = 'Фортунка с утра ';
-
-	unless (-d $dir) {
-		make_path ($dir)  ||  do {
-			cluck "[ERROR] Unable to create $dir: $OS_ERROR";
-			return;
-		};
-	}
-
-	my $backingfile = sprintf '%s/chats.sqlite', $dir;
-
-	tie my %toggle, 'SQLite_File', $backingfile  ||  do {
-		cluck "[ERROR] Unable to tie to $backingfile: $OS_ERROR";
-		return;
-	};
-
-	my $state = $toggle{$chatid};
-
-	if (defined $action) {
-		if ($action) {
-			$toggle{$chatid} = 1;
-			$phrase .= 'будет показываться.';
-		} else {
-			if (defined $state) {
-				delete $toggle{$chatid};
-			}
-
-			$phrase .= 'не будет показываться.';
-		}
-	} else {
-		if (defined $state && $state) {
-			delete $toggle{$chatid};
-			$phrase .= 'не будет показываться.';
-		} else {
-			$toggle{$chatid} = 1;
-			$phrase .= 'будет показываться.';
-		}
-	}
-
-	untie %toggle;
-	return $phrase;
-}
-
-sub fortune_status ($) {
-	my $chatid = shift;
-	my $phrase = 'Фортунка с утра ';
-
-	unless (-d $dir) {
-		make_path ($dir)  ||  do {
-			cluck "[ERROR] Unable to create $dir: $OS_ERROR";
-			return;
-		};
-	}
-
-	my $backingfile = sprintf '%s/chats.sqlite', $dir;
-
-	tie my %toggle, 'SQLite_File', $backingfile  ||  do {
-		cluck "[ERROR] Unable to tie to $backingfile: $OS_ERROR\n";
-		return;
-	};
-
-	my $state = $toggle{$chatid};
-
-	if (defined $state && $state) {
-		$phrase .= 'показывается.';
-	} else {
-		$phrase .= 'не показывается.';
-	}
-
-	untie %toggle;
-	return $phrase;
-}
-
-sub fortune_toggle_list () {
-	unless (-d $dir) {
-		make_path ($dir)  ||  do {
-			cluck "[ERROR] Unable to create $dir: $OS_ERROR";
-			my @empty = ();
-			return @empty;
-		}
-	}
-
-	my $backingfile = sprintf '%s/chats.sqlite', $dir;
-
-	tie my %toggle, 'SQLite_File', $backingfile  ||  do {
-		cluck "[ERROR] Unable to tie to $backingfile: $OS_ERROR";
-		my @empty = ();
-		return @empty;
-	};
-
-	my @list = keys %toggle;
-	untie %toggle;
-	return @list;
 }
 
 1;

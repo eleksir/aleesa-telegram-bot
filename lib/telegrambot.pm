@@ -13,9 +13,10 @@ use File::Path qw (make_path);
 use Hailo;
 use Math::Random::Secure qw (irand);
 use Mojo::Base 'Teapot::Bot::Brain';
-use botlib qw (randomCommonPhrase command highlight botsleep);
+use admin qw (fortune_toggle_list);
+use botlib qw (randomCommonPhrase command highlight botsleep isCensored);
 use conf qw (loadConf);
-use fortune qw (fortune fortune_toggle_list);
+use fortune qw (fortune);
 use karma qw (karmaSet);
 use util qw (trim fmatch);
 
@@ -51,7 +52,7 @@ sub __cron {
 			$send_args->{text} = sprintf "%s\n```\n%s\n```\n", $intro[irand ($#intro + 1)], trim (fortune ());
 			$send_args->{chat_id} = $enabledfortunechat;
 			$send_args->{parse_mode} = 'Markdown';
-			Teapot::Bot::Brain::sendMessage ($self, $send_args);
+			$self->sendMessage ($send_args);
 		}
 	}
 
@@ -68,7 +69,7 @@ sub __on_msg {
 	my $csign = $c->{telegrambot}->{csign};
 
 	unless ($myid) {
-		my $myObj = Teapot::Bot::Brain::getMe ($self);
+		my $myObj = $self->getMe ();
 
 		unless ($myObj) {
 			carp '[ERROR] Unable to get chatid, API Error?';
@@ -212,12 +213,17 @@ sub __on_msg {
 		if (defined $reply) {
 			$msg->typing ();
 			sleep 1;
-			carp sprintf ("[DEBUG] Private chat bot reply to $vis_a_vi: %s", $reply) if $c->{debug};
+			carp sprintf ('[DEBUG] Private chat bot reply to %s: %s', $vis_a_vi, $reply) if $c->{debug};
 			$msg->reply ($reply);
 		}
 # group chat
 	} elsif (($msg->chat->type eq 'supergroup') or ($msg->chat->type eq 'group')) {
 		my $reply;
+
+		if (isCensored $msg) {
+			carp '[INFO] In public chat %s (%s) message from %s was censored', $chatname, $chatid, $vis_a_vi;
+			$self->deleteMessage ({chat_id => $chatid, message_id => $msg->{message_id}});
+		}
 
 		# detect and log messages without text, noop here
 		unless (defined $msg->text) {

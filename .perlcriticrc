@@ -89,3 +89,7 @@ lib_sections    = NAME | VERSION | DESCRIPTION | AUTHOR | LICENSE AND COPYRIGHT
 
 [-InputOutput::RequireBriefOpen]
 # Yes, i do!
+
+[-ControlStructures::ProhibitDeepNests]
+# Have to use it, so fuckoff
+
