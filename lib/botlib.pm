@@ -15,6 +15,7 @@ use admin qw (@forbiddenMessageTypes getForbiddenTypes addForbiddenType delForbi
 use archeologist qw (dig);
 use fisher qw (fish);
 use fortune qw (fortune);
+use fox qw (fox);
 use friday qw (friday);
 use karma qw (karmaSet karmaGet);
 use kitty qw (kitty);
@@ -88,6 +89,12 @@ sub command {
 		}
 
 		$reply = karmaGet ($chatid, $mytext);
+	} elsif (substr ($text, 1) eq 'fox'  ||  substr ($text, 1) eq 'лис') {
+		$reply = fox ();
+		$msg->typing ();
+		sleep (irand (2) + 1);
+		$msg->replyMd ($reply);
+		return;
 	} elsif (substr ($text, 1) eq 'friday'  ||  substr ($text, 1) eq 'пятница') {
 		$reply = friday ();
 	} elsif (substr ($text, 1) eq 'fortune'  ||  substr ($text, 1) eq 'фортунка'  ||  substr ($text, 1) eq 'f'  ||  substr ($text, 1) eq 'ф') {
@@ -116,6 +123,7 @@ ${csign}fish | ${csign}рыба | ${csign}рыбка      - порыбачить
 ${csign}fishing | ${csign}рыбалка         - порыбачить
 ${csign}f | ${csign}ф                     - рандомная фраза из сборника цитат fortune_mod
 ${csign}fortune | ${csign}фортунка        - рандомная фраза из сборника цитат fortune_mod
+${csign}fox | ${csign}лис                 - лисичка
 ${csign}friday | ${csign}пятница          - а не пятница ли сегодня?
 ${csign}lat | ${csign}лат                 - сгенерить фразу из крылатых латинских выражений
 ${csign}ping | ${csign}пинг               - попинговать бота
