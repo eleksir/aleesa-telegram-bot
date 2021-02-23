@@ -263,8 +263,15 @@ sub isCensored {
 
 	my $forbidden = getForbiddenTypes ($msg->chat->id);
 
+	# voice messages are special
+	if (defined ($msg->voice) && defined ($msg->voice->duration) && ($msg->voice->duration > 0)) {
+		if ($forbidden->{'voice'}) {
+			return 1;
+		}
+	}
+
 	foreach (keys %{$forbidden}) {
-		if ($forbidden->{$_} && $msg->can ($_) && (defined $msg->{$_})) {
+		if ($forbidden->{$_} && (defined $msg->{$_})) {
 			return 1;
 		}
 	}
