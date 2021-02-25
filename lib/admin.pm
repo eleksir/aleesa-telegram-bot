@@ -16,10 +16,12 @@ use version; our $VERSION = qw (1.0);
 use Exporter qw (import);
 # to export array we need @ISA here
 our @ISA    = qw / Exporter /; ## no critic (ClassHierarchies::ProhibitExplicitISA)
-our @EXPORT_OK = qw (@forbiddenMessageTypes getForbiddenTypes addForbiddenType delForbiddenType listForbidden fortune_toggle fortune_toggle_list fortune_status);
+our @EXPORT_OK = qw (@forbiddenMessageTypes @pluginList getForbiddenTypes addForbiddenType delForbiddenType listForbidden fortune_toggle fortune_toggle_list fortune_status plugin_toggle plugin_status pluginEnabled);
 
 my $c = loadConf ();
 my $dir = $c->{admin}->{dir};
+# this list is not yet used
+our @pluginList = qw (oboobs obutts); ## no critic (Variables::ProhibitPackageVars)
 our @forbiddenMessageTypes = qw (audio voice photo video video_note animation sticker dice game poll document); ## no critic (Variables::ProhibitPackageVars)
 
 sub initCensorDB {
@@ -190,7 +192,7 @@ sub fortune_toggle (@) {
 		};
 	}
 
-	my $backingfile = sprintf '%s/chats.sqlite', $dir;
+	my $backingfile = sprintf '%s/fortune_morning.sqlite', $dir;
 
 	tie my %toggle, 'SQLite_File', $backingfile  ||  do {
 		cluck "[ERROR] Unable to tie to $backingfile: $OS_ERROR";
@@ -235,7 +237,7 @@ sub fortune_status ($) {
 		};
 	}
 
-	my $backingfile = sprintf '%s/chats.sqlite', $dir;
+	my $backingfile = sprintf '%s/fortune_morning.sqlite', $dir;
 
 	tie my %toggle, 'SQLite_File', $backingfile  ||  do {
 		cluck "[ERROR] Unable to tie to $backingfile: $OS_ERROR\n";
@@ -263,7 +265,7 @@ sub fortune_toggle_list () {
 		}
 	}
 
-	my $backingfile = sprintf '%s/chats.sqlite', $dir;
+	my $backingfile = sprintf '%s/fortune_morning.sqlite', $dir;
 
 	tie my %toggle, 'SQLite_File', $backingfile  ||  do {
 		cluck "[ERROR] Unable to tie to $backingfile: $OS_ERROR";
@@ -276,6 +278,114 @@ sub fortune_toggle_list () {
 	return @list;
 }
 
+sub plugin_status (@) {
+	my $chatid = shift;
+	my $plugin = shift;
+	my $phrase = "Плагин $plugin ";
+
+	unless (-d $dir) {
+		make_path ($dir)  ||  do {
+			cluck "[ERROR] Unable to create $dir: $OS_ERROR";
+			return;
+		};
+	}
+
+	my $backingfile = utf2sha1 $chatid;
+	$backingfile =~ s/\//-/xmsg;
+	$backingfile = sprintf '%s/%s.sqlite', $dir, $backingfile;
+
+	tie my %toggle, 'SQLite_File', $backingfile  ||  do {
+		cluck "[ERROR] Unable to tie to $backingfile: $OS_ERROR\n";
+		return;
+	};
+
+	my $state = $toggle{$plugin};
+	untie %toggle;
+
+	if (defined $state && $state) {
+		$phrase .= 'включён.';
+	} else {
+		$phrase .= 'выключен.';
+	}
+
+	return $phrase;
+}
+
+sub pluginEnabled (@) {
+	my $chatid = shift;
+	my $plugin = shift;
+
+	unless (-d $dir) {
+		make_path ($dir)  ||  do {
+			cluck "[ERROR] Unable to create $dir: $OS_ERROR";
+			return;
+		};
+	}
+
+	my $backingfile = utf2sha1 $chatid;
+	$backingfile =~ s/\//-/xmsg;
+	$backingfile = sprintf '%s/%s.sqlite', $dir, $backingfile;
+
+	tie my %toggle, 'SQLite_File', $backingfile  ||  do {
+		cluck "[ERROR] Unable to tie to $backingfile: $OS_ERROR\n";
+		return;
+	};
+
+	my $state = $toggle{$plugin};
+	untie %toggle;
+
+	if (defined $state && $state) {
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+sub plugin_toggle (@) {
+	my $chatid = shift;
+	my $plugin = shift;
+	my $action = shift // undef;
+	my $phrase = "Плагин $plugin ";
+
+	unless (-d $dir) {
+		make_path ($dir)  ||  do {
+			cluck "[ERROR] Unable to create $dir: $OS_ERROR";
+			my @empty = ();
+			return @empty;
+		}
+	}
+
+	my $backingfile = utf2sha1 $chatid;
+	$backingfile =~ s/\//-/xmsg;
+	$backingfile = sprintf '%s/%s.sqlite', $dir, $backingfile;
+
+	tie my %toggle, 'SQLite_File', $backingfile  ||  do {
+		cluck "[ERROR] Unable to tie to $backingfile: $OS_ERROR";
+		my @empty = ();
+		return @empty;
+	};
+
+	if (defined $action) {
+		if ($action) {
+			$toggle{$plugin} = 1;
+			$phrase .= 'включён';
+		} else {
+			$toggle{$plugin} = 0;
+			$phrase .= 'выключен';
+		}
+	} else {
+		if (defined ($toggle{$plugin}) && $toggle{$plugin}) {
+			$toggle{$plugin} = 0;
+			$phrase .= 'включён';
+		} else {
+			$toggle{$plugin} = 1;
+			$phrase .= 'выключен';
+		}
+	}
+
+	untie %toggle;
+	return $phrase;
+}
 
 1;
 

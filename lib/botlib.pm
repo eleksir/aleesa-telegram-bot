@@ -11,14 +11,13 @@ use Carp qw (carp);
 use Math::Random::Secure qw (irand);
 
 use conf qw (loadConf);
-use admin qw (@forbiddenMessageTypes getForbiddenTypes addForbiddenType delForbiddenType listForbidden fortune_toggle fortune_status);
+use admin qw (@forbiddenMessageTypes getForbiddenTypes addForbiddenType delForbiddenType listForbidden fortune_toggle fortune_status plugin_toggle plugin_status pluginEnabled);
 use archeologist qw (dig);
 use fisher qw (fish);
 use fortune qw (fortune);
-use fox qw (fox);
 use friday qw (friday);
+use image qw (kitty fox oboobs obutts);
 use karma qw (karmaSet karmaGet);
-use kitty qw (kitty);
 use lat qw (latAnswer);
 use util qw (trim);
 use weather qw (weather);
@@ -77,7 +76,10 @@ sub command {
 		return;
 	} elsif (substr ($text, 1) eq 'lat'  ||  substr ($text, 1) eq 'лат') {
 		$reply = latAnswer ();
-	} elsif ((length ($text) >= 6 && (substr ($text, 1, 6) eq 'karma ' || substr ($text, 1, 6) eq 'карма '))  ||  substr ($text, 1) eq 'karma'  ||  substr ($text, 1) eq 'карма') {
+	} elsif (
+		(length ($text) >= 6 && (substr ($text, 1, 6) eq 'karma ' || substr ($text, 1, 6) eq 'карма '))  ||
+		substr ($text, 1) eq 'karma'  ||  substr ($text, 1) eq 'карма'
+	) {
 		my $mytext = '';
 
 		if (length($text) > 6) {
@@ -94,6 +96,37 @@ sub command {
 		$msg->typing ();
 		sleep (irand (2) + 1);
 		$msg->replyMd ($reply);
+		return;
+	} elsif (
+		substr ($text, 1) eq 'tits'  ||
+		substr ($text, 1) eq 'boobs'  ||
+		substr ($text, 1) eq 'tities'  ||
+		substr ($text, 1) eq 'boobies'  ||
+		substr ($text, 1) eq 'сиси'  ||
+		substr ($text, 1) eq 'сисечки'
+	) {
+		if (pluginEnabled $chatid, 'oboobs') {
+			$reply = oboobs ();
+			$msg->typing ();
+			sleep (irand (2) + 1);
+			$msg->replyMd ($reply);
+		}
+
+		return;
+	} elsif (
+		substr ($text, 1) eq 'butt'  ||
+		substr ($text, 1) eq 'booty'  ||
+		substr ($text, 1) eq 'ass'  ||
+		substr ($text, 1) eq 'попа'  ||
+		substr ($text, 1) eq 'попка'
+	) {
+		if (pluginEnabled $chatid, 'obutts') {
+			$reply = obutts ();
+			$msg->typing ();
+			sleep (irand (2) + 1);
+			$msg->replyMd ($reply);
+		}
+
 		return;
 	} elsif (substr ($text, 1) eq 'friday'  ||  substr ($text, 1) eq 'пятница') {
 		$reply = friday ();
@@ -152,6 +185,10 @@ ${csign}admin fortune #     - где 1 - вкл, 0 - выкл фортунку �
 ${csign}admin фортунка #    - где 1 - вкл, 0 - выкл фортунку с утра
 ${csign}admin fortune       - показываем ли с утра фортунку для чата
 ${csign}admin фортунка      - показываем ли с утра фортунку для чата
+${csign}admin oboobs #      - где 1 - вкл, 0 - выкл плагина oboobs
+${csign}admin oboobs        - показываем ли сисечки по просьбе участников чата (команды ${csign}tits, ${csign}tities, ${csign}boobs, ${csign}boobies, ${csign}сиси, ${csign}сисечки)
+${csign}admin obutts #      - где 1 - вкл, 0 - выкл плагина obutts
+${csign}admin obutts        - показываем ли попки по просьбе участников чата (команды ${csign}ass, ${csign}butt, ${csign}booty, ${csign}попа, ${csign}попка)
 ```
 Типы сообщений:
 audio voice photo video animation sticker dice game poll document
@@ -200,6 +237,26 @@ MYADMIN
 					}
 				} else {
 					$reply = fortune_status ($chatid);
+				}
+			} elsif ($cmd eq 'oboobs') {
+				if (defined $args) {
+					if ($args == 1) {
+						$reply = plugin_toggle ($chatid, 'oboobs', 1);
+					} elsif ($args == 0) {
+						$reply = plugin_toggle ($chatid, 'oboobs', 0);
+					}
+				} else {
+					$reply = plugin_status ($chatid, 'oboobs');
+				}
+			} elsif ($cmd eq 'obutts') {
+				if (defined $args) {
+					if ($args == 1) {
+						$reply = plugin_toggle ($chatid, 'obutts', 1);
+					} elsif ($args == 0) {
+						$reply = plugin_toggle ($chatid, 'obutts', 0);
+					}
+				} else {
+					$reply = plugin_status ($chatid, 'obutts');
 				}
 			}
 		}
