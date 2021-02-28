@@ -1,4 +1,4 @@
-# Aleesa-Telegram-bot - Simple Telegram chatty bot
+# Aleesa-Telegram-bot - Telegram chatty bot
 
 ## About
 
