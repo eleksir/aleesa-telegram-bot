@@ -16,7 +16,7 @@ use archeologist qw (dig);
 use fisher qw (fish);
 use fortune qw (fortune);
 use friday qw (friday);
-use image qw (kitty fox oboobs obutts);
+use image qw (kitty fox oboobs obutts rabbit);
 use karma qw (karmaSet karmaGet);
 use lat qw (latAnswer);
 use util qw (trim);
