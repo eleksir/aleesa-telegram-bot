@@ -97,6 +97,11 @@ sub command {
 		sleep (irand (2) + 1);
 		$msg->replyMd ($reply);
 		return;
+	} elsif (substr ($text, 1) eq 'rabbit'  ||  substr ($text, 1) eq 'bunny'  ||  substr ($text, 1) eq 'кролик') {
+		$msg->typing ();
+		$reply = rabbit ();
+		$msg->replyMd ($reply);
+		return;
 	} elsif (
 		substr ($text, 1) eq 'tits'  ||
 		substr ($text, 1) eq 'boobs'  ||
@@ -150,6 +155,7 @@ sub command {
 		$reply = << "MYHELP";
 ```
 ${csign}help | ${csign}помощь             - список команд
+${csign}bunny | ${csign}rabbit | ${csign}кролик  - кролик (бета-версия)
 ${csign}cat | ${csign}кис                 - кошечка
 ${csign}dig | ${csign}копать              - заняться археологией
 ${csign}fish | ${csign}рыба | ${csign}рыбка      - порыбачить

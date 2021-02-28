@@ -4,6 +4,15 @@
     "admin" : {
         "dir" : "data/admin"
     },
+    "image": {
+        "dir" : "data/image",
+        "imgur" : {
+            "client-id" : "imgur api client id",
+            "secret" : "secret for client id",
+            "access_token" : "access token for querying imgur api",
+            "refresh_token" : "token for refreshing access token"
+        }
+    },
     "friday" : {
         "dir" : "data/friday",
         "src" : "data/friday.txt"
