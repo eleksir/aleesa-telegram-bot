@@ -311,6 +311,8 @@ sub rabbit {
 	);
 
 	my $rabbit = imgur ($terms[irand ($#terms + 1)]);
+	# return just large thumbnail instead of real photo (that can be really huge)
+	$rabbit = sprintf '%sl%s', substr ($rabbit, 0, -4), substr ($rabbit, -4);
 
 	if (defined $rabbit) {
 		return sprintf '[(\_/)](%s)', $rabbit;
