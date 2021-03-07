@@ -16,7 +16,7 @@ use archeologist qw (dig);
 use fisher qw (fish);
 use fortune qw (fortune);
 use friday qw (friday);
-use image qw (kitty fox oboobs obutts rabbit);
+use image qw (kitty fox oboobs obutts rabbit owl);
 use karma qw (karmaSet karmaGet);
 use lat qw (latAnswer);
 use util qw (trim);
@@ -102,6 +102,11 @@ sub command {
 		$reply = rabbit ();
 		$msg->replyMd ($reply);
 		return;
+	} elsif (substr ($text, 1) eq 'owl'  ||  substr ($text, 1) eq 'сова') {
+		$msg->typing ();
+		$reply = owl ();
+		$msg->replyMd ($reply);
+		return;
 	} elsif (
 		substr ($text, 1) eq 'tits'  ||
 		substr ($text, 1) eq 'boobs'  ||
@@ -155,7 +160,7 @@ sub command {
 		$reply = << "MYHELP";
 ```
 ${csign}help | ${csign}помощь             - список команд
-${csign}bunny | ${csign}rabbit | ${csign}кролик  - кролик (бета-версия)
+${csign}bunny | ${csign}rabbit | ${csign}кролик  - кролик
 ${csign}cat | ${csign}кис                 - кошечка
 ${csign}dig | ${csign}копать              - заняться археологией
 ${csign}fish | ${csign}рыба | ${csign}рыбка      - порыбачить
@@ -165,6 +170,7 @@ ${csign}fortune | ${csign}фортунка        - рандомная фраз�
 ${csign}fox | ${csign}лис                 - лисичка
 ${csign}friday | ${csign}пятница          - а не пятница ли сегодня?
 ${csign}lat | ${csign}лат                 - сгенерить фразу из крылатых латинских выражений
+${csign}owl | ${csign}сова                - сова
 ${csign}ping | ${csign}пинг               - попинговать бота
 ${csign}ver | ${csign}version | ${csign}версия   - что-то про версию ПО
 ${csign}w город | ${csign}п город         - погода в указанном городе

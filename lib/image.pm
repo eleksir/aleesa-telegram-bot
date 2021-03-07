@@ -13,10 +13,12 @@ use HTTP::Tiny;
 use Math::Random::Secure qw (irand);
 use SQLite_File;
 use conf qw (loadConf);
+use flickr qw (flickr_by_tags);
+use util qw (urlencode);
 
 use version; our $VERSION = qw (1.0);
 use Exporter qw (import);
-our @EXPORT_OK = qw (kitty fox oboobs obutts rabbit);
+our @EXPORT_OK = qw (kitty fox oboobs obutts rabbit owl);
 
 my $c = loadConf ();
 my $dir = $c->{image}->{dir};
@@ -301,13 +303,15 @@ sub imgur {
 	}
 }
 
-sub rabbit {
+# It works but results are not particulary relevant, partially. about 20-30% miss
+# So i prefer to use flickr rabbits selection :)
+sub rabbit_imgur {
 	my @terms = (
-		'?q=animals%20AND%20%28%20rabbits%20OR%20bunnies%20%29',
-		'year?q=animals%20AND%20%28%20rabbits%20OR%20bunnies%20%29',
-		'relevance?q=animals+AND+%28+rabbits+OR+bunnies+%29',
-		'relevance/year?q=animals+AND+%28+rabbits+OR+bunnies+%29',
-		'score?q_not=cat%20OR%20kitten%20OR%20kittens%20OR%20dog%20OR%20cats%20OR%20dogs%20OR%20puppy%20OR%20puppies&q_tags=bunnies%2Cbunny%2Crabbits%2Crabbit'
+		urlencode '?q=animals AND (rabbits OR bunnies)',
+		urlencode 'year?q=animals AND (rabbits OR bunnies)',
+		urlencode 'relevance?q=animals AND (rabbits OR bunnies)',
+		urlencode 'relevance/year?q=animals AND (rabbits OR bunnies)',
+		urlencode 'score?q_not=cat OR kitten OR kittens OR dog OR cats OR dogs OR puppy OR puppies&q_tags=bunnies,bunny,rabbits,rabbit'
 	);
 
 	my $rabbit = imgur ($terms[irand ($#terms + 1)]);
@@ -318,6 +322,27 @@ sub rabbit {
 		return sprintf '[(\_/)](%s)', $rabbit;
 	} else {
 		return 'Нету кроликов, все разбежались.'
+	}
+}
+
+sub rabbit {
+	# rabbit, but bunny
+	my $url = flickr_by_tags ('animal,bunny');
+
+	if (defined $url) {
+		return sprintf '[(\_/)](%s)', $url;
+	} else {
+		return 'Нету кроликов, все разбежались.';
+	}
+}
+
+sub owl {
+	my $url = flickr_by_tags ('bird,owl');
+
+	if (defined $url) {
+		return sprintf '[{ O v O }](%s)', $url;
+	} else {
+		return 'Нету сов, все разлетелись.';
 	}
 }
 
