@@ -23,3 +23,4 @@ requires 'Mojo::IOLoop';
 requires 'Mojo::UserAgent';
 requires 'Text::Fuzzy';
 requires 'URI::URL';
+requires 'URI::Encode::XS';
