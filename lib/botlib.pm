@@ -69,8 +69,8 @@ sub command {
 		my $city = substr $text, 3;
 		$reply = weather $city;
 	} elsif (substr ($text, 1) eq 'cat'  ||  substr ($text, 1) eq 'кис') {
-		$reply = kitty ();
 		$msg->typing ();
+		$reply = kitty ();
 		sleep (irand (2) + 1);
 		$msg->replyMd ($reply);
 		return;
@@ -92,8 +92,8 @@ sub command {
 
 		$reply = karmaGet ($chatid, $mytext);
 	} elsif (substr ($text, 1) eq 'fox'  ||  substr ($text, 1) eq 'лис') {
-		$reply = fox ();
 		$msg->typing ();
+		$reply = fox ();
 		sleep (irand (2) + 1);
 		$msg->replyMd ($reply);
 		return;
@@ -116,8 +116,8 @@ sub command {
 		substr ($text, 1) eq 'сисечки'
 	) {
 		if (pluginEnabled $chatid, 'oboobs') {
-			$reply = oboobs ();
 			$msg->typing ();
+			$reply = oboobs ();
 			sleep (irand (2) + 1);
 			$msg->replyMd ($reply);
 		}
@@ -131,8 +131,8 @@ sub command {
 		substr ($text, 1) eq 'попка'
 	) {
 		if (pluginEnabled $chatid, 'obutts') {
-			$reply = obutts ();
 			$msg->typing ();
+			$reply = obutts ();
 			sleep (irand (2) + 1);
 			$msg->replyMd ($reply);
 		}
@@ -145,14 +145,14 @@ sub command {
 		$msg->replyMd ($reply);
 		return;
 	} elsif (substr ($text, 1) eq 'dig' || substr ($text, 1) eq 'копать') {
-		$reply = dig $highlight;
 		$msg->typing ();
+		$reply = dig $highlight;
 		sleep (irand (2) + 1);
 		$msg->replyMd ($reply);
 		return;
 	} elsif (substr ($text, 1) eq 'fish' || substr ($text, 1) eq 'fishing' || substr ($text, 1) eq 'рыба' || substr ($text, 1) eq 'рыбка' || substr ($text, 1) eq 'рыбалка' ) {
-		$reply = fish $highlight;
 		$msg->typing ();
+		$reply = fish $highlight;
 		sleep (irand (2) + 1);
 		$msg->replyMd ($reply);
 		return;
