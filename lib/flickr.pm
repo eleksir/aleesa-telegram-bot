@@ -482,6 +482,14 @@ sub flickr_init {
 	if (defined $flickr_verifier && $flickr_verifier) {
 		my $flickr_request_token = $secret{flickr_request_token};
 		my $flickr_request_token_secret = $secret{flickr_request_token_secret};
+
+		unless (defined $flickr_request_token || defined $flickr_request_token_secret) {
+			say "Looks like there is no request token or request token secret in $backingfile";
+			say "Please remove verifier settings from config.json and run this script again";
+			untie %secret;
+			return 0;
+		}
+
 		my %accessToken = flickrAccessToken ($flickr_request_token, $flickr_request_token_secret, $flickr_verifier);
 
 		if (defined ($accessToken{oauth_token}) && defined ($accessToken{oauth_token_secret})) {
@@ -495,11 +503,11 @@ sub flickr_init {
 				$backingfile
 			);
 
+			untie %secret;
 			return 1;
 		}
 	} else {
 		my %req = flickrRequestToken ();
-
 		if (defined ($req{oauth_token}) && defined ($req{oauth_token_secret}) && defined ($req{oauth_token})) {
 			$secret{flickr_request_token} = $req{oauth_token};
 			$secret{flickr_request_token_secret} = $req{oauth_token_secret};
@@ -509,11 +517,13 @@ sub flickr_init {
 				say "Please open this url in your browser and grant access for this app:\n$confirm_url"; ## no critic (InputOutput::RequireCheckedSyscalls)
 				say 'Do not forget to put oauth_verifier to config.json file and re-run this script to get access token'; ## no critic (InputOutput::RequireCheckedSyscalls)
 				say 'Note that you should be logged off from flickr account.'; ## no critic (InputOutput::RequireCheckedSyscalls)
+				untie %secret;
 				return 1;
 			}
 		}
 	}
 
+	untie %secret;
 	return 0;
 }
 
@@ -535,6 +545,7 @@ sub flickr_test_login {
 
 	my $flickr_access_token = $secret{flickr_access_token};
 	my $flickr_access_token_secret = $secret{flickr_access_token_secret};
+	untie %secret;
 
 	if (flickrTestLogin ($flickr_access_token, $flickr_access_token_secret)) {
 		return 1;
@@ -561,6 +572,7 @@ sub flickr_by_tags {
 
 	my $flickr_access_token = $secret{flickr_access_token};
 	my $flickr_access_token_secret = $secret{flickr_access_token_secret};
+	untie %secret;
 
 	# NB: I honestly query random page (among number of pages) of results from api, but always got first page,
 	# no matter what is shown in response' "page" parameter. Looks like bug in API. Try to little bit mitigate
@@ -601,6 +613,7 @@ sub flickr_by_text {
 
 	my $flickr_access_token = $secret{flickr_access_token};
 	my $flickr_access_token_secret = $secret{flickr_access_token_secret};
+	untie %secret;
 
 	# NB: I honestly query random page (among number of pages) of results from api, but always got first page,
 	# no matter what is shown in response' "page" parameter. Looks like bug in API. Try to little bit mitigate
