@@ -21,6 +21,7 @@ use karma qw (karmaSet karmaGet);
 use lat qw (latAnswer);
 use util qw (trim);
 use weather qw (weather);
+use xkcd qw (xkcd);
 
 use version; our $VERSION = qw (1.0);
 use Exporter qw (import);
@@ -91,6 +92,12 @@ sub command {
 		}
 
 		$reply = karmaGet ($chatid, $mytext);
+	} elsif (substr ($text, 1) eq 'xkcd') {
+		$msg->typing ();
+		$reply = xkcd ();
+		sleep (irand (2) + 1);
+		$msg->replyMd ($reply);
+		return;
 	} elsif (substr ($text, 1) eq 'fox'  ||  substr ($text, 1) eq 'лис') {
 		$msg->typing ();
 		$reply = fox ();
@@ -174,6 +181,7 @@ ${csign}owl | ${csign}сова                - сова
 ${csign}ping | ${csign}пинг               - попинговать бота
 ${csign}ver | ${csign}version | ${csign}версия   - что-то про версию ПО
 ${csign}w город | ${csign}п город         - погода в указанном городе
+${csign}xkcd                       - рандомный стрип с сайта xkcd.ru
 ${csign}karma фраза | ${csign}карма фраза - посмотреть карму фразы
 фраза-- | фраза++           - убавить или добавить карму фразе
 ```
