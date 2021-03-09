@@ -9,6 +9,7 @@ requires 'Digest::SHA';
 requires 'File::Basename';
 requires 'File::Path';
 requires 'Hailo';
+requires 'HTML::TokeParser';
 requires 'HTTP::Tiny';
 requires 'IO::Socket::SSL';
 requires 'JSON';

@@ -13,6 +13,7 @@ use Math::Random::Secure qw (irand);
 use conf qw (loadConf);
 use admin qw (@forbiddenMessageTypes getForbiddenTypes addForbiddenType delForbiddenType listForbidden fortune_toggle fortune_status plugin_toggle plugin_status pluginEnabled);
 use archeologist qw (dig);
+use buni qw (buni);
 use fisher qw (fish);
 use fortune qw (fortune);
 use friday qw (friday);
@@ -69,6 +70,12 @@ sub command {
 	} elsif (length ($text) >= 2 && (substr ($text, 1, 2) eq 'w ' || substr ($text, 1, 2) eq 'п ')) {
 		my $city = substr $text, 3;
 		$reply = weather $city;
+	} elsif (substr ($text, 1) eq 'buni') {
+		$msg->typing ();
+		$reply = buni ();
+		sleep (irand (2) + 1);
+		$msg->replyMd ($reply);
+		return;
 	} elsif (substr ($text, 1) eq 'cat'  ||  substr ($text, 1) eq 'кис') {
 		$msg->typing ();
 		$reply = kitty ();
@@ -167,6 +174,7 @@ sub command {
 		$reply = << "MYHELP";
 ```
 ${csign}help | ${csign}помощь             - список команд
+${csign}buni                       - рандомный стрип hapi buni
 ${csign}bunny | ${csign}rabbit | ${csign}кролик  - кролик
 ${csign}cat | ${csign}кис                 - кошечка
 ${csign}dig | ${csign}копать              - заняться археологией
