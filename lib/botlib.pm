@@ -76,6 +76,12 @@ sub command {
 		sleep (irand (2) + 1);
 		$msg->replyMd ($reply);
 		return;
+	} elsif (substr ($text, 1) eq 'monkeyuser') {
+		$msg->typing ();
+		$reply = monkeyuser ();
+		sleep (irand (2) + 1);
+		$msg->replyMd ($reply);
+		return;
 	} elsif (substr ($text, 1) eq 'cat'  ||  substr ($text, 1) eq 'кис') {
 		$msg->typing ();
 		$reply = kitty ();
@@ -185,6 +191,7 @@ ${csign}fortune | ${csign}фортунка        - рандомная фраз�
 ${csign}fox | ${csign}лис                 - лисичка
 ${csign}friday | ${csign}пятница          - а не пятница ли сегодня?
 ${csign}lat | ${csign}лат                 - сгенерить фразу из крылатых латинских выражений
+${csign}monkeyuser                 - рандомный стрип MonkeyUser
 ${csign}owl | ${csign}сова                - сова
 ${csign}ping | ${csign}пинг               - попинговать бота
 ${csign}ver | ${csign}version | ${csign}версия   - что-то про версию ПО
