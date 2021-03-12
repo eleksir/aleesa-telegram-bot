@@ -1,40 +1,65 @@
 {
-    "user" : "nobody",
-    "debug_log" : "/var/log/aleesa-telegram-bot/debug.log",
     "admin" : {
+# store per-channel (per-conversation) settings
         "dir" : "data/admin"
     },
-    "image": {
-        "dir" : "data/image",
-        "imgur" : {
-            "client-id" : "imgur api client id",
-            "secret" : "secret for client id",
-            "access_token" : "access token for querying imgur api",
-            "refresh_token" : "token for refreshing access token"
-        }
-    },
-    "friday" : {
-        "dir" : "data/friday",
-        "src" : "data/friday.txt"
-    },
+
     "fortune" : {
         "dir" : "data/fortune",
         "srcdir" : "data/fortune_src"
     },
-    "telegrambot" : {
-        "csign" : "!",
-        "token" : "get_it_from_botfather",
-        "braindir": "data/telegrambot-brains"
+
+    "friday" : {
+        "dir" : "data/friday",
+        "src" : "data/friday.txt"
     },
-    "openweathermap" : {
-        "appid": "get_it_on_openweathermap.org",
-        "cachedir" : "data/cache"
+
+    "image": {
+        "dir" : "data/image",
+        "imgur" : {
+# see README.md about these settings - auth'ed search settings
+            "client-id" : "imgur api client id",
+            "secret" : "secret for client id",
+            "access_token" : "access token for querying imgur api",
+            "refresh_token" : "token for refreshing access token"
+        },
+        "flickr" : {
+# see README.md about these settings - auth'ed search settings
+            "consumer_key" : "md5-like_hash",
+            "consumer_secret" : "some_hash-like_string",
+            "verifier": "some_hash-like_string"
+        }
     },
+
+    "karma": {
+        "dir": "data/karma"
+    },
+
     "lat" : {
-        "brain": "data/lat/lat.sqlite",
+        "brain": "data/lat/brain.sqlite",
         "src": "data/lat.txt"
     },
-    "karma" : {
-        "dir": "data/karma"
-    }
+
+# required for debugging reasons, if commented out or not exist, no debug logging appears at all
+    "log" : "/var/log/aleesa-telegram-bot/debug.log",
+
+# openwatermap plugin
+    "openweathermap" : {
+        "appid" : "md5sum-like_string",
+# result cache, stores data for 4 hours
+        "cachedir" : "data/cache",
+    },
+
+# stuff for telegram itself
+    "telegrambot" : {
+# directory with per-conversation "brains"
+        "braindir" : "data/telegrambot-brains",
+# prefix-sign for all commands. in many irc-bots (eggdrop/windrop) it is "." (dot), in sulci it was "!"
+# in telegram commands begin with "/" on the start of first (and only) line.
+        "csign" : "!",
+        "token" : "Long_string_given_by_@BotFather"
+    },
+
+# unprivileged user to run this bot from
+    "user" : "unit",
 }
