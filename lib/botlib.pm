@@ -14,6 +14,7 @@ use conf qw (loadConf);
 use admin qw (@forbiddenMessageTypes getForbiddenTypes addForbiddenType delForbiddenType listForbidden fortune_toggle fortune_status plugin_toggle plugin_status pluginEnabled);
 use archeologist qw (dig);
 use buni qw (buni);
+use drink qw (drink);
 use fisher qw (fish);
 use fortune qw (fortune);
 use friday qw (friday);
@@ -164,6 +165,10 @@ sub command {
 		$reply = sprintf "```\n%s\n```\n", trim (fortune ());
 		$msg->replyMd ($reply);
 		return;
+	} elsif (substr ($text, 1) eq 'drink' || substr ($text, 1) eq 'праздник') {
+		$msg->typing ();
+		$reply = drink ();
+		sleep (irand (2) + 1);
 	} elsif (substr ($text, 1) eq 'dig' || substr ($text, 1) eq 'копать') {
 		$msg->typing ();
 		$reply = dig $highlight;
@@ -184,6 +189,7 @@ ${csign}buni                       - рандомный стрип hapi buni
 ${csign}bunny | ${csign}rabbit | ${csign}кролик  - кролик
 ${csign}cat | ${csign}кис                 - кошечка
 ${csign}dig | ${csign}копать              - заняться археологией
+${csign}drink | ${csign}праздник          - какой сегодня праздник?
 ${csign}fish | ${csign}рыба | ${csign}рыбка      - порыбачить
 ${csign}fishing | ${csign}рыбалка         - порыбачить
 ${csign}f | ${csign}ф                     - рандомная фраза из сборника цитат fortune_mod
