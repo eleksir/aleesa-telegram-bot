@@ -21,6 +21,7 @@ use friday qw (friday);
 use image qw (kitty fox oboobs obutts rabbit owl);
 use karma qw (karmaSet karmaGet);
 use lat qw (latAnswer);
+use monkeyuser qw (monkeyuse);
 use util qw (trim);
 use weather qw (weather);
 use xkcd qw (xkcd);
