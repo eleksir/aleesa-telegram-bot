@@ -34,7 +34,8 @@ sub weather {
 
 	if ($w) {
 		if ($w->{temperature_min} == $w->{temperature_max}) {
-			$reply = sprintf ("Погода в городе %s, %s:\n%s, ветер %s %s м/c, температура %s°C, ощущается как %s°C, относительная влажность %s%%, давление %s мм.рт.с",
+			$reply = sprintf (
+				"Погода в городе %s, %s:\n%s, ветер %s %s м/c, температура %s°C, ощущается как %s°C, относительная влажность %s%%, давление %s мм.рт.с",
 				$w->{name},
 				$w->{country},
 				ucfirst $w->{description},
@@ -46,7 +47,8 @@ sub weather {
 				$w->{pressure}
 			);
 		} else {
-			$reply = sprintf ("Погода в городе %s, %s:\n%s, ветер %s %s м/c, температура %s-%s°C, ощущается как %s°C, относительная влажность %s%%, давление %s мм.рт.ст",
+			$reply = sprintf (
+				"Погода в городе %s, %s:\n%s, ветер %s %s м/c, температура %s-%s°C, ощущается как %s°C, относительная влажность %s%%, давление %s мм.рт.ст",
 				$w->{name},
 				$w->{country},
 				ucfirst $w->{description},

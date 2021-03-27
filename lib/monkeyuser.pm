@@ -37,11 +37,11 @@ sub monkeyuser {
 
 		do {
 			$#a = -1;
-			@a = $p->get_tag("a");
+			@a = $p->get_tag('a'); ## no critic (Variables::RequireLocalizedPunctuationVars)
 
 			if (defined $a[0][1]->{class} && $a[0][1]->{class} eq 'lazyload small-image') {
-				if (defined $a[0][1]->{"data-src"} && ($a[0][1]->{"data-src"} !~ /adlitteram/)) {
-					push @link, $a[0][1]->{"data-src"};
+				if (defined $a[0][1]->{'data-src'} && ($a[0][1]->{'data-src'} !~ /adlitteram/)) {
+					push @link, $a[0][1]->{'data-src'};
 				}
 			}
 

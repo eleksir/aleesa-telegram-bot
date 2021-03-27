@@ -41,7 +41,7 @@ sub drink {
 
 		do {
 			$#a = -1;
-			@a = $p->get_tag("span");
+			@a = $p->get_tag('span'); ## no critic (Variables::RequireLocalizedPunctuationVars)
 
 			if ($#{$a[0]} > 2 && defined $a[0][1]->{itemprop} && $a[0][1]->{itemprop} eq 'text') {
 				push @holyday,'* ' . decode ('UTF-8', $p->get_trimmed_text ('/span'));
