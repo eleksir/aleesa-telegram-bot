@@ -6,6 +6,7 @@ use Mojo::Base -base;
 
 use strict;
 use warnings;
+use English qw ( -no_match_vars );
 
 use Mojo::IOLoop;
 use Mojo::UserAgent;
@@ -76,7 +77,7 @@ sub think {
   $self->init();
 
   $self->_add_getUpdates_handler;
-  Mojo::IOLoop->start until Mojo::IOLoop->is_running;
+  do { Mojo::IOLoop->start } until Mojo::IOLoop->is_running;
   return;
 }
 
@@ -402,11 +403,18 @@ sub _add_getUpdates_handler {
 
     $self->ua->get($updateURL => sub {
       my ($ua, $tx) = @_;
-      my $res = $tx->res->json;
-      my $items = $res->{result};
-      foreach my $item (@{$items}) {
-        $last_update_id = $item->{update_id};
-        $self->_process_message($item);
+      my $res = eval { $tx->res->json; };
+
+      # it looks like we can catch an error here if timeout or something bad occurs,
+      # try not to die in this case or we risk to stuck with $http_active=1 forever
+      if ((defined $res) && $res ne '') {
+        my $items = $res->{result};
+        foreach my $item (@{$items}) {
+          $last_update_id = $item->{update_id};
+          $self->_process_message($item);
+        }
+      } else {
+        cluck "Something nasty happen while handling updates from $updateURL : $EVAL_ERROR";
       }
 
       $http_active = 0;
