@@ -13,9 +13,14 @@ has 'custom_title';              # optional. Owner and administrators only.
 has 'is_anonymous';              # Optional. Owner and administrators only.
 
 has 'can_be_edited';             # optional. Administrators only.
+has 'can_manage_chat'            # Optional. Administrators only. True, if the administrator can access the chat event
+                                 # log, chat statistics, message statistics in channels, see channel members, see
+                                 # anonymous administrators in supergroups and ignore slow mode. Implied by any other
+                                 # administrator privilege
 has 'can_post_messages';         # optional. Administrators only.
 has 'can_edit_messages';         # optional. Administrators only.
 has 'can_delete_messages';       # optional. Administrators only.
+has 'can_manage_voice_chats'     # Optional. Administrators only. True, if the administrator can manage voice chats
 has 'can_restrict_members';      # optional. Administrators only.
 has 'can_promote_members';       # optional. Administrators only.
 has 'can_change_info';           # optional. Administrators and restricted only.
@@ -31,10 +36,11 @@ has 'until_date';                # optional. Restricted and kicked only.
 
 sub fields {
   return {
-          'scalar'                    => [qw/status custom_title is_anonymous can_be_edited can_post_messages can_edit_messages
-                                             can_delete_messages can_restrict_members can_promote_members can_change_info
-                                             can_invite_users can_pin_messages is_member can_send_messages
-                                             can_send_media_messages can_send_polls can_send_other_messages can_add_web_page_previews until_date/],
+          'scalar'                    => [qw/status custom_title is_anonymous can_be_edited can_manage_chat can_post_messages
+                                             can_edit_messages can_delete_messages can_manage_voice_chats can_restrict_members
+                                             can_promote_members can_change_info can_invite_users can_pin_messages is_member
+                                             can_send_messages can_send_media_messages can_send_polls can_send_other_messages
+                                             can_add_web_page_previews until_date/],
           'Teapot::Bot::Object::User' => [qw/user/],
         };
 }

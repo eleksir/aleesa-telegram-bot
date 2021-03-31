@@ -42,6 +42,129 @@ sub _field_is_array_of_arrays {
   return;
 }
 
+sub create_from_array {
+  my $class = shift;
+  my $array = shift;
+  my $brain = shift || croak 'No brain supplied to create_from_array()';
+  my $obj   = shift || $class->new(_brain => $brain);
+
+  unless (defined $array) {
+    cluck 'Array is undef';
+    return $obj;
+  }
+
+  unless (ref ($array) eq 'ARRAY') {
+    cluck 'Not array ' . Dumper ($hash);
+    return $obj;
+  }
+
+  cluck "Dumping class: " . Dumper ($class);
+  cluck "Dumping array: " . Dumper ($array);
+ Dumping array: $VAR1 = [
+          [
+            {
+              'text' => 'Spotify',
+              'url' => 'https://open.spotify.com/track/44MxUoeZg6FXDlHMrSbVjX'
+            },
+            {
+              'text' => 'Tidal',
+              'url' => 'https://listen.tidal.com/track/159119367'
+            },
+            {
+              'url' => 'https://music.apple.com/us/album/_/1534782030?i=1534782031',
+              'text' => 'Apple'
+            }
+          ],
+          [
+            {
+              'text' => 'Deezer',
+              'url' => 'https://www.deezer.com/track/1112603372'
+            },
+            {
+              'text' => 'YouTube',
+              'url' => 'https://music.youtube.com/watch?v=KT1jJDh7ir0'
+            },
+            {
+              'url' => 'https://song.link/s/44MxUoeZg6FXDlHMrSbVjX',
+              'text' => 'eXtra'
+            }
+          ]
+        ];
+
+ Dumping array: $VAR1 = [
+          [
+            {
+              'callback_data' => 'l85882326|open.spotify.com/track/44MxUoeZg6FXDlHMrSbVjX',
+              'text' => 'Get links'
+            }
+          ]
+        ];
+
+# https://core.telegram.org/bots/api#inlinekeyboardmarkup
+# который содержит в себе тупо массив
+# Array of Array of Teapot::Bot::Object::InlineKeyboardButton
+
+# https://core.telegram.org/bots/api#userprofilephotos
+# аналогично предыдущему содержит
+# Array of Array of Teapot::Bot::Object::PhotoSize
+
+  # deal with each type of field
+  foreach my $type (keys %{ $class->fields }) {
+    my @fields_of_this_type = @{ $class->fields->{$type} };
+
+    foreach my $field (@fields_of_this_type) {
+      # ignore undefined fields (sic!)
+      next if (! defined $field);
+
+      # ignore fields for which we have no value in the hash
+      next if (! defined $hash->{$field} );
+
+      # warn "type: $type field $field\n";
+      if ($type eq 'scalar') {
+        if ($obj->_field_is_array($field)) {
+          # simple scalar array ref, so just copy it
+          my $val = $hash->{$field};
+          # deal with boolean stuff so we don't pollute our object
+          # with JSON
+          if (ref($val) eq 'JSON::PP::Boolean') {
+            $val = !!$val;
+          }
+          $obj->$field($val);
+        }
+        elsif ($obj->_field_is_array_of_arrays) {
+          croak 'Not yet implemented for scalars';
+        }
+        else {
+          my $val = $hash->{$field};
+          if (ref($val) eq 'JSON::PP::Boolean') {
+            $val = 0+$val;
+
+          }
+          $obj->$field($val);
+        }
+      }
+
+      else {
+        if ($obj->_field_is_array($field)) {
+          my @sub_array;
+          foreach my $data ( @{ $hash->{$field} } ) {
+            push @sub_array, $type->create_from_hash($data, $brain);
+          }
+          $obj->$field(\@sub_array);
+        }
+        elsif ($obj->_field_is_array_of_arrays) {
+          croak 'Not yet implemented for scalars';
+        }
+        else {
+          $obj->$field($type->create_from_hash($hash->{$field}, $brain));
+        }
+
+      }
+    }
+  }
+
+  return $obj;
+}
 
 # create an object from a hash. Needs to deal with the nested types, and
 # arrays
@@ -57,6 +180,10 @@ sub create_from_hash {
   }
 
   unless (ref ($hash) eq 'HASH') {
+    if (ref ($array) eq 'ARRAY') {
+      return create_from_array($class, $hash, $brain);
+    }
+
     cluck 'Not a hash ' . Dumper ($hash);
     return $obj;
   }
