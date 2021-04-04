@@ -7,11 +7,13 @@ use utf8;
 use open qw (:std :utf8);
 use English qw ( -no_match_vars );
 use Carp qw (carp cluck);
+use CHI;
+use CHI::Driver::BerkeleyDB;
 use DB_File;
 use Digest::MD5 qw (md5_base64);
 use File::Path qw (make_path);
-use HTTP::Tiny;
-use JSON::XS;
+use Mojo::Log;
+use Mojo::UserAgent::Cached;
 use conf qw (loadConf);
 use util qw (trim urlencode);
 
@@ -71,76 +73,52 @@ sub weather {
 sub __weather {
 	my $city = shift;
 	$city = urlencode $city;
-	my $id = md5_base64 $city;
 	my $appid = $c->{openweathermap}->{appid};
 	my $cachedir = $c->{openweathermap}->{cachedir};
-	my $cachetimefile = $cachedir . '/openweathermap.Id-Timestamp.db';
-	my $cachedatafile = $cachedir . '/openweathermap.Id-Data.db';
 	my $now = time ();
 	my $fc;
 	my $w;
 
-	unless (-d $cachedir) {
-		make_path ($cachedir)  ||  do {
-			cluck "[ERROR] Unable to create $cachedir: $OS_ERROR";
-			return;
+	my $r;
+
+	# try 3 times and giveup
+	for (1..3) {
+		my $ua = Mojo::UserAgent::Cached->new;
+		$ua->local_dir ($cachedir);
+		$ua->cache_agent(
+				CHI->new (
+				driver             => 'BerkeleyDB',
+				root_dir           => $cachedir,
+				namespace          => __PACKAGE__,
+				expires_in         => '3 hours',
+				expires_on_backend => 1,
+			)
+		);
+		# just to make Mojo::UserAgent::Cached happy
+		$ua->logger (Mojo::Log->new (path => '/dev/null', level => 'error'));
+		$r = $ua->get (sprintf ('http://api.openweathermap.org/data/2.5/weather?q=%s&lang=ru&APPID=%s', $city, $appid))->result;
+
+		if ($r->is_success) {
+			last;
+		}
+
+		sleep 2;
+	}
+
+	# all 3 times can give error, so check it here
+	if ($r->is_success) {
+		$fc = eval {
+			return $r->json;
 		};
-	}
 
-	# attach to cache data
-	tie my %cachetime, 'DB_File', $cachetimefile or do {
-		carp "[ERROR] Something nasty happen when cachetime ties to its data: $OS_ERROR";
-		return undef;
-	};
-
-	tie my %cachedata, 'DB_File', $cachedatafile or do {
-		carp "[ERROR] Something nasty happen when cachedata ties to its data: $OS_ERROR";
-		return undef;
-	};
-
-	# lookup cache
-	if (defined ($cachetime{$id}) && ($now - $cachetime{$id}) < 10800) {
-		$fc = decode_json $cachedata{$id};
-	} else {
-		my $r;
-
-		# try 3 times and giveup
-		for (1..3) {
-			my $http = HTTP::Tiny->new (timeout => 3);
-			$r = $http->get (sprintf ('http://api.openweathermap.org/data/2.5/weather?q=%s&lang=ru&APPID=%s', $city, $appid));
-
-			if ($r->{success}) {
-				last;
-			}
-
-			sleep 2;
-		}
-
-		# all 3 times can give error, so check it here
-		if ($r->{success}) {
-			$fc = eval {
-				decode_json $r->{content};
-			};
-
-			if ($EVAL_ERROR) {
-				cluck "[WARN] openweathermap returns corrupted json: $EVAL_ERROR";
-				untie %cachetime;
-				untie %cachedata;
-				return undef;
-			};
-
-			$cachetime{$id} = $now;
-			$cachedata{$id} = encode_json $fc;
-		} else {
-			cluck sprintf 'Server return status %s with message: %s', $r->{status}, $r->{reason};
-			untie %cachetime;
-			untie %cachedata;
+		unless ($fc) {
+			cluck "[WARN] openweathermap returns corrupted json: $EVAL_ERROR";
 			return undef;
-		}
+		};
+	} else {
+		cluck sprintf 'Server return status %s with message: %s', $r->code, $r->message;
+		return undef;
 	}
-
-	untie %cachetime;
-	untie %cachedata;
 
 	# TODO: check all of this for existence
 	$w->{'name'} = $fc->{name};

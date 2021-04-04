@@ -7,8 +7,8 @@ use utf8;
 use open qw (:std :utf8);
 use English qw ( -no_match_vars );
 use Carp qw (cluck);
-use HTTP::Tiny;
 use HTML::TokeParser;
+use Mojo::UserAgent;
 
 use version; our $VERSION = qw (1.0);
 use Exporter qw (import);
@@ -19,18 +19,18 @@ sub buni {
 	my $ret = 'Нету Buni';
 
 	for (1..3) {
-		my $http = HTTP::Tiny->new (timeout => 3);
-		$r = $http->get ('http://www.bunicomic.com/?random&nocache=1');
+		my $ua  = Mojo::UserAgent->new->connect_timeout (3);
+		$r = $ua->get ('http://www.bunicomic.com/?random&nocache=1')->result;
 
-		if ($r->{success}) {
+		if ($r->is_success) {
 			last;
 		}
 
 		sleep 2;
 	}
 
-	if ($r->{success}) {
-		my $p = HTML::TokeParser->new(\$r->{content});
+	if ($r->is_success) {
+		my $p = HTML::TokeParser->new(\$r->body);
 		my @a;
 
 		# additional {} required in order "last" to work properly :)
@@ -47,7 +47,7 @@ sub buni {
 			} while ($#{$a[0]} > 1);
 		}
 	} else {
-		cluck sprintf 'Server return status %s with message: %s', $r->{status}, $r->{reason};
+		cluck sprintf 'Server return status %s with message: %s', $r->code, $r->message;
 	}
 
 	return $ret;

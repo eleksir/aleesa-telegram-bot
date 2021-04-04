@@ -8,9 +8,8 @@ use open qw (:std :utf8);
 use English qw ( -no_match_vars );
 use Carp qw (cluck);
 use File::Path qw (make_path);
-use JSON::XS;
-use HTTP::Tiny;
 use Math::Random::Secure qw (irand);
+use Mojo::UserAgent;
 use SQLite_File;
 use conf qw (loadConf);
 
@@ -30,7 +29,6 @@ sub imgur {
 
 	my $refresh_url   = 'https://api.imgur.com/oauth2/token';
 	my $search_url    = 'https://api.imgur.com/3/gallery/search/';
-	my $http = HTTP::Tiny->new (timeout => 5);
 
 	# load all tokens from api secrets db
 	my $backingfile = sprintf '%s/secrets.sqlite', $dir;
@@ -62,20 +60,13 @@ sub imgur {
 	}
 
 	# query api
-	my $r = $http->get (
-		$search_url . $tag,
-		{
-			headers => {
-				Authorization => "Bearer $imgur_access_token"
-			}
-		}
-	);
+	my $ua = Mojo::UserAgent->new->connect_timeout (3);
+	my $r = $ua->get ($search_url . $tag => {Authorization => "Bearer $imgur_access_token"})->result;
 
 	# looks like we need to refresh token
-	if (($r->{status} == 401) || ($r->{status} == 403)) {
-		$r = $http->post_form (
-			$refresh_url,
-			{
+	if (($r->code == 401) || ($r->code == 403)) {
+		$ua->post (
+			$refresh_url => form {
 				refresh_token => $imgur_refresh_token,
 				client_id => $imgur_client_id,
 				clinent_secret => $imgur_client_secret,
@@ -83,13 +74,13 @@ sub imgur {
 			}
 		);
 
-		unless ($r->{success}) {
-			cluck "Unable to refresh imgur token, please re-authorise app! or imgur experiencing api outage: $r->{status} $r->{content}";
+		unless ($r->is_success) {
+			cluck "Unable to refresh imgur token, please re-authorise app! or imgur experiencing api outage: $r->code $r->message";
 			untie %secret;
 			return undef;
 		}
 
-		my $refresh = eval { decode_json $r->{content} };
+		my $refresh = eval { return $r->json; };
 
 		if (defined $refresh) {
 			$imgur_refresh_token = $refresh->{refresh_token};
@@ -103,20 +94,13 @@ sub imgur {
 		}
 
 		# query api again
-		$r = $http->get (
-			$search_url . $tag,
-			{
-				headers => {
-					Authorization => "Bearer $imgur_access_token"
-				}
-			}
-		);
+		$r = $ua->get ($search_url . $tag => {Authorization => "Bearer $imgur_access_token"})->result;
 	}
 
 	untie %secret;
 
-	if ($r->{success}) {
-		my $searchResult = eval { decode_json ($r->{content}) };
+	if ($r->is_success) {
+		my $searchResult = eval { return $r->json; };
 		my @urls;
 
 		if (defined $searchResult) {
@@ -148,7 +132,7 @@ sub imgur {
 					return undef;
 				}
 			} else {
-				cluck "Unable to get results from imgur api: $r->{content}";
+				cluck "Unable to get results from imgur api: $r->message";
 				return undef;
 			}
 		} else {
@@ -156,7 +140,7 @@ sub imgur {
 			return undef;
 		}
 	} else {
-		cluck "Unable to get results from imgur api: $r->{status}, $r->{content}";
+		cluck "Unable to get results from imgur api: $r->code, $r->message";
 		return undef;
 	}
 }

@@ -8,9 +8,8 @@ use open qw (:std :utf8);
 use English qw ( -no_match_vars );
 use Carp qw (cluck);
 use File::Path qw (make_path);
-use JSON::XS;
-use HTTP::Tiny;
 use Math::Random::Secure qw (irand);
+use Mojo::UserAgent;
 use SQLite_File;
 use conf qw (loadConf);
 use flickr qw (flickr_by_tags);
@@ -29,19 +28,19 @@ sub kitty {
 	my $ret = 'Нету кошечек, все разбежались.';
 
 	for (1..3) {
-		my $http = HTTP::Tiny->new (timeout => 3);
-		$r = $http->get ('https://api.thecatapi.com/v1/images/search');
+		my $ua  = Mojo::UserAgent->new->connect_timeout (3);
+		$r = $ua->get ('https://api.thecatapi.com/v1/images/search')->result;
 
-		if ($r->{success}) {
+		if ($r->is_success) {
 			last;
 		}
 
 		sleep 2;
 	}
 
-	if ($r->{success}) {
+	if ($r->is_success) {
 		my $jcat = eval {
-			decode_json ($r->{content})
+			return $r->json;
 		};
 
 		unless (defined $jcat) {
@@ -53,7 +52,7 @@ sub kitty {
 			}
 		}
 	} else {
-		cluck sprintf 'Server return status %s with message: %s', $r->{status}, $r->{reason};
+		cluck sprintf 'Server return status %s with message: %s', $r->code, $r->message;
 	}
 
 	return $ret;
@@ -64,19 +63,19 @@ sub fox {
 	my $ret = 'Нету лисичек, все разбежались.';
 
 	for (1..3) {
-		my $http = HTTP::Tiny->new (timeout => 3);
-		$r = $http->get ('https://randomfox.ca/floof/');
+		my $ua  = Mojo::UserAgent->new->connect_timeout (3);
+		$r = $ua->get ('https://randomfox.ca/floof/')->result;
 
-		if ($r->{success}) {
+		if ($r->is_success) {
 			last;
 		}
 
 		sleep 2;
 	}
 
-	if ($r->{success}) {
+	if ($r->is_success) {
 		my $jfox = eval {
-			decode_json ($r->{content})
+			return $r->json;
 		};
 
 		unless (defined $jfox) {
@@ -88,7 +87,7 @@ sub fox {
 			}
 		}
 	} else {
-		cluck sprintf 'Server return status %s with message: %s', $r->{status}, $r->{reason};
+		cluck sprintf 'Server return status %s with message: %s', $r->code, $r->message;
 	}
 
 	return $ret;
@@ -99,19 +98,19 @@ sub oboobs {
 	my $ret = 'Нету cисичек, все разбежались.';
 
 	for (1..3) {
-		my $http = HTTP::Tiny->new (timeout => 3);
-		$r = $http->get ('http://api.oboobs.ru/boobs/0/1/random');
+		my $ua  = Mojo::UserAgent->new->connect_timeout (3);
+		$r = $ua->get ('http://api.oboobs.ru/boobs/0/1/random')->result;
 
-		if ($r->{success}) {
+		if ($r->is_success) {
 			last;
 		}
 
 		sleep 2;
 	}
 
-	if ($r->{success}) {
+	if ($r->is_success) {
 		my $joboobs = eval {
-			decode_json ($r->{content})
+			return $r->json;
 		};
 
 		unless (defined $joboobs) {
@@ -123,7 +122,7 @@ sub oboobs {
 			}
 		}
 	} else {
-		cluck sprintf 'Server return status %s with message: %s', $r->{status}, $r->{reason};
+		cluck sprintf 'Server return status %s with message: %s', $r->code, $r->message;
 	}
 
 	return $ret;
@@ -134,19 +133,19 @@ sub obutts {
 	my $ret = 'Нету попок, все разбежались.';
 
 	for (1..3) {
-		my $http = HTTP::Tiny->new (timeout => 3);
-		$r = $http->get ('http://api.obutts.ru/butts/0/1/random');
+		my $ua  = Mojo::UserAgent->new->connect_timeout (3);
+		$r = $ua->get ('http://api.obutts.ru/butts/0/1/random')->result;
 
-		if ($r->{success}) {
+		if ($r->is_success) {
 			last;
 		}
 
 		sleep 2;
 	}
 
-	if ($r->{success}) {
+	if ($r->is_success) {
 		my $jobutts = eval {
-			decode_json ($r->{content})
+			return $r->json;
 		};
 
 		unless (defined $jobutts) {
@@ -158,7 +157,7 @@ sub obutts {
 			}
 		}
 	} else {
-		cluck sprintf 'Server return status %s with message: %s', $r->{status}, $r->{reason};
+		cluck sprintf 'Server return status %s with message: %s', $r->code, $r->message;
 	}
 
 	return $ret;

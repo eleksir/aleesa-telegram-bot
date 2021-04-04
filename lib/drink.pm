@@ -5,11 +5,16 @@ use strict;
 use warnings;
 use utf8;
 use open qw (:std :utf8);
+use CHI;
+use CHI::Driver::BerkeleyDB;
+use DateTime;
 use English qw ( -no_match_vars );
 use Encode;
 use Carp qw (cluck);
-use HTTP::Tiny;
 use HTML::TokeParser;
+use Mojo::Log;
+use Mojo::UserAgent::Cached;
+use POSIX qw (strftime);
 
 use version; our $VERSION = qw (1.0);
 use Exporter qw (import);
@@ -23,19 +28,56 @@ sub drink {
 	my ($dayNum, $monthNum) = (localtime ())[3, 4];
 	my $url = sprintf 'https://kakoysegodnyaprazdnik.ru/baza/%s/%s', $MONTH[$monthNum], $dayNum;
 
-	for (1..3) {
-		my $http = HTTP::Tiny->new (timeout => 3);
-		$r = $http->get ($url, {'Accept-Charset' => 'utf-8', 'Accept-Language' => 'ru-RU'});
+	# Those POSIX assholes just forgot to add unix timestamps without TZ offset, so...
+	my ($mday, $mon, $year) = (gmtime ())[3, 4, 5];
+	my $offset = strftime ('%z', gmtime ());
+	my $offsetMinutes = (substr $offset, -2) * 60;
+	my $offsetHours = (substr $offset, 1, 2) * 60 * 60;
+	my $offsetSign;
 
-		if ($r->{success}) {
+	if ((substr $offset, 0, 1) eq '+') {
+		$offsetSign = 1;
+	}
+
+	my $expirationDate = DateTime->new (
+		year => $year + 1900,
+		month => $mon + 1,
+		day => $mday,
+		hour => 0,
+		minute => 0,
+		second => 0
+	)->add (days => 1)->strftime ('%s');
+
+	if ((substr $offset, 0, 1) eq '+') {
+		$expirationDate = $expirationDate - $offsetHours - $offsetMinutes;
+	} else {
+		$expirationDate = $expirationDate + $offsetHours + $offsetMinutes;
+	}
+
+	for (1..3) {
+		my $ua = Mojo::UserAgent::Cached->new->connect_timeout (3);
+		$ua->cache_agent(
+				CHI->new (
+				driver             => 'BerkeleyDB',
+				root_dir           => 'data/cache',
+				namespace          => __PACKAGE__,
+				expires_at         => $expirationDate,
+				expires_on_backend => 1,
+			)
+		);
+		# just to make Mojo::UserAgent::Cached happy
+		$ua->logger (Mojo::Log->new (path => '/dev/null', level => 'error'));
+		$r = $ua->get ($url => {'Accept-Language' => 'ru-RU', 'Accept-Charset' => 'utf-8'})->result;
+
+		if ($r->is_success) {
 			last;
 		}
 
 		sleep 2;
 	}
 
-	if ($r->{success}) {
-		my $p = HTML::TokeParser->new(\$r->{content});
+	if ($r->is_success) {
+		my $p = HTML::TokeParser->new(\$r->body);
 		my @a;
 		my @holyday;
 
@@ -58,7 +100,7 @@ sub drink {
 			$ret = join "\n", @holyday;
 		}
 	} else {
-		cluck sprintf 'Server return status %s with message: %s', $r->{status}, $r->{reason};
+		cluck sprintf 'Server return status %s with message: %s', $r->code, $r->message;
 	}
 
 	return $ret;
