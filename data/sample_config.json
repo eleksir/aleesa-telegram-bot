@@ -4,6 +4,9 @@
         "dir" : "data/admin"
     },
 
+# cachedir used not only for caches but for somesettings and stats too
+    "cachedir" : "data/cache",
+
     "fortune" : {
         "dir" : "data/fortune",
         "srcdir" : "data/fortune_src"
@@ -31,10 +34,6 @@
         }
     },
 
-    "karma": {
-        "dir": "data/karma"
-    },
-
     "lat" : {
         "brain": "data/lat/brain.sqlite",
         "src": "data/lat.txt"
@@ -46,8 +45,6 @@
 # openwatermap plugin
     "openweathermap" : {
         "appid" : "md5sum-like_string",
-# result cache, stores data for 4 hours
-        "cachedir" : "data/cache",
     },
 
 # stuff for telegram itself

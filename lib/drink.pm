@@ -15,12 +15,15 @@ use HTML::TokeParser;
 use Mojo::Log;
 use Mojo::UserAgent::Cached;
 use POSIX qw (strftime);
+use conf qw (loadConf);
 
 use version; our $VERSION = qw (1.0);
 use Exporter qw (import);
 our @EXPORT_OK = qw (drink);
 
 my @MONTH = qw (yanvar fevral mart aprel may iyun iyul avgust sentyabr oktyabr noyabr dekabr);
+my $c = loadConf ();
+my $cachedir = $c->{cachedir};
 
 sub drink {
 	my $r;
@@ -59,7 +62,7 @@ sub drink {
 		$ua->cache_agent(
 				CHI->new (
 				driver             => 'BerkeleyDB',
-				root_dir           => 'data/cache',
+				root_dir           => $cachedir,
 				namespace          => __PACKAGE__,
 				expires_at         => $expirationDate,
 				expires_on_backend => 1,

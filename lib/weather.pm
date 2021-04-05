@@ -22,6 +22,7 @@ use Exporter qw (import);
 our @EXPORT_OK = qw (weather);
 
 my $c = loadConf ();
+my $cachedir = $c->{cachedir};
 
 sub weather {
 	my $city = shift;
@@ -74,7 +75,6 @@ sub __weather {
 	my $city = shift;
 	$city = urlencode $city;
 	my $appid = $c->{openweathermap}->{appid};
-	my $cachedir = $c->{openweathermap}->{cachedir};
 	my $now = time ();
 	my $fc;
 	my $w;
