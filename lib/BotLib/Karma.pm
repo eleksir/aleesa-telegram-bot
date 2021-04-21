@@ -1,4 +1,4 @@
-package karma;
+package BotLib::Karma;
 
 use 5.018;
 use strict;
@@ -9,18 +9,18 @@ use English qw ( -no_match_vars );
 use Carp qw (cluck);
 use CHI;
 use CHI::Driver::BerkeleyDB;
-use conf qw (loadConf);
+use BotLib::Conf qw (LoadConf);
 
 use version; our $VERSION = qw (1.0);
 use Exporter qw (import);
-our @EXPORT_OK = qw (karmaSet karmaGet);
+our @EXPORT_OK = qw (KarmaSet KarmaGet);
 
-my $c = loadConf ();
+my $c = LoadConf ();
 my $cachedir = $c->{cachedir};
 my $max = 5;
 
 # swallow phrase and return answer
-sub karmaSet (@) {
+sub KarmaSet (@) {
 	my $chatid = shift;
 	my $phrase = shift;
 	my $action = shift;
@@ -71,7 +71,7 @@ sub karmaSet (@) {
 }
 
 # just return answer
-sub karmaGet (@) {
+sub KarmaGet (@) {
 	my $chatid = shift;
 	my $phrase = shift;
 

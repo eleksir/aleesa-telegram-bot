@@ -1,4 +1,4 @@
-package imgur;
+package Botlib::Image::Imgur;
 
 use 5.018;
 use strict;
@@ -7,56 +7,61 @@ use utf8;
 use open qw (:std :utf8);
 use English qw ( -no_match_vars );
 use Carp qw (cluck);
-use File::Path qw (make_path);
+use CHI;
+use CHI::Driver::BerkeleyDB;
 use Math::Random::Secure qw (irand);
 use Mojo::UserAgent;
-use SQLite_File;
-use conf qw (loadConf);
+
+use BotLib::Conf qw (LoadConf);
 
 use version; our $VERSION = qw (1.0);
 use Exporter qw (import);
-our @EXPORT_OK = qw (imgur);
+our @EXPORT_OK = qw (Imgur);
 
-my $c = loadConf ();
-my $dir = $c->{image}->{dir};
-my $imgur_client_id     = $c->{image}->{imgur}->{client_id};
-my $imgur_client_secret = $c->{image}->{imgur}->{client_secret};
-my $imgur_access_token  = $c->{image}->{imgur}->{access_token};;
-my $imgur_refresh_token = $c->{image}->{imgur}->{refresh_token};
+my $c = LoadConf ();
 
-sub imgur {
+sub Imgur {
 	my $tag = shift;
 
 	my $refresh_url   = 'https://api.imgur.com/oauth2/token';
 	my $search_url    = 'https://api.imgur.com/3/gallery/search/';
 
-	# load all tokens from api secrets db
-	my $backingfile = sprintf '%s/secrets.sqlite', $dir;
-
-	unless (-d $dir) {
-		make_path ($dir) or do {
-			cluck "Unable to create $dir: $OS_ERROR";
-			return undef;
-		};
-	}
-
-	tie my %secret, 'SQLite_File', $backingfile  ||  do {
-		cluck "[ERROR] Unable to tie to $backingfile: $OS_ERROR";
+	my $imgur_client_id     = $c->{image}->{imgur}->{client_id} // do {
+		cluck "No client_id specified in config for imgur module";
 		return undef;
 	};
-
-	# if there is no access_token in db - put there one from config
-	if (defined $secret{imgur_access_token}) {
-		$imgur_access_token = $secret{imgur_access_token};
-	} else {
-		$secret{imgur_access_token} = $imgur_access_token;
+	my $imgur_client_secret = $c->{image}->{imgur}->{client_secret} // do {
+		cluck "No client_secret specified in config for imgur module";
+		return undef;
+	};
+	my $imgur_access_token  = $c->{image}->{imgur}->{access_token} // do {
+		cluck "No access_token specified in config for imgur module";
+		return undef;
+	};
+	my $imgur_refresh_token = $c->{image}->{imgur}->{refresh_token} // do {
+		cluck "No refresh_token specified in config for imgur module";
 	}
 
+	# N.B. Both imgur_access_token and imgur_refresh_token time to time can change, so we need
+	#      some place where we can store new values
+	my $cache = CHI->new (
+		driver => 'BerkeleyDB',
+		root_dir => $cachedir,
+		namespace => __PACKAGE__
+	);
+
+	$imgur_access_token = $cache->get ('imgur_access_token');
+
+	# if there is no access_token in db - put there one from config
+	unless (defined $imgur_access_token) {
+		$cache->set ('imgur_access_token', $c->{image}->{imgur}->{access_token}, 'never');
+	}
+
+	$imgur_refresh_token = $cache->get ('imgur_refresh_token');
+
 	# if there is no refresh_token in db - put there one from config
-	if (defined $secret{imgur_refresh_token}) {
-		$imgur_refresh_token = $secret{imgur_refresh_token};
-	} else {
-		$secret{imgur_refresh_token} = $imgur_refresh_token;
+	unless (defined $imgur_refresh_token) {
+		$cache->set ('imgur_refresh_token', $c->{image}->{imgur}->{refresh_token}, 'never');
 	}
 
 	# query api
@@ -96,8 +101,6 @@ sub imgur {
 		# query api again
 		$r = $ua->get ($search_url . $tag => {Authorization => "Bearer $imgur_access_token"})->result;
 	}
-
-	untie %secret;
 
 	if ($r->is_success) {
 		my $searchResult = eval { return $r->json; };

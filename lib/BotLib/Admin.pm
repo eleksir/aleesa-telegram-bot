@@ -1,4 +1,4 @@
-package admin;
+package BotLib::Admin;
 
 use 5.018;
 use strict;
@@ -9,31 +9,25 @@ use English qw ( -no_match_vars );
 use Carp qw (cluck croak);
 use CHI;
 use CHI::Driver::BerkeleyDB;
-use conf qw (loadConf);
-use util qw (utf2sha1);
+use BotLib::Conf qw (LoadConf);
+use BotLib::Util qw (utf2sha1);
 
 use version; our $VERSION = qw (1.0);
 use Exporter qw (import);
 # to export array we need @ISA here
 our @ISA    = qw / Exporter /; ## no critic (ClassHierarchies::ProhibitExplicitISA)
-our @EXPORT_OK = qw (@forbiddenMessageTypes @pluginList getForbiddenTypes addForbiddenType delForbiddenType listForbidden fortune_toggle fortune_toggle_list fortune_status plugin_toggle plugin_status pluginEnabled);
+our @EXPORT_OK = qw (@ForbiddenMessageTypes @PluginList GetForbiddenTypes AddForbiddenType DelForbiddenType
+                     ListForbidden FortuneToggle FortuneToggleList FortuneStatus PluginToggle PluginStatus
+                     PluginEnabled);
 
-my $c = loadConf ();
+my $c = LoadConf ();
 my $cachedir = $c->{cachedir};
 # this list is not yet used
-our @pluginList = qw (oboobs obutts); ## no critic (Variables::ProhibitPackageVars)
-our @forbiddenMessageTypes = qw (audio voice photo video video_note animation sticker dice game poll document); ## no critic (Variables::ProhibitPackageVars)
+our @PluginList = qw (oboobs obutts); ## no critic (Variables::ProhibitPackageVars)
+our @ForbiddenMessageTypes = qw (audio voice photo video video_note animation sticker dice game poll document); ## no critic (Variables::ProhibitPackageVars)
 
-sub getForbiddenTypes {
+sub GetForbiddenTypes {
 	my $chatid = shift;
-
-	unless (-d $dir) {
-		unless (make_path $dir) {
-			cluck "Unable to create $dir: $OS_ERROR";
-			return;
-		}
-	}
-
 	my $messageTypes;
 
 	my $cache = CHI->new (
@@ -42,7 +36,7 @@ sub getForbiddenTypes {
 		namespace => __PACKAGE__ . '_' . 'censor' . '_' . utf2sha1 ($chatid)
 	);
 
-	foreach (@forbiddenMessageTypes) {
+	foreach (@ForbiddenMessageTypes) {
 		my $type = $c->get ($_);
 
 		if ($type) {
@@ -60,7 +54,7 @@ sub getForbiddenTypes {
 	return $messageTypes;
 }
 
-sub addForbiddenType {
+sub AddForbiddenType {
 	my $chatid = shift;
 	my $type = shift;
 
@@ -74,7 +68,7 @@ sub addForbiddenType {
 	return;
 }
 
-sub delForbiddenType {
+sub DelForbiddenType {
 	my $chatid = shift;
 	my $type = shift;
 
@@ -88,7 +82,7 @@ sub delForbiddenType {
 	return;
 }
 
-sub listForbidden {
+sub ListForbidden {
 	my $chatid = shift;
 	my @list;
 
@@ -98,7 +92,7 @@ sub listForbidden {
 		namespace => __PACKAGE__ . '_' . 'censor' . '_' . utf2sha1 ($chatid)
 	);
 
-	foreach (@forbiddenMessageTypes) {
+	foreach (@ForbiddenMessageTypes) {
 		my $type = $c->get ($_);
 
 		if ($type) {
@@ -116,7 +110,7 @@ sub listForbidden {
 	return join "\n", @list;
 }
 
-sub fortune_toggle (@) {
+sub FortuneToggle (@) {
 	my $chatid = shift;
 	my $action = shift // undef;
 	my $phrase = 'Фортунка с утра ';
@@ -153,7 +147,7 @@ sub fortune_toggle (@) {
 	return $phrase;
 }
 
-sub fortune_status ($) {
+sub FortuneStatus ($) {
 	my $chatid = shift;
 	my $phrase = 'Фортунка с утра ';
 
@@ -174,18 +168,17 @@ sub fortune_status ($) {
 	return $phrase;
 }
 
-sub fortune_toggle_list () {
+sub FortuneToggleList () {
 	my $cache = CHI->new (
 		driver => 'BerkeleyDB',
 		root_dir => $cachedir,
 		namespace => __PACKAGE__ . '_' . 'fortune'
 	);
 
-	my @list = $cache->get_keys();
-	return @list;
+	return $cache->get_keys ();
 }
 
-sub plugin_status (@) {
+sub PluginStatus (@) {
 	my $chatid = shift;
 	my $plugin = shift;
 	my $phrase = "Плагин $plugin ";
@@ -207,7 +200,7 @@ sub plugin_status (@) {
 	return $phrase;
 }
 
-sub pluginEnabled (@) {
+sub PluginEnabled (@) {
 	my $chatid = shift;
 	my $plugin = shift;
 
@@ -226,7 +219,7 @@ sub pluginEnabled (@) {
 	}
 }
 
-sub plugin_toggle (@) {
+sub PluginToggle (@) {
 	my $chatid = shift;
 	my $plugin = shift;
 	my $action = shift // undef;

@@ -32,8 +32,8 @@ use File::Path qw (make_path);
 use Log::Any::Adapter;
 use Log::Any::For::Std;
 use POSIX qw (setgid setuid setsid);
-use conf qw (loadConf);
-use telegrambot qw (run_telegrambot);
+use BotLib::Conf qw (LoadConf);
+use TelegramBot qw (RunTelegramBot);
 
 sub daemonize;
 sub __fork;
@@ -43,7 +43,7 @@ local $OUTPUT_AUTOFLUSH = 1;
 my $runAsUid = $UID;
 
 my $piddir = '/var/run/' . basename (abs_path ($PROGRAM_NAME));
-my $C = loadConf ();
+my $C = LoadConf ();
 my $logfile;
 
 if (defined $C->{'log'}) {

@@ -1,4 +1,4 @@
-package botlib;
+package BotLib;
 # store here utility functions that are not protocol-specified
 
 use 5.018;
@@ -10,30 +10,31 @@ use English qw ( -no_match_vars );
 use Carp qw (carp);
 use Math::Random::Secure qw (irand);
 
-use conf qw (loadConf);
-use admin qw (@forbiddenMessageTypes getForbiddenTypes addForbiddenType delForbiddenType listForbidden fortune_toggle fortune_status plugin_toggle plugin_status pluginEnabled);
-use archeologist qw (dig);
-use buni qw (buni);
-use drink qw (drink);
-use fisher qw (fish);
-use fortune qw (fortune);
-use friday qw (friday);
-use image qw (kitty fox oboobs obutts rabbit owl);
-use karma qw (karmaSet karmaGet);
-use lat qw (latAnswer);
-use monkeyuser qw (monkeyuse);
-use util qw (trim);
-use weather qw (weather);
-use xkcd qw (xkcd);
+use BotLib::Conf qw (LoadConf);
+use BotLib::Admin qw (@forbiddenMessageTypes GetForbiddenTypes AddForbiddenType DelForbiddenType ListForbidden
+                      FortuneToggle FortuneStatus PluginToggle PluginStatus PluginEnabled);
+use BotLib::Archeologist qw (Dig);
+use BotLib::Buni qw (Buni);
+use BotLib::Drink qw (Drink);
+use BotLib::Fisher qw (Fish);
+use BotLib::Fortune qw (Fortune);
+use BotLib::Friday qw (Friday);
+use BotLib::Image qw (Kitty Fox Oboobs Obutts Rabbit Owl);
+use BotLib::Karma qw (KarmaSet KarmaGet);
+use BotLib::Lat qw (Lat);
+use BotLib::Monkeyuser qw (Monkeyuser);
+use BotLib::Util qw (trim);
+use BotLib::Weather qw (Weather);
+use BotLib::Xkcd qw (Xkcd);
 
 use version; our $VERSION = qw (1.0);
 use Exporter qw (import);
-our @EXPORT_OK = qw (randomCommonPhrase command highlight botsleep isCensored);
+our @EXPORT_OK = qw (RandomCommonPhrase Command Highlight BotSleep IsCensored);
 
-my $c = loadConf ();
+my $c = LoadConf ();
 my $csign = $c->{telegrambot}->{csign};
 
-sub randomCommonPhrase {
+sub RandomCommonPhrase {
 	my @myphrase = (
 		'Так, блядь...',
 		'*Закатывает рукава* И ради этого ты меня позвал?',
@@ -51,13 +52,13 @@ sub randomCommonPhrase {
 	return $myphrase[irand ($#myphrase + 1)];
 }
 
-sub command {
+sub Command {
 	my $self = shift;
 	my $msg = shift;
 	my $text = shift;
 	my $chatid = shift;
 	my $reply;
-	my ($userid, $username, $fullname, $highlight, $visavi) = highlight ($msg);
+	my ($userid, $username, $fullname, $highlight, $visavi) = Highlight ($msg);
 
 	if (substr ($text, 1) eq 'ping') {
 		$reply = 'Pong.';
@@ -71,27 +72,27 @@ sub command {
 		$reply = 'Версия:  Нуль.Чего-то_там.Чего-то_там';
 	} elsif (length ($text) >= 2 && (substr ($text, 1, 2) eq 'w ' || substr ($text, 1, 2) eq 'п ')) {
 		my $city = substr $text, 3;
-		$reply = weather $city;
+		$reply = Weather $city;
 	} elsif (substr ($text, 1) eq 'buni') {
 		$msg->typing ();
-		$reply = buni ();
+		$reply = Buni ();
 		sleep (irand (2) + 1);
 		$msg->replyMd ($reply);
 		return;
 	} elsif (substr ($text, 1) eq 'monkeyuser') {
 		$msg->typing ();
-		$reply = monkeyuser ();
+		$reply = Monkeyuser ();
 		sleep (irand (2) + 1);
 		$msg->replyMd ($reply);
 		return;
 	} elsif (substr ($text, 1) eq 'cat'  ||  substr ($text, 1) eq 'кис') {
 		$msg->typing ();
-		$reply = kitty ();
+		$reply = Kitty ();
 		sleep (irand (2) + 1);
 		$msg->replyMd ($reply);
 		return;
 	} elsif (substr ($text, 1) eq 'lat'  ||  substr ($text, 1) eq 'лат') {
-		$reply = latAnswer ();
+		$reply = Lat ();
 	} elsif (
 		(length ($text) >= 6 && (substr ($text, 1, 6) eq 'karma ' || substr ($text, 1, 6) eq 'карма '))  ||
 		substr ($text, 1) eq 'karma'  ||  substr ($text, 1) eq 'карма'
@@ -106,27 +107,27 @@ sub command {
 			$mytext = '';
 		}
 
-		$reply = karmaGet ($chatid, $mytext);
+		$reply = KarmaGet ($chatid, $mytext);
 	} elsif (substr ($text, 1) eq 'xkcd') {
 		$msg->typing ();
-		$reply = xkcd ();
+		$reply = Xkcd ();
 		sleep (irand (2) + 1);
 		$msg->replyMd ($reply);
 		return;
 	} elsif (substr ($text, 1) eq 'fox'  ||  substr ($text, 1) eq 'лис') {
 		$msg->typing ();
-		$reply = fox ();
+		$reply = Fox ();
 		sleep (irand (2) + 1);
 		$msg->replyMd ($reply);
 		return;
 	} elsif (substr ($text, 1) eq 'rabbit'  ||  substr ($text, 1) eq 'bunny'  ||  substr ($text, 1) eq 'кролик') {
 		$msg->typing ();
-		$reply = rabbit ();
+		$reply = Rabbit ();
 		$msg->replyMd ($reply);
 		return;
 	} elsif (substr ($text, 1) eq 'owl'  ||  substr ($text, 1) eq 'сова') {
 		$msg->typing ();
-		$reply = owl ();
+		$reply = Owl ();
 		$msg->replyMd ($reply);
 		return;
 	} elsif (
@@ -139,7 +140,7 @@ sub command {
 	) {
 		if (pluginEnabled $chatid, 'oboobs') {
 			$msg->typing ();
-			$reply = oboobs ();
+			$reply = Oboobs ();
 			sleep (irand (2) + 1);
 			$msg->replyMd ($reply);
 		}
@@ -154,31 +155,31 @@ sub command {
 	) {
 		if (pluginEnabled $chatid, 'obutts') {
 			$msg->typing ();
-			$reply = obutts ();
+			$reply = Obutts ();
 			sleep (irand (2) + 1);
 			$msg->replyMd ($reply);
 		}
 
 		return;
 	} elsif (substr ($text, 1) eq 'friday'  ||  substr ($text, 1) eq 'пятница') {
-		$reply = friday ();
+		$reply = Friday ();
 	} elsif (substr ($text, 1) eq 'fortune'  ||  substr ($text, 1) eq 'фортунка'  ||  substr ($text, 1) eq 'f'  ||  substr ($text, 1) eq 'ф') {
-		$reply = sprintf "```\n%s\n```\n", trim (fortune ());
+		$reply = sprintf "```\n%s\n```\n", trim (Fortune ());
 		$msg->replyMd ($reply);
 		return;
 	} elsif (substr ($text, 1) eq 'drink' || substr ($text, 1) eq 'праздник') {
 		$msg->typing ();
-		$reply = drink ();
+		$reply = Drink ();
 		sleep (irand (2) + 1);
 	} elsif (substr ($text, 1) eq 'dig' || substr ($text, 1) eq 'копать') {
 		$msg->typing ();
-		$reply = dig $highlight;
+		$reply = Dig $highlight;
 		sleep (irand (2) + 1);
 		$msg->replyMd ($reply);
 		return;
 	} elsif (substr ($text, 1) eq 'fish' || substr ($text, 1) eq 'fishing' || substr ($text, 1) eq 'рыба' || substr ($text, 1) eq 'рыбка' || substr ($text, 1) eq 'рыбалка' ) {
 		$msg->typing ();
-		$reply = fish $highlight;
+		$reply = Fish $highlight;
 		sleep (irand (2) + 1);
 		$msg->replyMd ($reply);
 		return;
@@ -255,50 +256,50 @@ MYADMIN
 					my ($msgType, $toggle) = split /\s/, $args, 2;
 
 					if (defined $toggle) {
-						foreach (@forbiddenMessageTypes) {
+						foreach (@ForbiddenMessageTypes) {
 							if ($msgType eq $_) {
 								if ($toggle == 1) {
-									addForbiddenType ($chatid, $msgType);
+									AddForbiddenType ($chatid, $msgType);
 									$reply = "Теперь сообщения с $msgType будут автоматически удаляться";
 								} elsif ($toggle == 0) {
-									delForbiddenType ($chatid, $msgType);
+									DelForbiddenType ($chatid, $msgType);
 									$reply = "Теперь сообщения с $msgType будут оставаться";
 								}
 							}
 						}
 					}
 				} else {
-					$reply = listForbidden ($chatid);
+					$reply = ListForbidden ($chatid);
 				}
 			} elsif ($cmd eq 'fortune' || $cmd eq 'фортунка') {
 				if (defined $args) {
 					if ($args == 1) {
-						$reply = fortune_toggle ($chatid, 1);
+						$reply = FortuneToggle ($chatid, 1);
 					} elsif ($args == 0) {
-						$reply = fortune_toggle ($chatid, 0);
+						$reply = FortuneToggle ($chatid, 0);
 					}
 				} else {
-					$reply = fortune_status ($chatid);
+					$reply = FortuneStatus ($chatid);
 				}
 			} elsif ($cmd eq 'oboobs') {
 				if (defined $args) {
 					if ($args == 1) {
-						$reply = plugin_toggle ($chatid, 'oboobs', 1);
+						$reply = PluginToggle ($chatid, 'oboobs', 1);
 					} elsif ($args == 0) {
-						$reply = plugin_toggle ($chatid, 'oboobs', 0);
+						$reply = PluginToggle ($chatid, 'oboobs', 0);
 					}
 				} else {
-					$reply = plugin_status ($chatid, 'oboobs');
+					$reply = PluginStatus ($chatid, 'oboobs');
 				}
 			} elsif ($cmd eq 'obutts') {
 				if (defined $args) {
 					if ($args == 1) {
-						$reply = plugin_toggle ($chatid, 'obutts', 1);
+						$reply = PluginToggle ($chatid, 'obutts', 1);
 					} elsif ($args == 0) {
-						$reply = plugin_toggle ($chatid, 'obutts', 0);
+						$reply = PluginToggle ($chatid, 'obutts', 0);
 					}
 				} else {
-					$reply = plugin_status ($chatid, 'obutts');
+					$reply = PluginStatus ($chatid, 'obutts');
 				}
 			}
 		}
@@ -307,7 +308,7 @@ MYADMIN
 	return $reply;
 }
 
-sub highlight {
+sub Highlight {
 	my $msg = shift;
 
 	my $fullname;
@@ -349,7 +350,7 @@ sub highlight {
 	return ($userid, $username, $fullname, $highlight, $visavi);
 }
 
-sub botsleep {
+sub BotSleep {
 	# TODO: Parametrise this with fuzzy sleep time in seconds
 	my $msg = shift;
 	# let's emulate real human and delay answer
@@ -365,10 +366,10 @@ sub botsleep {
 	return;
 }
 
-sub isCensored {
+sub IsCensored {
 	my $msg = shift;
 
-	my $forbidden = getForbiddenTypes ($msg->chat->id);
+	my $forbidden = GetForbiddenTypes ($msg->chat->id);
 
 	# voice messages are special
 	if (defined ($msg->voice) && defined ($msg->voice->duration) && ($msg->voice->duration > 0)) {

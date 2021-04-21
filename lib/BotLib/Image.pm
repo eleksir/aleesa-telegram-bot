@@ -1,4 +1,4 @@
-package image;
+package BotLib::Image;
 
 use 5.018;
 use strict;
@@ -7,21 +7,15 @@ use utf8;
 use open qw (:std :utf8);
 use English qw ( -no_match_vars );
 use Carp qw (cluck);
-use File::Path qw (make_path);
 use Math::Random::Secure qw (irand);
 use Mojo::UserAgent;
-use SQLite_File;
-use conf qw (loadConf);
-use flickr qw (flickr_by_tags);
-use imgur qw (imgur);
-use util qw (urlencode);
+use BotLIb::Image::Flickr qw (FlickrByTags);
+use BotLib::Image::Imgur qw (Imgur);
+use BotLib::Util qw (urlencode);
 
 use version; our $VERSION = qw (1.0);
 use Exporter qw (import);
-our @EXPORT_OK = qw (kitty fox oboobs obutts rabbit owl);
-
-my $c = loadConf ();
-my $dir = $c->{image}->{dir};
+our @EXPORT_OK = qw (Kitty Fox Oboobs Obutts Rabbit Owl);
 
 sub kitty {
 	my $r;
@@ -174,7 +168,7 @@ sub rabbit_imgur {
 		urlencode 'score?q_not=cat OR kitten OR kittens OR dog OR cats OR dogs OR puppy OR puppies&q_tags=bunnies,bunny,rabbits,rabbit',
 	);
 
-	my $rabbit = imgur ($terms[irand ($#terms + 1)]);
+	my $rabbit = Imgur ($terms[irand ($#terms + 1)]);
 	# return just large thumbnail instead of real photo (that can be really huge)
 	$rabbit = sprintf '%sl%s', substr ($rabbit, 0, -4), substr ($rabbit, -4);
 
@@ -187,7 +181,7 @@ sub rabbit_imgur {
 
 sub rabbit {
 	# rabbit, but bunny
-	my $url = flickr_by_tags ('animal,bunny');
+	my $url = FlickrByTags ('animal,bunny');
 
 	if (defined $url) {
 		return sprintf '[(\_/)](%s)', $url;
@@ -197,7 +191,7 @@ sub rabbit {
 }
 
 sub owl {
-	my $url = flickr_by_tags ('bird,owl');
+	my $url = FlickrByTags ('bird,owl');
 
 	if (defined $url) {
 		return sprintf '[{ O v O }](%s)', $url;

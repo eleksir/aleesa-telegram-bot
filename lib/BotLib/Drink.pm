@@ -1,4 +1,4 @@
-package drink;
+package BotLib::Drink;
 
 use 5.018;
 use strict;
@@ -15,17 +15,17 @@ use HTML::TokeParser;
 use Mojo::Log;
 use Mojo::UserAgent::Cached;
 use POSIX qw (strftime);
-use conf qw (loadConf);
+use BotLib::Conf qw (LoadConf);
 
 use version; our $VERSION = qw (1.0);
 use Exporter qw (import);
-our @EXPORT_OK = qw (drink);
+our @EXPORT_OK = qw (Drink);
 
 my @MONTH = qw (yanvar fevral mart aprel may iyun iyul avgust sentyabr oktyabr noyabr dekabr);
-my $c = loadConf ();
+my $c = LoadConf ();
 my $cachedir = $c->{cachedir};
 
-sub drink {
+sub Drink {
 	my $r;
 	my $ret = 'Не знаю праздников - вджобываю весь день на шахтах, как проклятая.';
 	my ($dayNum, $monthNum) = (localtime ())[3, 4];

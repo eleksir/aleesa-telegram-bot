@@ -1,4 +1,4 @@
-package weather;
+package BotLib::Weather;
 
 use 5.018;
 use strict;
@@ -9,19 +9,16 @@ use English qw ( -no_match_vars );
 use Carp qw (carp cluck);
 use CHI;
 use CHI::Driver::BerkeleyDB;
-use DB_File;
-use Digest::MD5 qw (md5_base64);
-use File::Path qw (make_path);
 use Mojo::Log;
 use Mojo::UserAgent::Cached;
-use conf qw (loadConf);
-use util qw (trim urlencode);
+use BotLib::Conf qw (LoadConf);
+use BotLib::Util qw (trim urlencode);
 
 use version; our $VERSION = qw (1.0);
 use Exporter qw (import);
 our @EXPORT_OK = qw (weather);
 
-my $c = loadConf ();
+my $c = LoadConf ();
 my $cachedir = $c->{cachedir};
 
 sub weather {

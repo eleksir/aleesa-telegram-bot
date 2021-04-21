@@ -1,4 +1,4 @@
-package util;
+package BotLib::Util;
 
 use 5.018;
 use strict;
@@ -76,7 +76,6 @@ sub utf2sha1 {
 	my $bytes = encode_utf8 $string;
 	return sha1_base64 $bytes;
 }
-
 
 1;
 

@@ -20,7 +20,7 @@ BEGIN {
 }
 
 use lib ("$workdir/lib", "$workdir/vendor_perl", "$workdir/vendor_perl/lib/perl5");
-use friday qw (seed);
+use BotLib::Friday qw (Seed);
 
-seed ();
+Seed ();
 exit 0;

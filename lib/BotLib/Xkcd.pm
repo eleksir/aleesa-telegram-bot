@@ -1,4 +1,4 @@
-package xkcd;
+package BotLib::Xkcd;
 
 use 5.018;
 use strict;
@@ -9,9 +9,9 @@ use Mojo::UserAgent;
 
 use version; our $VERSION = qw (1.0);
 use Exporter qw (import);
-our @EXPORT_OK = qw (xkcd);
+our @EXPORT_OK = qw (Xkcd);
 
-sub xkcd {
+sub Xkcd {
 	my $ua  = Mojo::UserAgent->new->connect_timeout (5)->max_redirects (0);
 	my $r = $ua->get ('https://xkcd.ru/random/')->result;
 

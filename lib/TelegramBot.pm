@@ -1,4 +1,4 @@
-package telegrambot;
+package TelegramBot;
 # main bot gears are here
 
 use 5.018;
@@ -13,18 +13,19 @@ use File::Path qw (make_path);
 use Hailo;
 use Math::Random::Secure qw (irand);
 use Mojo::Base 'Teapot::Bot::Brain';
-use admin qw (fortune_toggle_list);
-use botlib qw (randomCommonPhrase command highlight botsleep isCensored);
-use conf qw (loadConf);
-use fortune qw (fortune);
-use karma qw (karmaSet);
-use util qw (trim fmatch);
+
+use BotLib::Admin qw (FortuneToggleList);
+use BotLib qw (RandomCommonPhrase Command Highlight BotSleep IsCensored);
+use BotLib::Conf qw (LoadConf);
+use BotLib::Fortune qw (Fortune);
+use BotLib::Karma qw (KarmaSet);
+use BotLib::Util qw (trim fmatch);
 
 use version; our $VERSION = qw (1.0);
 use Exporter qw (import);
-our @EXPORT_OK = qw (run_telegrambot);
+our @EXPORT_OK = qw (RunTelegramBot);
 
-my $c = loadConf ();
+my $c = LoadConf ();
 my $hailo;
 my $myid;
 my $myusername;
@@ -47,10 +48,10 @@ sub __cron {
 	my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime (time);
 
 	if ($hour == 8 && ($min >= 0 && $min <= 14)) {
-		foreach my $enabledfortunechat (fortune_toggle_list ()) {
+		foreach my $enabledFortuneChat (FortuneToggleList ()) {
 			my $send_args;
-			$send_args->{text} = sprintf "%s\n```\n%s\n```\n", $intro[irand ($#intro + 1)], trim (fortune ());
-			$send_args->{chat_id} = $enabledfortunechat;
+			$send_args->{text} = sprintf "%s\n```\n%s\n```\n", $intro[irand ($#intro + 1)], trim (Fortune ());
+			$send_args->{chat_id} = $enabledFortuneChat;
 			$send_args->{parse_mode} = 'Markdown';
 			$self->sendMessage ($send_args);
 		}
@@ -65,7 +66,7 @@ sub __on_msg {
 	my $chatid;
 	my $chatname = 'Noname chat';
 	# user sending message info
-	my ($userid, $username, $fullname, $highlight, $vis_a_vi) = highlight $msg;
+	my ($userid, $username, $fullname, $highlight, $vis_a_vi) = Highlight $msg;
 	my $csign = $c->{telegrambot}->{csign};
 
 	unless ($myid) {
@@ -142,18 +143,18 @@ sub __on_msg {
 			$phrase = sprintf 'Дратути, %s. Представьтес, пожалуйста, и расскажите, что вас сюда привело.', $members[0];
 		}
 
-		botsleep $msg;
+		BotSleep $msg;
 		$msg->replyMd ($phrase);
 		return;
 	}
 
 # lazy init chat-bot brains
 	unless (defined $hailo->{$chatid}) {
-		my $brainname = sprintf '%s/%s.brain.sqlite', $c->{telegrambot}->{braindir}, $chatid;
+		my $brainName = sprintf '%s/%s.brain.sqlite', $c->{telegrambot}->{braindir}, $chatid;
 
 		$hailo->{$chatid} = Hailo->new (
 # we'll got file like this: data/telegrambot-brains/-1001332512695.brain.sqlite
-			brain => $brainname,
+			brain => $brainName,
 			order => 3
 		);
 
@@ -167,6 +168,7 @@ sub __on_msg {
 # is this a 1-on-1 ?
 	if ($msg->chat->type eq 'private') {
 		unless (defined $msg->text) {
+			# TODO: it can be sticker, image, voice, video, etc. Maybe, i'll handle it once? :)
 			return;
 		}
 
@@ -175,7 +177,7 @@ sub __on_msg {
 		my $reply = 'Давайте ещё пообщаемся, а то я ещё не научилась от вас плохому.';
 
 		if (substr ($text, 0, 1) eq $csign) {
-			$reply = command ($self, $msg, $text, $userid);
+			$reply = Command ($self, $msg, $text, $userid);
 		} else {
 			my $just_message_in_chat = 0;
 
@@ -184,7 +186,7 @@ sub __on_msg {
 				my @arr = split /\n/, $text;
 
 				if ($#arr < 1) {
-					$reply = karmaSet ($chatid, trim (substr ($text, 0, -2)), substr ($text, -2));
+					$reply = KarmaSet ($chatid, trim (substr ($text, 0, -2)), substr ($text, -2));
 				} else {
 					$just_message_in_chat = 1;
 				}
@@ -204,7 +206,7 @@ sub __on_msg {
 					$phrase = lc $phrase;
 
 					if (fmatch (lc ($reply), $phrase)) {
-						$reply = randomCommonPhrase ();
+						$reply = RandomCommonPhrase ();
 					}
 				}
 			}
@@ -220,7 +222,7 @@ sub __on_msg {
 	} elsif (($msg->chat->type eq 'supergroup') or ($msg->chat->type eq 'group')) {
 		my $reply;
 
-		if (isCensored $msg) {
+		if (IsCensored $msg) {
 			carp sprintf '[INFO] In public chat %s (%s) message from %s was censored', $chatname, $chatid, $vis_a_vi;
 			$self->deleteMessage ({chat_id => $chatid, message_id => $msg->{message_id}});
 		}
@@ -259,7 +261,7 @@ sub __on_msg {
 			}
 		# simple commands
 		} elsif (substr ($text, 0, 1) eq $csign) {
-			$reply = command ($self, $msg, $text, $chatid);
+			$reply = Command ($self, $msg, $text, $chatid);
 		} elsif (
 				($text eq $myusername) or
 				($text eq '@' . $myusername) or
@@ -279,7 +281,7 @@ sub __on_msg {
 			# bot mention by name
 			} elsif ((lc ($text) =~ /.+ ${qname}[\,|\!|\?|\.| ]/) or (lc ($text) =~ / $qname$/)) {
 				$phrase = $text;
-				$reply = $hailo->{$msg->chat->id}->reply($phrase);
+				$reply = $hailo->{$msg->chat->id}->reply ($phrase);
 			# bot mention by telegram name
 			} elsif ((lc ($text) =~ /.+ ${qtname}[\,|\!|\?|\.| ]/) or (lc ($text) =~ / $qtname$/)) {
 				$phrase = $text;
@@ -289,7 +291,7 @@ sub __on_msg {
 				my @arr = split /\n/, $text;
 
 				if ($#arr < 1) {
-					$reply = karmaSet ($chatid, trim (substr ($text, 0, -2)), substr ($text, -2));
+					$reply = KarmaSet ($chatid, trim (substr ($text, 0, -2)), substr ($text, -2));
 				} else {
 					# just message in chat
 					$hailo->{$msg->chat->id}->learn ($text);
@@ -311,7 +313,7 @@ sub __on_msg {
 			$phrase = lc $phrase;
 
 			if (fmatch (lc ($reply), $phrase)) {
-				$reply = randomCommonPhrase ();
+				$reply = RandomCommonPhrase ();
 			}
 
 			$msg->typing ();
@@ -347,7 +349,7 @@ sub init {
 	return;
 }
 
-sub run_telegrambot {
+sub RunTelegramBot {
 	while (sleep 3) {
 		eval {                                       ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
 			telegrambot->new->think;

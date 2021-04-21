@@ -20,9 +20,9 @@ BEGIN {
 }
 
 use lib ("$workdir/lib", "$workdir/vendor_perl", "$workdir/vendor_perl/lib/perl5");
-use flickr qw (flickr_test_login);
+use BotLib::Image::Flickr qw (FlickrTestLogin);
 
-if (flickr_test_login ()) {
+if (FlickrTestLogin ()) {
 	exit 0;
 } else {
 	exit 1;
