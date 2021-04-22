@@ -13,14 +13,14 @@ has 'custom_title';              # optional. Owner and administrators only.
 has 'is_anonymous';              # Optional. Owner and administrators only.
 
 has 'can_be_edited';             # optional. Administrators only.
-has 'can_manage_chat'            # Optional. Administrators only. True, if the administrator can access the chat event
+has 'can_manage_chat';           # Optional. Administrators only. True, if the administrator can access the chat event
                                  # log, chat statistics, message statistics in channels, see channel members, see
                                  # anonymous administrators in supergroups and ignore slow mode. Implied by any other
                                  # administrator privilege
 has 'can_post_messages';         # optional. Administrators only.
 has 'can_edit_messages';         # optional. Administrators only.
 has 'can_delete_messages';       # optional. Administrators only.
-has 'can_manage_voice_chats'     # Optional. Administrators only. True, if the administrator can manage voice chats
+has 'can_manage_voice_chats';    # Optional. Administrators only. True, if the administrator can manage voice chats
 has 'can_restrict_members';      # optional. Administrators only.
 has 'can_promote_members';       # optional. Administrators only.
 has 'can_change_info';           # optional. Administrators and restricted only.

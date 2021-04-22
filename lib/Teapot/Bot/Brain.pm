@@ -653,7 +653,15 @@ sub _process_message {
 
     foreach my $listener (@{ $self->listeners }) {
       # call the listener code, supplying ourself and the update
-      $listener->($self, $update);
+      my $evalRet = eval {
+        $listener->($self, $update);
+        return 1;
+      };
+
+      unless ($evalRet) {
+        cluck "An error occured during update processing: $EVAL_ERROR";
+        return;
+      }
     }
 
     return;

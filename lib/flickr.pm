@@ -9,10 +9,9 @@ use English qw ( -no_match_vars );
 use Carp qw (cluck);
 use Digest::HMAC_SHA1 qw (hmac_sha1);
 use File::Path qw (make_path);
-use JSON::XS;
-use HTTP::Tiny;
 use Math::Random::Secure qw (irand);
 use MIME::Base64;
+use Mojo::UserAgent;
 use SQLite_File;
 use URI::Encode::XS qw (uri_encode);
 
@@ -120,15 +119,15 @@ sub flickrRequestToken {
 		uri_encode ($flickr_callback_url)
 	);
 
-	my $http = HTTP::Tiny->new (timeout => 5);
-	my $r = $http->get ($url);
+	my $ua = Mojo::UserAgent->new->connect_timeout (5);
+	my $r = $ua->get ($url)->result;
 	my %params;
 
-	if ($r->{success}) {
+	if ($r->is_success) {
 		# they ignore format=json, so...
-		%params = map {split /=/} split /&/, $r->{content};
+		%params = map {split /=/} split /&/, $r->body;
 	} else {
-		say "Something bad returns from flickr api: $r->{status} $r->{content}"; ## no critic (InputOutput::RequireCheckedSyscalls)
+		say "Something bad returns from flickr api: $r->code $r->message"; ## no critic (InputOutput::RequireCheckedSyscalls)
 	}
 
 	return %params;
@@ -161,15 +160,15 @@ sub flickrAccessToken {
 		uri_encode ($oauth_signature)
 	);
 
-	my $http = HTTP::Tiny->new (timeout => 5);
-	my $r = $http->get ($url);
+	my $ua  = Mojo::UserAgent->new->connect_timeout (5);
+	my $r = $ua->get ($url)->result;
 	my %params;
 
-	if ($r->{success}) {
+	if ($r->is_success) {
 		# they ignore format=json
-		%params = map {split /=/} split /&/, $r->{content};
+		%params = map {split /=/} split /&/, $r->body;
 	} else {
-		say "Something bad returns from flickr api: $r->{status} $r->{content}"; ## no critic (InputOutput::RequireCheckedSyscalls)
+		say "Something bad returns from flickr api: $r->code $r->message"; ## no critic (InputOutput::RequireCheckedSyscalls)
 	}
 
 	return %params;
@@ -183,13 +182,13 @@ sub flickrAuthorization {
 		$flickr_request_token,
 	);
 
-	my $http = HTTP::Tiny->new (timeout => 5);
-	my $r = $http->get ($url);
+	my $ua = Mojo::UserAgent->new->connect_timeout (5);
+	my $r = $ua->get ($url)->result;
 
-	if ($r->{success}) {
-		return $r->{url};
+	if ($r->is_success) {
+		return $r->url;
 	} else {
-		say "Something went wrong: $r->{status} $r->{content}"; ## no critic (InputOutput::RequireCheckedSyscalls)
+		say "Something went wrong: $r->code $r->message"; ## no critic (InputOutput::RequireCheckedSyscalls)
 		return;
 	}
 }
@@ -224,24 +223,23 @@ sub flickrTestLogin {
 		uri_encode ($oauth_signature)
 	);
 
-	my $http = HTTP::Tiny->new (timeout => 5);
-	my $r = $http->get ($url);
+	my $ua = Mojo::UserAgent->new->connect_timeout (5);
+	my $r = $ua->get ($url)->result;
 
-	if ($r->{success}) {
+	if ($r->is_success) {
 		my $response = eval {
-			my $j = JSON::XS->new->utf8->relaxed;
-			return $j->decode ($r->{content});
+			return $r->json;
 		};
 
 		if (defined $response) {
 			say Dumper $response; ## no critic (InputOutput::RequireCheckedSyscalls)
 			return 1;
 		} else {
-			say "Flickr api returns incorrect json: $r->{content}"; ## no critic (InputOutput::RequireCheckedSyscalls)
+			say "Flickr api returns incorrect json: $r->message"; ## no critic (InputOutput::RequireCheckedSyscalls)
 			return 0;
 		}
 	} else {
-		say "HTTP status code not 200: $r->{status}, $r>{contenr}"; ## no critic (InputOutput::RequireCheckedSyscalls)
+		say "HTTP status code not 200: $r->code, $r->message"; ## no critic (InputOutput::RequireCheckedSyscalls)
 		return 0;
 	}
 }
@@ -282,13 +280,12 @@ sub flickrSearchByText {
 		uri_encode ($text)
 	);
 
-	my $http = HTTP::Tiny->new (timeout => 5);
-	my $r = $http->get ($url);
+	my $ua = Mojo::UserAgent->new->connect_timeout (5);
+	my $r = $ua->get ($url)->result;
 
-	if ($r->{success}) {
+	if ($r->is_success) {
 		my $response = eval {
-			my $j = JSON::XS->new->utf8->relaxed;
-			return $j->decode ($r->{content});
+			return $r->json;
 		};
 
 		if (defined $response) {
@@ -326,31 +323,31 @@ sub flickrSearchByText {
 				uri_encode ($text)
 			);
 
-			$http = HTTP::Tiny->new (timeout => 5);
-			$r = $http->get ($url);
+			$ua = Mojo::UserAgent->new->connect_timeout (5);
+			$r = $ua->get ($url)->result;
 
-			if ($r->{success}) {
+
+			if ($r->is_success) {
 				$response = eval {
-					my $j = JSON::XS->new->utf8->relaxed;
-					return $j->decode ($r->{content});
+					return $r->json;
 				};
 
 				if (defined $response) {
 					return $response;
 				} else {
-					cluck "Flickr api returns incorrect json: $r->{content}";
+					cluck "Flickr api returns incorrect json: $r->message";
 					return undef;
 				}
 			} else {
-				cluck "Flickr api returns incorrect json: $r->{content}";
+				cluck "Flickr api returns incorrect json: $r->message";
 				return undef;
 			}
 		} else {
-			cluck "Flickr api returns incorrect json: $r->{content}";
+			cluck "Flickr api returns incorrect json: $r->message";
 			return undef;
 		}
 	} else {
-		cluck "HTTP status code not 200: $r->{status}, $r->{content}";
+		cluck "HTTP status code not 200: $r->code, $r->message";
 		return undef;
 	}
 }
@@ -391,13 +388,12 @@ sub flickrSearchByTags {
 		uri_encode ($tags)
 	);
 
-	my $http = HTTP::Tiny->new (timeout => 5);
-	my $r = $http->get ($url);
+	my $ua = Mojo::UserAgent->new->connect_timeout (5);
+	my $r = $ua->get ($url)->result;
 
-	if ($r->{success}) {
+	if ($r->is_success) {
 		my $response = eval {
-			my $j = JSON::XS->new->utf8->relaxed;
-			return $j->decode ($r->{content});
+			return $r->json;
 		};
 
 		if (defined $response) {
@@ -435,31 +431,30 @@ sub flickrSearchByTags {
 				uri_encode ($tags)
 			);
 
-			$http = HTTP::Tiny->new (timeout => 5);
-			$r = $http->get ($url);
+			$ua = Mojo::UserAgent->new->connect_timeout (5);
+			$r = $ua->get ($url)->result;
 
-			if ($r->{success}) {
+			if ($r->is_success) {
 				$response = eval {
-					my $j = JSON::XS->new->utf8->relaxed;
-					return $j->decode ($r->{content});
+					return $r->json;
 				};
 
 				if (defined $response) {
 					return $response;
 				} else {
-					cluck "Flickr api returns incorrect json: $r->{content}";
+					cluck "Flickr api returns incorrect json: $r->message";
 					return undef;
 				}
 			} else {
-				cluck "Flickr api returns incorrect json: $r->{content}";
+				cluck "Flickr api returns incorrect json: $r->message";
 				return undef;
 			}
 		} else {
-			cluck "Flickr api returns incorrect json: $r->{content}";
+			cluck "Flickr api returns incorrect json: $r->message";
 			return undef;
 		}
 	} else {
-		cluck "HTTP status code not 200: $r->{status}, $r>{contenr}";
+		cluck "HTTP status code not 200: $r->code, $r->message";
 		return undef;
 	}
 }
@@ -484,8 +479,8 @@ sub flickr_init {
 		my $flickr_request_token_secret = $secret{flickr_request_token_secret};
 
 		unless (defined $flickr_request_token || defined $flickr_request_token_secret) {
-			say "Looks like there is no request token or request token secret in $backingfile";
-			say "Please remove verifier settings from config.json and run this script again";
+			say "Looks like there is no request token or request token secret in $backingfile"; ## no critic (InputOutput::RequireCheckedSyscalls)
+			say 'Please remove verifier settings from config.json and run this script again';   ## no critic (InputOutput::RequireCheckedSyscalls)
 			untie %secret;
 			return 0;
 		}
