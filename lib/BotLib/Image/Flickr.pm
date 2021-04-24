@@ -185,10 +185,10 @@ sub flickrAuthorization {
 	my $ua = Mojo::UserAgent->new->connect_timeout (5);
 	my $r = $ua->get ($url)->result;
 
-	if ($r->is_success) {
-		return $r->url;
+	if ($r->code == 302) {
+		return $r->content->headers->location;
 	} else {
-		say "Something went wrong: $r->code $r->message"; ## no critic (InputOutput::RequireCheckedSyscalls)
+		printf 'Something went wrong: %s %s', $r->code, $r->message;
 		return;
 	}
 }
@@ -471,7 +471,7 @@ sub FlickrInit {
 		my $flickr_request_token_secret = $cache->get ('flickr_request_token_secret');
 
 		unless (defined $flickr_request_token || defined $flickr_request_token_secret) {
-			say "Looks like there is no request token or request token secret in config db."; ## no critic (InputOutput::RequireCheckedSyscalls)
+			say 'Looks like there is no request token or request token secret in config db.';    ## no critic (InputOutput::RequireCheckedSyscalls)
 			say 'Please remove verifier settings from config.json and run this script again.';   ## no critic (InputOutput::RequireCheckedSyscalls)
 			return 0;
 		}

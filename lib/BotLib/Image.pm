@@ -9,7 +9,7 @@ use English qw ( -no_match_vars );
 use Carp qw (cluck);
 use Math::Random::Secure qw (irand);
 use Mojo::UserAgent;
-use BotLIb::Image::Flickr qw (FlickrByTags);
+use BotLib::Image::Flickr qw (FlickrByTags);
 use BotLib::Image::Imgur qw (Imgur);
 use BotLib::Util qw (urlencode);
 
@@ -17,7 +17,7 @@ use version; our $VERSION = qw (1.0);
 use Exporter qw (import);
 our @EXPORT_OK = qw (Kitty Fox Oboobs Obutts Rabbit Owl);
 
-sub kitty {
+sub Kitty {
 	my $r;
 	my $ret = 'Нету кошечек, все разбежались.';
 
@@ -52,7 +52,7 @@ sub kitty {
 	return $ret;
 }
 
-sub fox {
+sub Fox {
 	my $r;
 	my $ret = 'Нету лисичек, все разбежались.';
 
@@ -87,7 +87,7 @@ sub fox {
 	return $ret;
 }
 
-sub oboobs {
+sub Oboobs {
 	my $r;
 	my $ret = 'Нету cисичек, все разбежались.';
 
@@ -122,7 +122,7 @@ sub oboobs {
 	return $ret;
 }
 
-sub obutts {
+sub Obutts {
 	my $r;
 	my $ret = 'Нету попок, все разбежались.';
 
@@ -179,7 +179,7 @@ sub rabbit_imgur {
 	}
 }
 
-sub rabbit {
+sub Rabbit {
 	# rabbit, but bunny
 	my $url = FlickrByTags ('animal,bunny');
 
@@ -190,7 +190,7 @@ sub rabbit {
 	}
 }
 
-sub owl {
+sub Owl {
 	my $url = FlickrByTags ('bird,owl');
 
 	if (defined $url) {

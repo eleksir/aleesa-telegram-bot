@@ -20,6 +20,7 @@ sub Buni {
 
 	for (1..3) {
 		my $ua  = Mojo::UserAgent->new->connect_timeout (3);
+		$ua->max_redirects(3);
 		$r = $ua->get ('http://www.bunicomic.com/?random&nocache=1')->result;
 
 		if ($r->is_success) {

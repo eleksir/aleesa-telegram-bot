@@ -15,7 +15,7 @@ use BotLib::Conf qw (LoadConf);
 
 use version; our $VERSION = qw (1.0);
 use Exporter qw (import);
-our @EXPORT_OK = qw (seed friday);
+our @EXPORT_OK = qw (Seed Friday);
 
 my $c = LoadConf ();
 my $dir = $c->{friday}->{dir};

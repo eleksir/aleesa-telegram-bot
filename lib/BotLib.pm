@@ -11,8 +11,9 @@ use Carp qw (carp);
 use Math::Random::Secure qw (irand);
 
 use BotLib::Conf qw (LoadConf);
-use BotLib::Admin qw (@forbiddenMessageTypes GetForbiddenTypes AddForbiddenType DelForbiddenType ListForbidden
-                      FortuneToggle FortuneStatus PluginToggle PluginStatus PluginEnabled);
+use BotLib::Admin qw (@ForbiddenMessageTypes GetForbiddenTypes AddForbiddenType
+                      DelForbiddenType ListForbidden FortuneToggle FortuneStatus
+                      PluginToggle PluginStatus PluginEnabled);
 use BotLib::Archeologist qw (Dig);
 use BotLib::Buni qw (Buni);
 use BotLib::Drink qw (Drink);
@@ -138,7 +139,7 @@ sub Command {
 		substr ($text, 1) eq 'сиси'  ||
 		substr ($text, 1) eq 'сисечки'
 	) {
-		if (pluginEnabled $chatid, 'oboobs') {
+		if (PluginEnabled $chatid, 'oboobs') {
 			$msg->typing ();
 			$reply = Oboobs ();
 			sleep (irand (2) + 1);
@@ -153,7 +154,7 @@ sub Command {
 		substr ($text, 1) eq 'попа'  ||
 		substr ($text, 1) eq 'попка'
 	) {
-		if (pluginEnabled $chatid, 'obutts') {
+		if (PluginEnabled $chatid, 'obutts') {
 			$msg->typing ();
 			$reply = Obutts ();
 			sleep (irand (2) + 1);

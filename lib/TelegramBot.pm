@@ -13,7 +13,6 @@ use File::Path qw (make_path);
 use Hailo;
 use Math::Random::Secure qw (irand);
 use Mojo::Base 'Teapot::Bot::Brain';
-
 use BotLib::Admin qw (FortuneToggleList);
 use BotLib qw (RandomCommonPhrase Command Highlight BotSleep IsCensored);
 use BotLib::Conf qw (LoadConf);
@@ -48,10 +47,10 @@ sub __cron {
 	my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime (time);
 
 	if ($hour == 8 && ($min >= 0 && $min <= 14)) {
-		foreach my $enabledFortuneChat (FortuneToggleList ()) {
+		foreach my $enabledfortunechat (fortuneToggleList ()) {
 			my $send_args;
 			$send_args->{text} = sprintf "%s\n```\n%s\n```\n", $intro[irand ($#intro + 1)], trim (Fortune ());
-			$send_args->{chat_id} = $enabledFortuneChat;
+			$send_args->{chat_id} = $enabledfortunechat;
 			$send_args->{parse_mode} = 'Markdown';
 			$self->sendMessage ($send_args);
 		}
@@ -66,7 +65,7 @@ sub __on_msg {
 	my $chatid;
 	my $chatname = 'Noname chat';
 	# user sending message info
-	my ($userid, $username, $fullname, $highlight, $vis_a_vi) = Highlight $msg;
+	my ($userid, $username, $fullname, $highlight, $vis_a_vi) = BotLib::Highlight ($msg);
 	my $csign = $c->{telegrambot}->{csign};
 
 	unless ($myid) {
@@ -150,11 +149,11 @@ sub __on_msg {
 
 # lazy init chat-bot brains
 	unless (defined $hailo->{$chatid}) {
-		my $brainName = sprintf '%s/%s.brain.sqlite', $c->{telegrambot}->{braindir}, $chatid;
+		my $brainname = sprintf '%s/%s.brain.sqlite', $c->{telegrambot}->{braindir}, $chatid;
 
 		$hailo->{$chatid} = Hailo->new (
 # we'll got file like this: data/telegrambot-brains/-1001332512695.brain.sqlite
-			brain => $brainName,
+			brain => $brainname,
 			order => 3
 		);
 
@@ -168,7 +167,6 @@ sub __on_msg {
 # is this a 1-on-1 ?
 	if ($msg->chat->type eq 'private') {
 		unless (defined $msg->text) {
-			# TODO: it can be sticker, image, voice, video, etc. Maybe, i'll handle it once? :)
 			return;
 		}
 
@@ -281,7 +279,7 @@ sub __on_msg {
 			# bot mention by name
 			} elsif ((lc ($text) =~ /.+ ${qname}[\,|\!|\?|\.| ]/) or (lc ($text) =~ / $qname$/)) {
 				$phrase = $text;
-				$reply = $hailo->{$msg->chat->id}->reply ($phrase);
+				$reply = $hailo->{$msg->chat->id}->reply($phrase);
 			# bot mention by telegram name
 			} elsif ((lc ($text) =~ /.+ ${qtname}[\,|\!|\?|\.| ]/) or (lc ($text) =~ / $qtname$/)) {
 				$phrase = $text;
@@ -352,7 +350,7 @@ sub init {
 sub RunTelegramBot {
 	while (sleep 3) {
 		eval {                                       ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
-			telegrambot->new->think;
+			TelegramBot->new->think;
 		}
 	}
 

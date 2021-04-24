@@ -19,6 +19,7 @@ use Exporter qw (import);
 our @EXPORT_OK = qw (Imgur);
 
 my $c = LoadConf ();
+my $cachedir = $c->{cachedir};
 
 sub Imgur {
 	my $tag = shift;
@@ -27,20 +28,20 @@ sub Imgur {
 	my $search_url    = 'https://api.imgur.com/3/gallery/search/';
 
 	my $imgur_client_id     = $c->{image}->{imgur}->{client_id} // do {
-		cluck "No client_id specified in config for imgur module";
+		cluck 'No client_id specified in config for imgur module';
 		return undef;
 	};
 	my $imgur_client_secret = $c->{image}->{imgur}->{client_secret} // do {
-		cluck "No client_secret specified in config for imgur module";
+		cluck 'No client_secret specified in config for imgur module';
 		return undef;
 	};
 	my $imgur_access_token  = $c->{image}->{imgur}->{access_token} // do {
-		cluck "No access_token specified in config for imgur module";
+		cluck 'No access_token specified in config for imgur module';
 		return undef;
 	};
 	my $imgur_refresh_token = $c->{image}->{imgur}->{refresh_token} // do {
-		cluck "No refresh_token specified in config for imgur module";
-	}
+		cluck 'No refresh_token specified in config for imgur module';
+	};
 
 	# N.B. Both imgur_access_token and imgur_refresh_token time to time can change, so we need
 	#      some place where we can store new values
@@ -81,7 +82,6 @@ sub Imgur {
 
 		unless ($r->is_success) {
 			cluck "Unable to refresh imgur token, please re-authorise app! or imgur experiencing api outage: $r->code $r->message";
-			untie %secret;
 			return undef;
 		}
 
@@ -89,12 +89,11 @@ sub Imgur {
 
 		if (defined $refresh) {
 			$imgur_refresh_token = $refresh->{refresh_token};
-			$secret{imgur_refresh_token} = $refresh->{refresh_token};
+			$cache->set ('refresh_token', $refresh->{refresh_token}, 'never');
 			$imgur_access_token = $refresh->{access_token};
-			$secret{imgur_access_token} = $refresh->{access_token};
+			$cache->set ('imgur_access_token', $refresh->{access_token}, 'never');
 		} else {
 			cluck "Unable to refresh imgur access_token, unable to decode json: $EVAL_ERROR";
-			untie %secret;
 			return undef;
 		}
 

@@ -121,7 +121,7 @@ local $SIG{TERM} = \&__signal_handler;
 $PROGRAM_NAME = abs_path $PROGRAM_NAME;              ## no critic (Variables::RequireLocalizedPunctuationVars)
 
 # run bot, at last
-run_telegrambot ();
+RunTelegramBot ();
 
 if (-f $pidfile) {
 	unlink $pidfile;

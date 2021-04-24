@@ -11,7 +11,7 @@ use Carp qw (cluck);
 use File::Basename qw (dirname);
 use File::Path qw (make_path);
 use Hailo;
-use BotLib::Conf qw (loadConf);
+use BotLib::Conf qw (LoadConf);
 
 use version; our $VERSION = qw (1.0);
 use Exporter qw (import);

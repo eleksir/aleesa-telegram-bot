@@ -37,17 +37,16 @@ sub GetForbiddenTypes {
 	);
 
 	foreach (@ForbiddenMessageTypes) {
-		my $type = $c->get ($_);
+		my $type = $cache->get ($_);
 
 		if ($type) {
 			$messageTypes->{$_} = 1;
 		} else {
 			unless (defined $type) {
-				$c->set ($_, 1, 'never');
-				$messageTypes->{$_} = 1;
-			} else {
-				$messageTypes->{$_} = 0;
+				$cache->set ($_, 0, 'never');
 			}
+
+			$messageTypes->{$_} = 0;
 		}
 	}
 
@@ -93,17 +92,16 @@ sub ListForbidden {
 	);
 
 	foreach (@ForbiddenMessageTypes) {
-		my $type = $c->get ($_);
+		my $type = $cache->get ($_);
 
 		if ($type) {
 			push @list, sprintf 'Тип сообщения %s удаляется', $_;
 		} else {
 			unless (defined $type) {
-				push @list, sprintf 'Тип сообщения %s удаляется', $_;
-				$c->set ($_, 1, 'never');
-			} else {
-				push @list, sprintf 'Тип сообщения %s не удаляется', $_;
+				$cache->set ($_, 0, 'never');
 			}
+
+			push @list, sprintf 'Тип сообщения %s не удаляется', $_;
 		}
 	}
 
@@ -191,9 +189,13 @@ sub PluginStatus (@) {
 
 	my $state = $cache->get ($plugin);
 
-	if (defined $state && $state) {
+	if ($state) {
 		$phrase .= 'включён.';
 	} else {
+		unless (defined $state) {
+			$cache->set ($plugin, 0, 'never');
+		}
+
 		$phrase .= 'выключен.';
 	}
 

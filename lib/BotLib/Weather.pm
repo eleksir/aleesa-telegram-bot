@@ -16,12 +16,12 @@ use BotLib::Util qw (trim urlencode);
 
 use version; our $VERSION = qw (1.0);
 use Exporter qw (import);
-our @EXPORT_OK = qw (weather);
+our @EXPORT_OK = qw (Weather);
 
 my $c = LoadConf ();
 my $cachedir = $c->{cachedir};
 
-sub weather {
+sub Weather {
 	my $city = shift;
 	$city = trim $city;
 
