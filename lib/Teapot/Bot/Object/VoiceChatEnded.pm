@@ -6,7 +6,7 @@ use Mojo::Base 'Teapot::Bot::Object::Base';
 $Teapot::Bot::Object::VoiceChatEnded::VERSION = '0.022';
 
 # This object represents a service message about a voice chat started in the chat. Currently holds no information.
-has 'duartion';
+has 'duration';
 
 sub fields {
   return { scalar => [qw/duration/] };

@@ -18,6 +18,13 @@ use Log::Any;
 use Data::Dumper;
 
 use Teapot::Bot::Object::Message;
+use Teapot::Bot::Object::Poll;
+use Teapot::Bot::Object::PollAnswer;
+use Teapot::Bot::Object::ChatMemberUpdated;
+use Teapot::Bot::Object::User;
+use Teapot::Bot::Object::Chat;
+use Teapot::Bot::Object::ChatMember;
+use Teapot::Bot::Object::ChatInviteLink;
 
 $Teapot::Bot::Brain::VERSION = '0.022';
 
@@ -354,7 +361,7 @@ sub deleteMessage {
 
   my $token = $self->token || croak 'No token supplied to deleteMessage()?';
 
-  if (Teapot::Bot::Object::ChatMember::canDeleteMessage($self, $args->{chat_id})) {
+  if (Teapot::Bot::Object::ChatMember->canDeleteMessage($self, $args->{chat_id})) {
     my $url = "https://api.telegram.org/bot${token}/deleteMessage";
     $self->_post_request($url, $send_args);
   }
