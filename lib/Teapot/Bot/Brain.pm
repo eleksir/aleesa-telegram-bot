@@ -132,6 +132,61 @@ sub getChatMember {
   }
 }
 
+sub kickChatMember {
+  my $self = shift;
+  my $args = shift || {};
+
+  my $token = $self->token || croak 'No token supplied to kickChatMember?';
+  my $send_args = {};
+
+  unless ($args->{chat_id}) {
+    cluck 'No chat_id supplied to kickChatMember()';
+    return {'error' => 1};
+  }
+
+  unless ($args->{user_id}) {
+    cluck 'No user_id supplied to kickChatMember()';
+    return {'error' => 1};
+  }
+
+  $send_args->{chat_id} = $args->{chat_id};
+  $send_args->{user_id} = $args->{user_id};
+  $send_args->{until_date} = $args->{until_date} if exists $args->{until_date};
+  $send_args->{revoke_messages} = $args->{revoke_messages} if exists $args->{revoke_messages};
+
+  my $url = "https://api.telegram.org/bot${token}/kickChatMember";
+  my $api_response = $self->_post_request($url, $send_args);
+
+  return;
+}
+
+sub unbanChatMember {
+  my $self = shift;
+  my $args = shift || {};
+
+  my $token = $self->token || croak 'No token supplied to unbanChatMember?';
+  my $send_args = {};
+
+  unless ($args->{chat_id}) {
+    cluck 'No chat_id supplied to unbanChatMember()';
+    return {'error' => 1};
+  }
+
+  unless ($args->{user_id}) {
+    cluck 'No user_id supplied to unbanChatMember()';
+    return {'error' => 1};
+  }
+
+  $send_args->{chat_id} = $args->{chat_id};
+  $send_args->{user_id} = $args->{user_id};
+  $send_args->{only_if_banned} = $args->{only_if_banned} if exists $args->{only_if_banned};
+
+  my $url = "https://api.telegram.org/bot${token}/unbanChatMember";
+  my $api_response = $self->_post_request($url, $send_args);
+
+  return;
+}
+
 
 sub getChat {
   my $self = shift;
@@ -157,6 +212,28 @@ sub getChat {
   else {
     return {'error' => 1};
   }
+}
+
+
+sub leaveChat {
+  my $self = shift;
+  my $args = shift || {};
+
+  my $send_args = {};
+
+  unless ($args->{chat_id}) {
+    cluck 'No chat_id supplied to getChat()';
+    return {'error' => 1};
+  }
+
+  $send_args->{chat_id} = $args->{chat_id};
+
+  my $token = $self->token || croak 'No token supplied to getChat()?';
+
+  my $url = "https://api.telegram.org/bot${token}/leaveChat";
+  my $api_response = $self->_post_request($url, $send_args);
+
+  return;
 }
 
 
@@ -385,6 +462,121 @@ sub sendChatAction {
   return;
 }
 
+sub exportChatInviteLink {
+  my $self = shift;
+  my $args = shift || {};
+  my $send_args = {};
+
+  my $token = $self->token || croak 'No token supplied to createChatInviteLink()?';
+
+  unless ($args->{chat_id}) {
+    cluck 'No chat_id supplied in createChatInviteLink()';
+    return {'error' => 1};
+  }
+
+  $send_args->{chat_id} = $args->{chat_id};
+
+  my $url = "https://api.telegram.org/bot${token}/exportChatInviteLink";
+  my $api_response = $self->_post_request($url);
+
+  if ($api_response) {
+    return $api_response;
+  }
+  else {
+    return {'error' => 1};
+  }
+}
+
+sub createChatInviteLink {
+  my $self = shift;
+  my $args = shift || {};
+  my $send_args = {};
+
+  my $token = $self->token || croak 'No token supplied to createChatInviteLink()?';
+
+  unless ($args->{chat_id}) {
+    cluck 'No chat_id supplied in createChatInviteLink()';
+    return {'error' => 1};
+  }
+
+  $send_args->{chat_id} = $args->{chat_id};
+  $send_args->{expire_date} = $args->{expire_date} if exists $args->{expire_date};
+  $send_args->{member_limit} = $args->{member_limit} if exists $args->{member_limit};
+
+  my $url = "https://api.telegram.org/bot${token}/createChatInviteLink";
+  my $api_response = $self->_post_request($url);
+
+  if ($api_response) {
+    return Teapot::Bot::Object::ChatInviteLink->create_from_hash($api_response, $self);
+  }
+  else {
+    return {'error' => 1};
+  }
+}
+
+sub editChatInviteLink {
+  my $self = shift;
+  my $args = shift || {};
+  my $send_args = {};
+
+  my $token = $self->token || croak 'No token supplied to editChatInviteLink()?';
+
+  unless ($args->{chat_id}) {
+    cluck 'No chat_id supplied in editChatInviteLink()';
+    return {'error' => 1};
+  }
+
+  unless ($args->{invite_link}) {
+    cluck 'No invite_link supplied in editChatInviteLink()';
+    return {'error' => 1};
+  }
+
+  $send_args->{chat_id} = $args->{chat_id};
+  $send_args->{invite_link} = $args->{invite_link};
+  $send_args->{expire_date} = $args->{expire_date} if exists $args->{expire_date};
+  $send_args->{member_limit} = $args->{member_limit} if exists $args->{member_limit};
+
+  my $url = "https://api.telegram.org/bot${token}/editChatInviteLink";
+  my $api_response = $self->_post_request($url);
+
+  if ($api_response) {
+    return Teapot::Bot::Object::ChatInviteLink->create_from_hash($api_response, $self);
+  }
+  else {
+    return {'error' => 1};
+  }
+}
+
+sub revokeChatInviteLink {
+  my $self = shift;
+  my $args = shift || {};
+  my $send_args = {};
+
+  my $token = $self->token || croak 'No token supplied to revokeChatInviteLink()?';
+
+  unless ($args->{chat_id}) {
+    cluck 'No chat_id supplied in revokeChatInviteLink()';
+    return {'error' => 1};
+  }
+
+  unless ($args->{invite_link}) {
+    cluck 'No invite_link supplied in revokeChatInviteLink()';
+    return {'error' => 1};
+  }
+
+  $send_args->{chat_id} = $args->{chat_id};
+  $send_args->{invite_link} = $args->{invite_link};
+
+  my $url = "https://api.telegram.org/bot${token}/revokeChatInviteLink";
+  my $api_response = $self->_post_request($url);
+
+  if ($api_response) {
+    return Teapot::Bot::Object::ChatInviteLink->create_from_hash($api_response, $self);
+  }
+  else {
+    return {'error' => 1};
+  }
+}
 
 sub _add_getUpdates_handler {
   my $self = shift;
@@ -414,7 +606,7 @@ sub _add_getUpdates_handler {
           $self->_process_message($item);
         }
       } else {
-        cluck "Something nasty happen while handling updates from $updateURL : $EVAL_ERROR";
+        cluck "Unable to get update from API: $EVAL_ERROR";
       }
 
       $http_active = 0;
@@ -433,11 +625,24 @@ sub _process_message {
     # There can be several types of responses. But only one response.
     # https://core.telegram.org/bots/api#update
     my $update;
-    $update = Teapot::Bot::Object::Message->create_from_hash($item->{message}, $self)             if $item->{message};
-    $update = Teapot::Bot::Object::Message->create_from_hash($item->{edited_message}, $self)      if $item->{edited_message};
-    $update = Teapot::Bot::Object::Message->create_from_hash($item->{channel_post}, $self)        if $item->{channel_post};
-    $update = Teapot::Bot::Object::Message->create_from_hash($item->{edited_channel_post}, $self) if $item->{edited_channel_post};
-    $update = Teapot::Bot::Object::Message->create_from_hash($item->{poll}, $self)                if $item->{poll};
+    $update = Teapot::Bot::Object::Message->create_from_hash($item->{message}, $self)                         if $item->{message};
+    $update = Teapot::Bot::Object::Message->create_from_hash($item->{edited_message}, $self)                  if $item->{edited_message};
+    $update = Teapot::Bot::Object::Message->create_from_hash($item->{channel_post}, $self)                    if $item->{channel_post};
+    $update = Teapot::Bot::Object::Message->create_from_hash($item->{edited_channel_post}, $self)             if $item->{edited_channel_post};
+    # Not yet implemented, we have no InlineQuery object yet
+    #$update = Teapot::Bot::Object::InlineQuery->create_from_hash($tem->{inline_query}, $self)                if $item->{inline_query};
+    # Not yet implemented, we have no ChosenInlineResult object yet
+    #$update = Teapot::Bot::Object::ChosenInlineResult->create_from_hash($tem->{chosen_inline_result}, $self) if $item->{chosen_inline_result};
+    # Not yet implemented, we have no callback_query object yet, because we do not use this mechanism, s API should not gi us that shit
+    #$update = Teapot::Bot::Object::CallbackQuery->create_from_hash($tem->{callback_query}, $self)            if $item->{callback_query};
+    # Not yet implemented, we have no ShippingQuery object yet
+    #$update = Teapot::Bot::Object::ShippingQuery->create_from_hash($tem->{shipping_query}, $self)            if $item->{shipping_query};
+    # Not yet implemented, we have no PreCheckoutQuery object yet
+    #$update = Teapot::Bot::Object::PreCheckoutQuery->create_from_hash($tem->{pre_checkout_query}, $self)     if $item->{pre_checkout_query};
+    $update = Teapot::Bot::Object::Poll->create_from_hash($item->{poll}, $self)                               if $item->{poll};
+    $update = Teapot::Bot::Object::PollAnswer->create_from_hash($item->{poll_answer}, $self)                  if $item->{poll_answer};
+    $update = Teapot::Bot::Object::ChatMemberUpdated->create_from_hash($item->{my_chat_member}, $self)        if $item->{my_chat_member};
+    $update = Teapot::Bot::Object::ChatMemberUpdated->create_from_hash($item->{chat_member}, $self)           if $item->{chat_member};
 
     # if we got to this point without creating a response, it must be a type we
     # don't handle yet
@@ -448,7 +653,15 @@ sub _process_message {
 
     foreach my $listener (@{ $self->listeners }) {
       # call the listener code, supplying ourself and the update
-      $listener->($self, $update);
+      my $evalRet = eval {
+        $listener->($self, $update);
+        return 1;
+      };
+
+      unless ($evalRet) {
+        cluck "An error occured during update processing: $EVAL_ERROR";
+        return;
+      }
     }
 
     return;
@@ -585,6 +798,25 @@ of Chat User.
 
 On error returns hash reference with error set to 1
 
+=head2 kickChatMember
+
+This is the wrapper around the C<kickChatMember> API method. See
+L<https://core.telegram.org/bots/api#kickchatmember>.
+
+Takes chat_id, and user_id as arguments. And optionally until_date and
+revoke_messages.
+
+Returns nothing, it's send-only method (Telegram API returns true on success)
+
+=head2 unbanChatMember
+
+This is the wrapper around the C<unbanChatMember> API method. See
+L<https://core.telegram.org/bots/api#unbanchatmember>.
+
+Takes chat_id, and user_id as arguments. And optionally only_if_banned.
+
+Returns nothing, it's send-only method (Telegram API returns true on success)
+
 =head2 getChat
 
 This is the wrapper around the C<getChat> API method. See
@@ -595,6 +827,15 @@ Takes chat_id as argument.
 Returns the L<Teapot::Bot::Object::Chat> that represents properties of Chat.
 
 On error returns hash reference with error set to 1
+
+=head2 leaveChat
+
+This is the wrapper around the C<leaveChat> API method. See
+L<https://core.telegram.org/bots/api#leavechat>.
+
+Takes chat_id as argument.
+
+Returns nothing, it's send-only method (Telegram API returns true on success)
 
 =head2 sendMessage
 
@@ -632,6 +873,47 @@ On error returns hash reference with error set to 1
 See L<https://core.telegram.org/bots/api#sendchataction>.
 
 Returns nothing, it's send-only method (Telegram API returns true on success)
+
+=head2 exportChatInviteLink
+
+See L<https://core.telegram.org/bots/api#exportchatinvitelink>
+
+Takes chat_id as argument.
+
+Returns a raw api answer.
+
+On error returns hash reference with error set to 1
+
+=head2 createChatInviteLink
+
+See L<https://core.telegram.org/bots/api#createchatinvitelink>
+
+Takes chat_id as argument. And optionally expire_date and member_limit.
+
+Returns a L<Teapot::Bot::Object::ChatInviteLink> object.
+
+On error returns hash reference with error set to 1
+
+=head2 editChatInviteLink
+
+See L<https://core.telegram.org/bots/api#editchatinvitelink>
+
+Takes chat_id and invite_link as arguments. And optionally expire_date
+and member_limit.
+
+Returns a L<Teapot::Bot::Object::ChatInviteLink> object.
+
+On error returns hash reference with error set to 1
+
+=head2 revokeChatInviteLink
+
+See L<https://core.telegram.org/bots/api#revokechatinvitelink>
+
+Takes chat_id and invite_link as arguments.
+
+Returns a L<Teapot::Bot::Object::ChatInviteLink> object.
+
+On error returns hash reference with error set to 1
 
 =head1 SEE ALSO
 

@@ -42,6 +42,28 @@ sub _field_is_array_of_arrays {
   return;
 }
 
+sub create_from_array {
+  my $class = shift;
+  my $array = shift;
+  my $brain = shift || croak 'No brain supplied to create_from_array()';
+  my $obj   = shift || $class->new(_brain => $brain);
+
+  unless (defined $array) {
+    cluck 'Array is undef';
+    return $obj;
+  }
+
+  unless (ref ($array) eq 'ARRAY') {
+    cluck 'Not array ' . Dumper ($array);
+    return $obj;
+  }
+
+  cluck "Dumping class: " . Dumper ($class);
+  cluck "Dumping array: " . Dumper ($array);
+
+# it's stub, return $obj
+  return $obj;
+}
 
 # create an object from a hash. Needs to deal with the nested types, and
 # arrays
@@ -57,6 +79,10 @@ sub create_from_hash {
   }
 
   unless (ref ($hash) eq 'HASH') {
+    if (ref ($hash) eq 'ARRAY') {
+      return create_from_array($class, $hash, $brain);
+    }
+
     cluck 'Not a hash ' . Dumper ($hash);
     return $obj;
   }
