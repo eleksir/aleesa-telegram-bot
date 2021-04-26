@@ -47,7 +47,7 @@ sub __cron {
 	my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime (time);
 
 	if ($hour == 8 && ($min >= 0 && $min <= 14)) {
-		foreach my $enabledfortunechat (fortuneToggleList ()) {
+		foreach my $enabledfortunechat (FortuneToggleList ()) {
 			my $send_args;
 			$send_args->{text} = sprintf "%s\n```\n%s\n```\n", $intro[irand ($#intro + 1)], trim (Fortune ());
 			$send_args->{chat_id} = $enabledfortunechat;
