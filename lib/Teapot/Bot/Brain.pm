@@ -440,11 +440,11 @@ sub sendChatAction {
   elsif ($args->{action} eq 'upload_video') {
     $send_args->{action} = 'upload_video';
   }
-  elsif ($args->{action} eq 'record_audio') {
-    $send_args->{action} = 'record_audio';
+  elsif ($args->{action} eq 'record_voice') {
+    $send_args->{action} = 'record_voice';
   }
-  elsif ($args->{action} eq 'upload_audio') {
-    $send_args->{action} = 'upload_audio';
+  elsif ($args->{action} eq 'upload_voice') {
+    $send_args->{action} = 'upload_voice';
   }
   elsif ($args->{action} eq 'upload_document') {
     $send_args->{action} = 'upload_document';

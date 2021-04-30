@@ -30,6 +30,7 @@ use Teapot::Bot::Object::InlineKeyboardMarkup;
 use Teapot::Bot::Object::ProximityAlertTriggered;
 use Teapot::Bot::Object::Dice;
 use Teapot::Bot::Object::MessageAutoDeleteTimerChanged;
+use Teapot::Bot::Object::VoiceChatScheduled;
 use Teapot::Bot::Object::VoiceChatStarted;
 use Teapot::Bot::Object::VoiceChatEnded;
 use Teapot::Bot::Object::VoiceChatParticipantsInvited;
@@ -91,6 +92,7 @@ has 'successful_payment'; # SuccessfulPayment
 has 'connected_website';
 has 'passport_data'; # PassportData
 has 'proximity_alert_triggered';
+has 'voice_chat_scheduled'; # Optional. Service message: voice chat scheduled
 has 'voice_chat_started'; # Optional. Service message: voice chat started
 has 'voice_chat_ended'; # Optional. Service message: voice chat ended
 has 'voice_chat_participants_invited'; # Optional. Service message: new participants invited to a voice chat
@@ -135,6 +137,7 @@ sub fields {
           'Teapot::Bot::Object::ProximityAlertTriggered' => [qw/proximity_alert_triggered/],
           'Teapot::Bot::Object::Dice'                 => [qw/dice/],
           'Teapot::Bot::Object::MessageAutoDeleteTimerChanged' => [qw/message_auto_delete_timer_changed/],
+          'Teapot::Bot::Object::VoiceChatScheduled'   => [qw/voice_chat_scheduled/],
           'Teapot::Bot::Object::VoiceChatStarted'     => [qw/voice_chat_started/],
           'Teapot::Bot::Object::VoiceChatEnded'       => [qw/voice_chat_ended/],
           'Teapot::Bot::Object::VoiceChatParticipantsInvited' => [qw/voice_chat_participants_invited/],
