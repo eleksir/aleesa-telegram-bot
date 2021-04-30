@@ -14,6 +14,7 @@ has 'from';
 has 'date';
 has 'old_chat_member';
 has 'new_chat_member';
+has 'text';            # Undocumented as of Bot API 5.2
 has 'invite_link';     # Optional. Chat invite link, which was used by the user to join the chat; for joining by
                        # invite link events only.
 
@@ -21,7 +22,7 @@ sub fields {
   return {
           'Teapot::Bot::Object::Chat'           => [qw/chat/],
           'Teapot::Bot::Object::User'           => [qw/from/],
-          'scalar'                              => [qw/date/],
+          'scalar'                              => [qw/date text/],
           'Teapot::Bot::Object::ChatMember'     => [qw/old_chat_member new_chat_member/],
           'Teapot::Bot::Object::ChatInviteLink' => [qw/invite_link/]
         };
