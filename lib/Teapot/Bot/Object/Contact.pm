@@ -9,10 +9,11 @@ has 'phone_number';
 has 'first_name';
 has 'last_name';
 has 'user_id';
+has 'vcard';
 
 sub fields {
   return {
-           scalar => [qw/phone_number first_name last_name user_id/],
+           scalar => [qw/phone_number first_name last_name user_id vcard/],
          };
 }
 

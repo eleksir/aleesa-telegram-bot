@@ -6,12 +6,13 @@ use Mojo::Base 'Teapot::Bot::Object::Base';
 $Teapot::Bot::Object::Voice::VERSION = '0.022';
 
 has 'file_id';
+has 'file_unique_id';
 has 'duration';
 has 'mime_type';
 has 'file_size';
 
 sub fields {
-  return { scalar => [qw/file_id duration mime_type file_size/] };
+  return { scalar => [qw/file_id file_unique_id duration mime_type file_size/] };
 }
 
 1;

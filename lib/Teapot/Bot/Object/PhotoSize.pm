@@ -7,12 +7,13 @@ use Carp qw/croak/;
 $Teapot::Bot::Object::PhotoSize::VERSION = '0.022';
 
 has 'file_id';
+has 'file_unique_id';
 has 'width';
 has 'height';
 has 'file_size';
 
 sub fields {
-  return { scalar => [qw/file_id width height file_size/] };
+  return { scalar => [qw/file_id file_unique_id width height file_size/] };
 }
 
 1;

@@ -8,6 +8,7 @@ use Teapot::Bot::Object::PhotoSize;
 $Teapot::Bot::Object::VideoNote::VERSION = '0.022';
 
 has 'file_id';
+has 'file_unique_id';
 has 'length';
 has 'duration';
 has 'mime_type';
@@ -16,7 +17,7 @@ has 'file_size';
 
 sub fields {
   return {
-           scalar                           => [qw/file_id length duration mime_type file_size/],
+           scalar                           => [qw/file_id file_unique_id length duration mime_type file_size/],
            'Teapot::Bot::Object::PhotoSize' => [qw/thumb /],
          };
 }
