@@ -20,9 +20,9 @@ BEGIN {
 }
 
 use lib ("$workdir/lib", "$workdir/vendor_perl", "$workdir/vendor_perl/lib/perl5");
-use flickr qw (flickr_by_tags);
+use BotLib::Image::Flickr qw (FlickrByTags);
 
-my $url = flickr_by_tags ('bird,owl');
+my $url = FlickrByTags ('bird,owl');
 
 if ($url) {
 	say $url; ## no critic (InputOutput::RequireCheckedSyscalls)

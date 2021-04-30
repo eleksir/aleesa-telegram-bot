@@ -20,7 +20,7 @@ BEGIN {
 }
 
 use lib ("$workdir/lib", "$workdir/vendor_perl", "$workdir/vendor_perl/lib/perl5");
-use lat qw (train);
+use BotLib::Lat qw (Train);
 
-train ();
+Train ();
 exit 0;
