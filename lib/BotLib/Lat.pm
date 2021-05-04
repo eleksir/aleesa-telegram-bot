@@ -11,6 +11,7 @@ use Carp qw (cluck);
 use File::Basename qw (dirname);
 use File::Path qw (make_path);
 use Hailo;
+use Log::Any qw ($log);
 use BotLib::Conf qw (LoadConf);
 
 use version; our $VERSION = qw (1.0);
@@ -49,12 +50,12 @@ sub Lat () {
 	my $braindir = dirname $brain;
 
 	unless (-d $braindir) {
-		cluck "[ERROR] No lat module data: $braindir is absent! Train lat first.";
+		$log->error ("[ERROR] No lat module data: $braindir is absent! Train lat first.");
 		return '';
 	}
 
 	unless (-f $brain) {
-		cluck "[ERROR] No lat module data: $brain is absent! Train lat first.";
+		$log->error ("[ERROR] No lat module data: $brain is absent! Train lat first.");
 		return '';
 	}
 

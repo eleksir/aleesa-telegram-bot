@@ -12,6 +12,7 @@ use English qw ( -no_match_vars );
 use Encode;
 use Carp qw (cluck);
 use HTML::TokeParser;
+use Log::Any qw ($log);
 use Mojo::Log;
 use Mojo::UserAgent::Cached;
 use POSIX qw (strftime);
@@ -103,7 +104,7 @@ sub Drink {
 			$ret = join "\n", @holyday;
 		}
 	} else {
-		cluck sprintf 'Server return status %s with message: %s', $r->code, $r->message;
+		$log->warn (sprintf '[WARN] Kakoysegodnyaprazdnik server return status %s with message: %s', $r->code, $r->message);
 	}
 
 	return $ret;

@@ -184,7 +184,7 @@ sub Command {
 		sleep (irand (2) + 1);
 		$msg->replyMd ($reply);
 		return;
-	} elsif (substr ($text, 1) eq 'хэлп') {
+	} elsif (substr ($text, 1) eq 'хэлп' || substr ($text, 1) eq 'хелп') {
 		$reply = 'HALP!!!11';
 	} elsif (substr ($text, 1) eq 'help'  ||  substr ($text, 1) eq 'помощь') {
 		$reply = << "MYHELP";

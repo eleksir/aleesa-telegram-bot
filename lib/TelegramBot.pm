@@ -11,6 +11,7 @@ use English qw ( -no_match_vars );
 use Carp qw (cluck carp);
 use File::Path qw (make_path);
 use Hailo;
+use Log::Any qw($log);
 use Math::Random::Secure qw (irand);
 use Mojo::Base 'Teapot::Bot::Brain';
 use BotLib::Admin qw (FortuneToggleList);
@@ -72,7 +73,7 @@ sub __on_msg {
 		my $myObj = $self->getMe ();
 
 		unless ($myObj) {
-			carp '[ERROR] Unable to get chatid, API Error?';
+			$log->error ('[ERROR] Unable to get chatid, API Error?');
 			return;
 		}
 
@@ -105,7 +106,7 @@ sub __on_msg {
 			}
 		}
 	} else {
-		carp '[INFO] Unable to get chatid';
+		$log->warn ('[INFO] Unable to get chatid');
 		return;
 	}
 
@@ -158,9 +159,9 @@ sub __on_msg {
 		);
 
 		if ($chatid < 0) {
-			carp "[INFO] Initialized brain for public chat $chatname ($chatid): $brainname";
+			$log->info ("[INFO] Initialized brain for public chat $chatname ($chatid): $brainname");
 		} else {
-			carp "[INFO] Initialized brain for private chat $chatname ($chatid): $brainname";
+			$log->info ("[INFO] Initialized brain for private chat $chatname ($chatid): $brainname");
 		}
 	}
 
@@ -171,7 +172,7 @@ sub __on_msg {
 		}
 
 		my $text = $msg->text;
-		carp sprintf ('[DEBUG] Private chat %s say to bot: %s', $vis_a_vi, $text) if $c->{debug};
+		$log->debug (sprintf ('[DEBUG] Private chat %s say to bot: %s', $vis_a_vi, $text));
 		my $reply = 'Давайте ещё пообщаемся, а то я ещё не научилась от вас плохому.';
 
 		if (substr ($text, 0, 1) eq $csign) {
@@ -213,7 +214,7 @@ sub __on_msg {
 		if (defined $reply) {
 			$msg->typing ();
 			sleep 1;
-			carp sprintf ('[DEBUG] Private chat bot reply to %s: %s', $vis_a_vi, $reply) if $c->{debug};
+			$log->debug (sprintf ('[DEBUG] Private chat bot reply to %s: %s', $vis_a_vi, $reply));
 			$msg->reply ($reply);
 		}
 # group chat
@@ -221,26 +222,26 @@ sub __on_msg {
 		my $reply;
 
 		if (IsCensored $msg) {
-			carp sprintf '[INFO] In public chat %s (%s) message from %s was censored', $chatname, $chatid, $vis_a_vi;
+			$log->info (sprintf '[INFO] In public chat %s (%s) message from %s was censored', $chatname, $chatid, $vis_a_vi);
 			$self->deleteMessage ({chat_id => $chatid, message_id => $msg->{message_id}});
 		}
 
 		# detect and log messages without text, noop here
 		unless (defined $msg->text) {
-			carp sprintf ('[DEBUG] No text in message from %s', $vis_a_vi) if $c->{debug};
+			$log->debug (sprintf ('[DEBUG] No text in message from %s', $vis_a_vi));
 			return;
 		}
 
 		# we have text here! so potentially we can chit-chat
 		my $text = $msg->text;
-		carp sprintf ('[DEBUG] In public chat %s (%s) %s say: %s', $chatname, $chatid, $vis_a_vi, $text) if $c->{debug};
+		$log->debug (sprintf ('[DEBUG] In public chat %s (%s) %s say: %s', $chatname, $chatid, $vis_a_vi, $text));
 
 		# are they quote something, maybe, us?
 		if (defined ($msg->reply_to_message) &&
 		            defined ($msg->reply_to_message->from) &&
 		                    defined ($msg->reply_to_message->from->username) &&
 		                            ($msg->reply_to_message->from->username eq $myusername)) {
-			carp sprintf ('[DEBUG] In public chat %s (%s) %s quote us!', $chatname, $chatid, $vis_a_vi) if $c->{debug};
+			$log->debug (sprintf ('[DEBUG] In public chat %s (%s) %s quote us!', $chatname, $chatid, $vis_a_vi));
 
 			# do not answer back if someone quote our new member greet
 			if ((substr ($msg->reply_to_message->text, 0, 9) eq 'Дратути, ') &&
@@ -335,10 +336,10 @@ sub __on_msg {
 
 			$msg->typing ();
 			sleep (irand 2);
-			carp sprintf ('[DEBUG] In public chat %s (%s) bot reply to %s: %s', $chatname, $chatid, $vis_a_vi, $reply) if $c->{debug};
+			$log->debug (sprintf ('[DEBUG] In public chat %s (%s) bot reply to %s: %s', $chatname, $chatid, $vis_a_vi, $reply));
 			$msg->reply ($reply);
 		} else {
-			carp sprintf ('[DEBUG] In public chat %s (%s) bot is not required to reply to %s', $chatname, $chatid, $vis_a_vi) if $c->{debug};
+			$log->debug (sprintf ('[DEBUG] In public chat %s (%s) bot is not required to reply to %s', $chatname, $chatid, $vis_a_vi));
 		}
 
 # should be channel, so we can't talk
@@ -356,7 +357,7 @@ sub init {
 
 	unless (-d $braindir) {
 		make_path ($braindir, 0, 0755) or do { ## no critic (ValuesAndExpressions::ProhibitLeadingZeros)
-			cluck "Unable to create $braindir: $OS_ERROR";
+			$log->fatal ("[FATAL] Unable to create $braindir: $OS_ERROR");
 			exit 1;
 		};
 	}

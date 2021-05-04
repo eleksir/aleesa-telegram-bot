@@ -10,6 +10,7 @@ use Carp qw (cluck);
 use CHI;
 use CHI::Driver::BerkeleyDB;
 use Digest::HMAC_SHA1 qw (hmac_sha1);
+use Log::Any qw ($log);
 use Math::Random::Secure qw (irand);
 use MIME::Base64;
 use Mojo::UserAgent;
@@ -188,7 +189,7 @@ sub flickrAuthorization {
 	if ($r->code == 302) {
 		return $r->content->headers->location;
 	} else {
-		printf 'Something went wrong: %s %s', $r->code, $r->message;
+		printf "Something went wrong: %s %s\n", $r->code, $r->message;
 		return;
 	}
 }
@@ -335,19 +336,19 @@ sub flickrSearchByText {
 				if (defined $response) {
 					return $response;
 				} else {
-					cluck "Flickr api returns incorrect json: $r->message";
+					$log->warn ("[WARN] Flickr api returns incorrect json: $r->message");
 					return undef;
 				}
 			} else {
-				cluck "Flickr api returns incorrect json: $r->message";
+				$log->warn ("[WARN] Flickr api returns incorrect json: $r->message");
 				return undef;
 			}
 		} else {
-			cluck "Flickr api returns incorrect json: $r->message";
+			$log->warn ("[WARN] Flickr api returns incorrect json: $r->message");
 			return undef;
 		}
 	} else {
-		cluck "HTTP status code not 200: $r->code, $r->message";
+		$log->warn ("[WARN] Flickr api HTTP status code not 200: $r->code, $r->message");
 		return undef;
 	}
 }
@@ -442,19 +443,19 @@ sub flickrSearchByTags {
 				if (defined $response) {
 					return $response;
 				} else {
-					cluck "Flickr api returns incorrect json: $r->message";
+					$log->warn ("[WARN] Flickr api returns incorrect json: $r->message");
 					return undef;
 				}
 			} else {
-				cluck "Flickr api returns incorrect json: $r->message";
+				$log->warn ("[WARN] Flickr api returns incorrect json: $r->message");
 				return undef;
 			}
 		} else {
-			cluck "Flickr api returns incorrect json: $r->message";
+			$log->warn ("[WARN] Flickr api returns incorrect json: $r->message");
 			return undef;
 		}
 	} else {
-		cluck "HTTP status code not 200: $r->code, $r->message";
+		$log->warn ("[WARN] Flickr api HTTP status code not 200: $r->code, $r->message");
 		return undef;
 	}
 }
@@ -554,7 +555,7 @@ sub FlickrByTags {
 			$item = sprintf 'https://live.staticflickr.com/%s/%s_%s_z.jpg', $item->{server}, $item->{id}, $item->{secret};
 			return $item;
 		} else {
-			cluck 'Flickr api returns empty search result list';
+			$log->notice ('[NOTICE] Flickr api returns empty search result list');
 			return;
 		}
 	} else {
@@ -587,7 +588,7 @@ sub FlickrByText {
 			$item = sprintf 'https://live.staticflickr.com/%s/%s_%s_z.jpg', $item->{server}, $item->{id}, $item->{secret};
 			return $item;
 		} else {
-			cluck 'Flickr api returns empty search result list';
+			$log->notice ('[NOTICE] Flickr api returns empty search result list');
 			return;
 		}
 	} else {

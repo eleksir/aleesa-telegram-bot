@@ -8,6 +8,7 @@ use open qw (:std :utf8);
 use English qw ( -no_match_vars );
 use Carp qw (cluck);
 use HTML::TokeParser;
+use Log::Any qw ($log);
 use Math::Random::Secure qw (irand);
 use Mojo::UserAgent;
 
@@ -51,7 +52,7 @@ sub Monkeyuser {
 			$ret = sprintf '[MonkeyUser](https://www.monkeyuser.com%s)', $link [irand (1 + $#link)];
 		}
 	} else {
-		cluck sprintf 'Server return status %s with message: %s', $r->{status}, $r->{reason};
+		$log->warn (sprintf '[WARN] MonkeyUser server return status %s with message: %s', $r->{status}, $r->{reason});
 	}
 
 	return $ret;

@@ -9,6 +9,7 @@ use English qw ( -no_match_vars );
 use Carp qw (cluck);
 use CHI;
 use CHI::Driver::BerkeleyDB;
+use Log::Any qw ($log);
 use Math::Random::Secure qw (irand);
 use Mojo::UserAgent;
 
@@ -28,19 +29,19 @@ sub Imgur {
 	my $search_url    = 'https://api.imgur.com/3/gallery/search/';
 
 	my $imgur_client_id     = $c->{image}->{imgur}->{client_id} // do {
-		cluck 'No client_id specified in config for imgur module';
+		$log->error ('[ERROR] No client_id specified in config for imgur module');
 		return undef;
 	};
 	my $imgur_client_secret = $c->{image}->{imgur}->{client_secret} // do {
-		cluck 'No client_secret specified in config for imgur module';
+		$log->error ('[ERROR] No client_secret specified in config for imgur module');
 		return undef;
 	};
 	my $imgur_access_token  = $c->{image}->{imgur}->{access_token} // do {
-		cluck 'No access_token specified in config for imgur module';
+		$log->error ('[ERROR] No access_token specified in config for imgur module');
 		return undef;
 	};
 	my $imgur_refresh_token = $c->{image}->{imgur}->{refresh_token} // do {
-		cluck 'No refresh_token specified in config for imgur module';
+		$log->warn ('[WARN] No refresh_token specified in config for imgur module');
 	};
 
 	# N.B. Both imgur_access_token and imgur_refresh_token time to time can change, so we need
@@ -81,7 +82,7 @@ sub Imgur {
 		);
 
 		unless ($r->is_success) {
-			cluck "Unable to refresh imgur token, please re-authorise app! or imgur experiencing api outage: $r->code $r->message";
+			$log->error ("[ERROR] Unable to refresh imgur token, please re-authorise app! or imgur experiencing api outage: $r->code $r->message");
 			return undef;
 		}
 
@@ -93,7 +94,7 @@ sub Imgur {
 			$imgur_access_token = $refresh->{access_token};
 			$cache->set ('imgur_access_token', $refresh->{access_token}, 'never');
 		} else {
-			cluck "Unable to refresh imgur access_token, unable to decode json: $EVAL_ERROR";
+			$log->warn ("[ERROR] Unable to refresh imgur access_token, unable to decode json: $EVAL_ERROR");
 			return undef;
 		}
 
@@ -130,19 +131,19 @@ sub Imgur {
 				if ($#urls > 0) {
 					return $urls[irand ($#urls + 1)];
 				} else {
-					cluck 'Imgur api returned empty result.';
+					$log->notice ('[NOTICE] Imgur api returned empty result.');
 					return undef;
 				}
 			} else {
-				cluck "Unable to get results from imgur api: $r->message";
+				$log->warn ("[WARN] Unable to get results from imgur api: $r->message");
 				return undef;
 			}
 		} else {
-			cluck "Unable to decode imgur api json: $EVAL_ERROR";
+			$log->warn ("[WARN] Unable to decode imgur api json: $EVAL_ERROR");
 			return undef;
 		}
 	} else {
-		cluck "Unable to get results from imgur api: $r->code, $r->message";
+		$log->warn ("[WARN] Unable to get results from imgur api: $r->code, $r->message");
 		return undef;
 	}
 }

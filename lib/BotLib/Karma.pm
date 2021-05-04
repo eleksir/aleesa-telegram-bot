@@ -9,6 +9,7 @@ use English qw ( -no_match_vars );
 use Carp qw (cluck);
 use CHI;
 use CHI::Driver::BerkeleyDB;
+use Log::Any qw ($log);
 use BotLib::Conf qw (LoadConf);
 
 use version; our $VERSION = qw (1.0);
@@ -52,7 +53,7 @@ sub KarmaSet (@) {
 	}
 
 	if ($cache->set ($phrase, $score, 'never') != $score) {
-		cluck 'Cache error: unable to set karma.';
+		$log->error ('[ERROR] Cache error: unable to set karma.');
 	}
 
 	if ($score < -1 && (($score % (0 - $max)) + 1) == 0) {

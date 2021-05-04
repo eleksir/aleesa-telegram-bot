@@ -9,6 +9,7 @@ use open qw (:std :utf8);
 use English qw ( -no_match_vars );
 use Carp qw (cluck croak);
 use File::Path qw (make_path);
+use Log::Any qw ($log);
 use Math::Random::Secure qw (irand);
 use SQLite_File;
 use BotLib::Conf qw (LoadConf);
@@ -69,7 +70,7 @@ sub Fortune () {
 	my $backingfile = sprintf '%s/fortune.sqlite', $dir;
 
 	tie my @array, 'SQLite_File', $backingfile  ||  do {
-		cluck "[ERROR] Unable to tie to $backingfile: $OS_ERROR";
+		$log->error ("[ERROR] Unable to tie to $backingfile: $OS_ERROR");
 		return '';
 	};
 

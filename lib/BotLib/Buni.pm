@@ -8,6 +8,7 @@ use open qw (:std :utf8);
 use English qw ( -no_match_vars );
 use Carp qw (cluck);
 use HTML::TokeParser;
+use Log::Any qw ($log);
 use Mojo::UserAgent;
 
 use version; our $VERSION = qw (1.0);
@@ -48,7 +49,7 @@ sub Buni {
 			} while ($#{$a[0]} > 1);
 		}
 	} else {
-		cluck sprintf 'Server return status %s with message: %s', $r->code, $r->message;
+		$log->warn (sprintf '[WARN] Bunicomic server return status %s with message: %s', $r->code, $r->message);
 	}
 
 	return $ret;

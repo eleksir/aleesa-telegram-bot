@@ -1,10 +1,5 @@
 {
-    "admin" : {
-# store per-channel (per-conversation) settings
-        "dir" : "data/admin"
-    },
-
-# cachedir used not only for caches but for somesettings and stats too
+    # Cachedir used not only for caches but for some settings and stats too.
     "cachedir" : "data/cache",
 
     "fortune" : {
@@ -18,16 +13,15 @@
     },
 
     "image": {
-        "dir" : "data/image",
         "imgur" : {
-# see README.md about these settings - auth'ed search settings
+            # See README.md about these settings - auth'ed search settings.
             "client-id" : "imgur api client id",
             "secret" : "secret for client id",
             "access_token" : "access token for querying imgur api",
             "refresh_token" : "token for refreshing access token"
         },
         "flickr" : {
-# see README.md about these settings - auth'ed search settings
+            # See README.md about these settings - auth'ed search settings.
             "consumer_key" : "md5-like_hash",
             "consumer_secret" : "some_hash-like_string",
             "verifier": "some_hash-like_string"
@@ -39,24 +33,31 @@
         "src": "data/lat.txt"
     },
 
-# required for debugging reasons, if commented out or not exist, no debug logging appears at all
-    "log" : "/var/log/aleesa-telegram-bot/debug.log",
+    # Required for debugging reasons, if commented out or not exist, no debug logging appears at all.
+    "log" : "/var/log/aleesa-telegram-bot/aleesa.log",
 
-# openwatermap plugin
+    # Verbosity can be trace, debug, info (inform), notice, warning (warn), error (err), critical (crit, fatal), alert, emergency.
+    # Currently implemented debug, info, notice, warn, error, fatal. Notice is default logging level.
+    "loglevel": "notice",
+
+    # Openwatermap plugin.
     "openweathermap" : {
         "appid" : "md5sum-like_string",
     },
 
-# stuff for telegram itself
+    # Stuff for telegram itself.
     "telegrambot" : {
-# directory with per-conversation "brains"
+
+        # Directory with per-conversation "brains".
         "braindir" : "data/telegrambot-brains",
-# prefix-sign for all commands. in many irc-bots (eggdrop/windrop) it is "." (dot), in sulci it was "!"
-# in telegram commands begin with "/" on the start of first (and only) line.
+
+        # Prefix-sign for all commands. In many irc-bots (eggdrop/windrop) it is "." (dot), in sulci it was "!".
+        # In telegram commands begin with "/" on the start of first (and only) line. In case of this bot you can define what to use.
         "csign" : "!",
+
         "token" : "Long_string_given_by_@BotFather"
     },
 
-# unprivileged user to run this bot from
+    # Unprivileged user to run this bot from.
     "user" : "unit",
 }

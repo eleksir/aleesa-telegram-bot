@@ -7,6 +7,7 @@ use utf8;
 use open qw (:std :utf8);
 use English qw ( -no_match_vars );
 use Carp qw (cluck);
+use Log::Any qw ($log);
 use Math::Random::Secure qw (irand);
 use Mojo::UserAgent;
 use BotLib::Image::Flickr qw (FlickrByTags);
@@ -38,15 +39,15 @@ sub Kitty {
 		};
 
 		unless (defined $jcat) {
-			cluck "[ERROR] Unable to decode JSON: $EVAL_ERROR";
+			$log->warn ("[WARN] Unable to decode JSON from thecatapi: $EVAL_ERROR");
 		} else {
 			if ($jcat->[0]->{url}) {
-				my @cats = ('龴ↀ◡ↀ龴', '=^..^=', '≧◔◡◔≦ ','^ↀᴥↀ^' );
+				my @cats = ('龴ↀ◡ↀ龴', '=^..^=', '≧◔◡◔≦ ','^ↀᴥↀ^');
 				$ret = sprintf '[%s](%s)', $cats[irand ($#cats + 1)], $jcat->[0]->{url};
 			}
 		}
 	} else {
-		cluck sprintf 'Server return status %s with message: %s', $r->code, $r->message;
+		$log->warn (sprintf '[WARN] Thecatapi server return status %s with message: %s', $r->code, $r->message);
 	}
 
 	return $ret;
@@ -73,7 +74,7 @@ sub Fox {
 		};
 
 		unless (defined $jfox) {
-			cluck "[ERROR] Unable to decode JSON: $EVAL_ERROR";
+			$log->warn ("[WARN] Unable to decode JSON from randomfox: $EVAL_ERROR");
 		} else {
 			if ($jfox->{image}) {
 				$jfox->{image} =~ s/\\//xmsg;
@@ -81,7 +82,7 @@ sub Fox {
 			}
 		}
 	} else {
-		cluck sprintf 'Server return status %s with message: %s', $r->code, $r->message;
+		$log->warn (sprintf '[WARN] Randomfox server return status %s with message: %s', $r->code, $r->message);
 	}
 
 	return $ret;
@@ -108,7 +109,7 @@ sub Oboobs {
 		};
 
 		unless (defined $joboobs) {
-			cluck "[ERROR] Unable to decode JSON: $EVAL_ERROR";
+			$log->warn ("[WARN] Unable to decode JSON from oboobs: $EVAL_ERROR");
 		} else {
 			if ($joboobs->[0]->{preview}) {
 				my @boobs = ('(. )( .)', '(  . Y .  )', '(o)(o)', '( @ )( @ )', '(.)(.)');
@@ -116,7 +117,7 @@ sub Oboobs {
 			}
 		}
 	} else {
-		cluck sprintf 'Server return status %s with message: %s', $r->code, $r->message;
+		$log->warn (sprintf '[WARN] Oboobs server return status %s with message: %s', $r->code, $r->message);
 	}
 
 	return $ret;
@@ -143,7 +144,7 @@ sub Obutts {
 		};
 
 		unless (defined $jobutts) {
-			cluck "[ERROR] Unable to decode JSON: $EVAL_ERROR";
+			$log->warn ("[ERROR] Unable to decode JSON from obutts: $EVAL_ERROR");
 		} else {
 			if ($jobutts->[0]->{preview}) {
 				my @butts = ('(__(__)', '(_!_)', '(__.__)');
@@ -151,7 +152,7 @@ sub Obutts {
 			}
 		}
 	} else {
-		cluck sprintf 'Server return status %s with message: %s', $r->code, $r->message;
+		$log->warn (sprintf '[WARN] Obutts server return status %s with message: %s', $r->code, $r->message);
 	}
 
 	return $ret;

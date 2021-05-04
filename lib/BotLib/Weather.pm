@@ -9,6 +9,7 @@ use English qw ( -no_match_vars );
 use Carp qw (carp cluck);
 use CHI;
 use CHI::Driver::BerkeleyDB;
+use Log::Any qw ($log);
 use Mojo::Log;
 use Mojo::UserAgent::Cached;
 use BotLib::Conf qw (LoadConf);
@@ -109,11 +110,11 @@ sub __weather {
 		};
 
 		unless ($fc) {
-			cluck "[WARN] openweathermap returns corrupted json: $EVAL_ERROR";
+			$log->warn ("[WARN] openweathermap returns corrupted json: $EVAL_ERROR");
 			return undef;
 		};
 	} else {
-		cluck sprintf 'Server return status %s with message: %s', $r->code, $r->message;
+		$log->warn (sprintf '[WARN] Server return status %s with message: %s', $r->code, $r->message);
 		return undef;
 	}
 
