@@ -227,7 +227,7 @@ sub __on_msg {
 
 		# detect and log messages without text, noop here
 		unless (defined $msg->text) {
-			carp sprintf ('[INFO] No text in message from %s', $vis_a_vi);
+			carp sprintf ('[DEBUG] No text in message from %s', $vis_a_vi) if $c->{debug};
 			return;
 		}
 
@@ -275,15 +275,30 @@ sub __on_msg {
 			# phrase directed to bot
 			if ((lc ($text) =~ /^${qname}[\,|\:]? (.+)/) or (lc ($text) =~ /^${qtname}[\,|\:]? (.+)/)){
 				$phrase = $1;
-				$reply = $hailo->{$msg->chat->id}->learn_reply ($phrase);
+
+				if ($text =~ /^кто +все +эти +люди\?$/i) {
+					$reply = 'Кто здесь?';
+				} else {
+					$reply = $hailo->{$msg->chat->id}->learn_reply ($phrase);
+				}
 			# bot mention by name
 			} elsif ((lc ($text) =~ /.+ ${qname}[\,|\!|\?|\.| ]/) or (lc ($text) =~ / $qname$/)) {
 				$phrase = $text;
-				$reply = $hailo->{$msg->chat->id}->reply($phrase);
+
+				if ($text =~ /^кто +все +эти +люди\?$/i) {
+					$reply = 'Кто здесь?';
+				} else {
+					$reply = $hailo->{$msg->chat->id}->learn_reply ($phrase);
+				}
 			# bot mention by telegram name
 			} elsif ((lc ($text) =~ /.+ ${qtname}[\,|\!|\?|\.| ]/) or (lc ($text) =~ / $qtname$/)) {
 				$phrase = $text;
-				$reply = $hailo->{$msg->chat->id}->reply ($phrase);
+
+				if ($text =~ /^кто +все +эти +люди\?$/i) {
+					$reply = 'Кто здесь?';
+				} else {
+					$reply = $hailo->{$msg->chat->id}->learn_reply ($phrase);
+				}
 			# karma adjustment
 			} elsif (substr ($text, -2) eq '++'  ||  substr ($text, -2) eq '--') {
 				my @arr = split /\n/, $text;
@@ -296,7 +311,11 @@ sub __on_msg {
 				}
 			# just message in chat
 			} else {
-				$hailo->{$msg->chat->id}->learn ($text);
+				if ($text =~ /^кто +все +эти +люди\?$/i) {
+					$reply = 'Кто здесь?';
+				} else {
+					$hailo->{$msg->chat->id}->learn ($text);
+				}
 			}
 		}
 
