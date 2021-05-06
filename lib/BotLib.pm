@@ -20,7 +20,7 @@ use BotLib::Drink qw (Drink);
 use BotLib::Fisher qw (Fish);
 use BotLib::Fortune qw (Fortune);
 use BotLib::Friday qw (Friday);
-use BotLib::Image qw (Kitty Fox Oboobs Obutts Rabbit Owl);
+use BotLib::Image qw (Kitty Fox Oboobs Obutts Rabbit Owl Frog Horse Snail);
 use BotLib::Karma qw (KarmaSet KarmaGet);
 use BotLib::Lat qw (Lat);
 use BotLib::Monkeyuser qw (Monkeyuser);
@@ -89,6 +89,24 @@ sub Command {
 	} elsif (substr ($text, 1) eq 'cat'  ||  substr ($text, 1) eq 'кис') {
 		$msg->typing ();
 		$reply = Kitty ();
+		sleep (irand (2) + 1);
+		$msg->replyMd ($reply);
+		return;
+	} elsif (substr ($text, 1) eq 'frog'  ||  substr ($text, 1) eq 'toad'  || substr ($text, 1) eq 'лягушка') {
+		$msg->typing ();
+		$reply = Frog ();
+		sleep (irand (2) + 1);
+		$msg->replyMd ($reply);
+		return;
+	} elsif (substr ($text, 1) eq 'horse'  ||  substr ($text, 1) eq 'лошадка') {
+		$msg->typing ();
+		$reply = Horse ();
+		sleep (irand (2) + 1);
+		$msg->replyMd ($reply);
+		return;
+	} elsif (substr ($text, 1) eq 'snail'  ||  substr ($text, 1) eq 'улитка') {
+		$msg->typing ();
+		$reply = Snail ();
 		sleep (irand (2) + 1);
 		$msg->replyMd ($reply);
 		return;
@@ -201,10 +219,13 @@ ${csign}f | ${csign}ф                     - рандомная фраза из 
 ${csign}fortune | ${csign}фортунка        - рандомная фраза из сборника цитат fortune_mod
 ${csign}fox | ${csign}лис                 - лисичка
 ${csign}friday | ${csign}пятница          - а не пятница ли сегодня?
+${csign}frog | ${csign}лягушка            - лягушка
+${csign}horse | ${csign}лошадка           - лошадка
 ${csign}lat | ${csign}лат                 - сгенерить фразу из крылатых латинских выражений
 ${csign}monkeyuser                 - рандомный стрип MonkeyUser
 ${csign}owl | ${csign}сова                - сова
 ${csign}ping | ${csign}пинг               - попинговать бота
+${csign}snail | ${csign}улитка            - улитка
 ${csign}ver | ${csign}version | ${csign}версия   - что-то про версию ПО
 ${csign}w город | ${csign}п город         - погода в указанном городе
 ${csign}xkcd                       - рандомный стрип с сайта xkcd.ru

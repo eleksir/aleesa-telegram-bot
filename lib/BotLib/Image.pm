@@ -16,7 +16,7 @@ use BotLib::Util qw (urlencode);
 
 use version; our $VERSION = qw (1.0);
 use Exporter qw (import);
-our @EXPORT_OK = qw (Kitty Fox Oboobs Obutts Rabbit Owl);
+our @EXPORT_OK = qw (Kitty Fox Oboobs Obutts Rabbit Owl Frog Horse Snail);
 
 sub Kitty {
 	my $r;
@@ -201,6 +201,41 @@ sub Owl {
 	}
 }
 
+sub Frog {
+	# unable to find any one-line ascii art for frog :(
+	my @art = qw (frog toad лягушка);
+	my $url = FlickrByTags ('frog,toad,amphibian');
+
+	if (defined $url) {
+		return sprintf '[%s](%s)', $art [irand ($#art + 1)], $url;
+	} else {
+		return 'Нету лягушек, все свалили.';
+	}
+}
+
+sub Horse {
+	# unable to find any one-line ascii art for frog :(
+	my @art = qw (horse лошадь лошадка);
+	my $url = FlickrByTags ('horse,equine,mammal');
+
+	if (defined $url) {
+		return sprintf '[%s](%s)', $art [irand ($#art + 1)], $url;
+	} else {
+		return 'Нету коняшек, все разбежались.';
+	}
+}
+
+sub Snail {
+	# unable to find any one-line ascii art for frog :(
+	my @art = qw ('-'_@_ @╜ @_'-');
+	my $url = FlickrByTags ('snail,slug');
+
+	if (defined $url) {
+		return sprintf '[%s](%s)', $art [irand ($#art + 1)], $url;
+	} else {
+		return 'Нету улиток, все расползлись.';
+	}
+}
 1;
 
 # vim: set ft=perl noet ai ts=4 sw=4 sts=4:
