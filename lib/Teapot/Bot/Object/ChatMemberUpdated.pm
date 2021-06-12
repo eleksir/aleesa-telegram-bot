@@ -6,6 +6,7 @@ use Teapot::Bot::Object::Chat;
 use Teapot::Bot::Object::User;
 use Teapot::Bot::Object::ChatMember;
 use Teapot::Bot::Object::ChatInviteLink;
+use Teapot::Bot::Object::Voice;
 
 $Teapot::Bot::Object::ChatMemberUpdated::VERSION = '0.022';
 
@@ -15,6 +16,7 @@ has 'date';
 has 'old_chat_member';
 has 'new_chat_member';
 has 'text';            # Undocumented as of Bot API 5.2
+has 'voice';           # Undocumented as of Bot API 5.2
 has 'invite_link';     # Optional. Chat invite link, which was used by the user to join the chat; for joining by
                        # invite link events only.
 
@@ -24,6 +26,7 @@ sub fields {
           'Teapot::Bot::Object::User'           => [qw/from/],
           'scalar'                              => [qw/date text/],
           'Teapot::Bot::Object::ChatMember'     => [qw/old_chat_member new_chat_member/],
+          'Teapot::Bot::Object::Voice'          => [qw/voice/],
           'Teapot::Bot::Object::ChatInviteLink' => [qw/invite_link/]
         };
 }
