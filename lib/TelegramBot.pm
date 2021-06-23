@@ -277,7 +277,7 @@ sub __on_msg {
 			if ((lc ($text) =~ /^${qname}[\,|\:]? (.+)/) or (lc ($text) =~ /^${qtname}[\,|\:]? (.+)/)){
 				$phrase = $1;
 
-				if ($text =~ /^кто +все +эти +люди\?$/i) {
+				if ($phrase =~ /^кто +все +эти +люди *\?$/i) {
 					$reply = 'Кто здесь?';
 				} else {
 					$reply = $hailo->{$msg->chat->id}->learn_reply ($phrase);
@@ -286,7 +286,7 @@ sub __on_msg {
 			} elsif ((lc ($text) =~ /.+ ${qname}[\,|\!|\?|\.| ]/) or (lc ($text) =~ / $qname$/)) {
 				$phrase = $text;
 
-				if ($text =~ /^кто +все +эти +люди\?$/i) {
+				if ($phrase =~ /^кто +все +эти +люди *\?$/i) {
 					$reply = 'Кто здесь?';
 				} else {
 					$reply = $hailo->{$msg->chat->id}->learn_reply ($phrase);
@@ -295,7 +295,7 @@ sub __on_msg {
 			} elsif ((lc ($text) =~ /.+ ${qtname}[\,|\!|\?|\.| ]/) or (lc ($text) =~ / $qtname$/)) {
 				$phrase = $text;
 
-				if ($text =~ /^кто +все +эти +люди\?$/i) {
+				if ($phrase =~ /^кто +все +эти +люди *\?$/i) {
 					$reply = 'Кто здесь?';
 				} else {
 					$reply = $hailo->{$msg->chat->id}->learn_reply ($phrase);
@@ -312,7 +312,7 @@ sub __on_msg {
 				}
 			# just message in chat
 			} else {
-				if ($text =~ /^кто +все +эти +люди\?$/i) {
+				if ($text =~ /^кто +все +эти +люди *\?$/i) {
 					$reply = 'Кто здесь?';
 				} else {
 					$hailo->{$msg->chat->id}->learn ($text);
