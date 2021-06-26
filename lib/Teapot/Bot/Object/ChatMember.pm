@@ -7,32 +7,58 @@ use Carp qw(cluck);
 
 $Teapot::Bot::Object::ChatMember::VERSION = '0.022';
 
-has 'user';
-has 'status';
-has 'custom_title';              # optional. Owner and administrators only.
-has 'is_anonymous';              # Optional. Owner and administrators only.
+# ChatMemberOwner
+has   'user';
+has   'status';
+has   'custom_title';              # optional. Owner and administrators only.
+has   'is_anonymous';              # Optional. Owner and administrators only.
 
-has 'can_be_edited';             # optional. Administrators only.
-has 'can_manage_chat';           # Optional. Administrators only. True, if the administrator can access the chat event
+# ChatMemberAdministrator
+# has 'user';
+# has 'status';
+has   'can_be_edited';             # optional. Administrators only.
+# has 'custom_title';              # optional. Owner and administrators only.
+# has 'is_anonymous';              # Optional. Owner and administrators only.
+has   'can_manage_chat';           # Optional. Administrators only. True, if the administrator can access the chat event
                                  # log, chat statistics, message statistics in channels, see channel members, see
                                  # anonymous administrators in supergroups and ignore slow mode. Implied by any other
                                  # administrator privilege
-has 'can_post_messages';         # optional. Administrators only.
-has 'can_edit_messages';         # optional. Administrators only.
-has 'can_delete_messages';       # optional. Administrators only.
-has 'can_manage_voice_chats';    # Optional. Administrators only. True, if the administrator can manage voice chats
-has 'can_restrict_members';      # optional. Administrators only.
-has 'can_promote_members';       # optional. Administrators only.
-has 'can_change_info';           # optional. Administrators and restricted only.
-has 'can_invite_users';          # optional. Administrators and restricted only.
-has 'can_pin_messages';          # optional. Administrators and restricted only.
-has 'is_member';                 # optional. Restricted only.
-has 'can_send_messages';         # optional. Restricted only.
-has 'can_send_media_messages';   # optional. Restricted only.
-has 'can_send_polls';            # optional. Restricted only.
-has 'can_send_other_messages';   # optional. Restricted only.
-has 'can_add_web_page_previews'; # optional. Restricted only.
-has 'until_date';                # optional. Restricted and kicked only.
+has   'can_post_messages';         # optional. Administrators only.
+has   'can_edit_messages';         # optional. Administrators only.
+has   'can_delete_messages';       # optional. Administrators only.
+has   'can_manage_voice_chats';    # Optional. Administrators only. True, if the administrator can manage voice chats
+has   'can_restrict_members';      # optional. Administrators only.
+has   'can_promote_members';       # optional. Administrators only.
+has   'can_change_info';           # optional. Administrators and restricted only.
+has   'can_invite_users';          # optional. Administrators and restricted only.
+has   'can_pin_messages';          # optional. Administrators and restricted only.
+
+# ChatMemberMember
+# has 'status';
+# has 'user';
+
+# ChatMemberRestricted
+# has 'status';
+# has 'user';
+has   'is_member';                 # optional. Restricted only.
+# has 'can_change_info';           # optional. Administrators and restricted only.
+# has 'can_invite_users';          # optional. Administrators and restricted only.
+# has 'can_pin_messages';          # optional. Administrators and restricted only.
+has   'can_send_messages';         # optional. Restricted only.
+has   'can_send_media_messages';   # optional. Restricted only.
+has   'can_send_polls';            # optional. Restricted only.
+has   'can_send_other_messages';   # optional. Restricted only.
+has   'can_add_web_page_previews'; # optional. Restricted only.
+has   'until_date';                # optional. Restricted and kicked only.
+
+# ChatMemberLeft
+# has 'status';
+# has 'user';
+
+# ChatMemberBanned
+# has 'status';
+# has 'user';
+# has 'until_date';                # optional. Restricted and kicked only.
 
 sub fields {
   return {

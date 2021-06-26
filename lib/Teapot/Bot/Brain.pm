@@ -139,20 +139,20 @@ sub getChatMember {
   }
 }
 
-sub kickChatMember {
+sub banChatMember {
   my $self = shift;
   my $args = shift || {};
 
-  my $token = $self->token || croak 'No token supplied to kickChatMember?';
+  my $token = $self->token || croak 'No token supplied to banChatMember?';
   my $send_args = {};
 
   unless ($args->{chat_id}) {
-    cluck 'No chat_id supplied to kickChatMember()';
+    cluck 'No chat_id supplied to banChatMember()';
     return {'error' => 1};
   }
 
   unless ($args->{user_id}) {
-    cluck 'No user_id supplied to kickChatMember()';
+    cluck 'No user_id supplied to banChatMember()';
     return {'error' => 1};
   }
 
@@ -161,7 +161,7 @@ sub kickChatMember {
   $send_args->{until_date} = $args->{until_date} if exists $args->{until_date};
   $send_args->{revoke_messages} = $args->{revoke_messages} if exists $args->{revoke_messages};
 
-  my $url = "https://api.telegram.org/bot${token}/kickChatMember";
+  my $url = "https://api.telegram.org/bot${token}/banChatMember";
   my $api_response = $self->_post_request($url, $send_args);
 
   return;
@@ -805,10 +805,10 @@ of Chat User.
 
 On error returns hash reference with error set to 1
 
-=head2 kickChatMember
+=head2 banChatMember
 
-This is the wrapper around the C<kickChatMember> API method. See
-L<https://core.telegram.org/bots/api#kickchatmember>.
+This is the wrapper around the C<banChatMember> API method. See
+L<https://core.telegram.org/bots/api#banchatmember>.
 
 Takes chat_id, and user_id as arguments. And optionally until_date and
 revoke_messages.
