@@ -36,12 +36,26 @@ sub Weather {
 	if ($w) {
 		if ($w->{temperature_min} == $w->{temperature_max}) {
 			$reply = sprintf (
-				"Погода в городе %s, %s:\n%s, ветер %s %s м/c, температура %s°C, ощущается как %s°C, относительная влажность %s%%, давление %s мм.рт.с",
+				"Погода в городе %s, %s:\n%s, ветер %s %s м/c, температура %s°C, ощущается как %s°C, относительная влажность %s%%, давление %s мм.рт.ст",
 				$w->{name},
 				$w->{country},
 				ucfirst $w->{description},
 				$w->{wind_direction},
 				$w->{wind_speed},
+				$w->{temperature_min},
+				$w->{temperature_feelslike},
+				$w->{humidity},
+				$w->{pressure}
+			);
+		} elsif ($w->{temperature_min} < 0 && $w->{temperature_max} <= 0) {
+			$reply = sprintf (
+				"Погода в городе %s, %s:\n%s, ветер %s %s м/c, температура %s-%s°C, ощущается как %s°C, относительная влажность %s%%, давление %s мм.рт.ст",
+				$w->{name},
+				$w->{country},
+				ucfirst $w->{description},
+				$w->{wind_direction},
+				$w->{wind_speed},
+				$w->{temperature_max},
 				$w->{temperature_min},
 				$w->{temperature_feelslike},
 				$w->{humidity},
