@@ -2,6 +2,11 @@
     # Cachedir used not only for caches but for some settings and stats too.
     "cachedir" : "data/cache",
 
+    "gamestat" : {
+        "dir" : "data",
+        "gamestatdir" : "data/gamestat"
+    },
+
     "fortune" : {
         "dir" : "data/fortune",
         "srcdir" : "data/fortune_src"

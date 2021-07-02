@@ -6,65 +6,53 @@ use warnings;
 use utf8;
 use open qw (:std :utf8);
 use English qw ( -no_match_vars );
+use DBI;
+use Log::Any qw ($log);
 use Math::Random::Secure qw (irand);
+
+use BotLib::Conf qw (LoadConf);
 
 use version; our $VERSION = qw (1.0);
 use Exporter qw (import);
 our @EXPORT_OK = qw (Fish);
 
+my $c = LoadConf ();
+my $gamestatdir = $c->{gamestat}->{gamestatdir};
+my $dbfile = sprintf '%s/gamestat.sqlite', $gamestatdir;
+
+
+sub getRandomArtifact {
+	my $dbh;
+	$dbh = DBI->connect ("dbi:SQLite:$dbfile", '', '') or do {
+		$log->error (sprintf '[ERROR] Unable to get random artifact, sqlite error: %s', $dbh->errstr);
+		return undef;
+	};
+
+	$dbh->{sqlite_unicode} = 1;
+
+	my $rows_affected = $dbh->do ('PRAGMA foreign_keys=ON') or do {
+		$log->error (sprintf '[ERROR] Unable to get random artifact, sqlite error: %s', $dbh->errstr);
+		return undef;
+	};
+
+	$rows_affected = $dbh->do ('PRAGMA journal_mode=WAL') or do {
+		$log->error (sprintf '[ERROR] Unable to get random artifact, sqlite error: %s', $dbh->errstr);
+		return undef;
+	};
+
+	my $ary_ref = $dbh->selectall_arrayref ('SELECT name FROM artifacts WHERE id > 9999 AND id < 20000') or do {
+		$log->error (sprintf '[ERROR] Unable to get random artifact, sqlite error: %s', $dbh->errstr);
+		return undef;
+	};
+
+	$dbh->disconnect or $log->warn (sprintf '[WARN] Unable to close gamestat db, sqlite error: %s', $dbh->errstr);
+
+	return $ary_ref->[irand ($#{ $ary_ref } + 1)]->[0];
+}
+
 
 sub Fish {
 	my $name = shift;
-
-	my @artifact = (
-		'семикрылого чешуйчатого пятихуя',
-		'разумного конденсатора',
-		'сальмонеллу',
-		'селёдку',
-		'желтоперого тунца',
-		'розовую сальмонеллу',
-		'голавля',
-		'барбуса',
-		'окуня',
-		'верхоплавку',
-		'коричневую форель',
-		'полярника',
-		'плотву',
-		'зубатку',
-		'солнечную рыбу',
-		'старую шину',
-		'скользкую корягу',
-		'лампу джина',
-		'любовное послание в бутылке',
-		'старое бревно',
-		'резиновый сапог',
-		'труп',
-		'Лох-Несское чудовище',
-		'старую рыбацкую приманку',
-		'кусок Титаника',
-		'обломок Атлантиды',
-		'кита',
-		'кальмара',
-		'дельфина',
-		'ската',
-		'подводную лодку',
-		'медузу',
-		'морскую звезду',
-		'электрического угря',
-		'большую белую акулу',
-		'аквалангиста',
-		'монстра',
-		'вируса',
-		'сырую пачку сигарет',
-		'водоросли',
-		'якорь от лодки',
-		'водяного',
-		'русалку',
-		'палтуса',
-		'труп собаки по кличке Беня',
-		'олигофрена Проню',
-		'огеймера Фишкина',
-	);
 
 	my @location = (
 		'в поток',
@@ -117,7 +105,8 @@ sub Fish {
 		return $phrase;
 	}
 
-	$phrase .= sprintf "Поздравляю, %s! Вы только что поймали %s! аж на %d кило!\n\n", $name, $artifact[irand ($#artifact + 1)], $weight;
+	my $artifact = getRandomArtifact ();
+	$phrase .= sprintf "Поздравляю, %s! Вы только что поймали %s! аж на %d кило!\n\n", $name, $artifact, $weight;
 
 	if ($success_probability <= 25) {
 		$phrase .= sprintf 'Ё-мое!!! А это ведь новый рекорд! Продолжай в том же духе, %s!', $name;
