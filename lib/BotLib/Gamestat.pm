@@ -26,7 +26,7 @@ my $dbfile = sprintf '%s/gamestat.sqlite', $gamestatdir;
 
 # assume that there is not too much artifacts.
 sub SeedArtifacts {
-	open (my $AFH, '<', "$dir/archeologic_artifacts.txt") || die "No $dir/archeologic_artifacts.txt";
+	open (my $AFH, '<', "$dir/archeologic_artifacts.txt") || die "No $dir/archeologic_artifacts.txt\n";
 	my @arch_artifacts;
 
 	while (my $artifact = <$AFH>) {
@@ -35,9 +35,9 @@ sub SeedArtifacts {
 		push @arch_artifacts, $artifact;
 	}
 
-	close $AFH;
+	close $AFH; ## no critic (InputOutput::RequireCheckedSyscalls)
 
-	open ($AFH, '<', "$dir/fisher_artifacts.txt") || die "No $dir/fisher_artifacts.txt";
+	open ($AFH, '<', "$dir/fisher_artifacts.txt") || die "No $dir/fisher_artifacts.txt\n";
 	my @fisher_artifacts;
 
 	while (my $artifact = <$AFH>) {
@@ -46,10 +46,10 @@ sub SeedArtifacts {
 		push @fisher_artifacts, $artifact;
 	}
 
-	close $AFH;
+	close $AFH; ## no critic (InputOutput::RequireCheckedSyscalls)
 	undef $AFH;
 
-	my $tablename = random_string ("..........");
+	my $tablename = random_string ('..........');
 	$tablename = utf2sha1 ($tablename);
 
 	while ($tablename =~ /^\d/) {
@@ -60,56 +60,55 @@ sub SeedArtifacts {
 	$tablename = lc ($tablename);
 
 	unless (-d $gamestatdir) {
-		make_path ($gamestatdir)  ||  die "Unable to create $dir: $OS_ERROR";
+		make_path ($gamestatdir)  ||  die "Unable to create $dir: $OS_ERROR\n";
 	}
 
 	my $dbh = DBI->connect ("dbi:SQLite:$dbfile", '', '');
 	$dbh->{sqlite_unicode} = 1;
-	my $rows_affected = $dbh->do ('PRAGMA foreign_keys=ON') or die $dbh->errstr;
-	$rows_affected = $dbh->do ('PRAGMA journal_mode=WAL') or die $dbh->errstr;
+	my $rows_affected = $dbh->do ('PRAGMA foreign_keys=ON') or die $dbh->errstr . "\n";
+	$rows_affected = $dbh->do ('PRAGMA journal_mode=WAL') or die $dbh->errstr . "\n";
 
 	# Open transaction
-	$dbh->begin_work or die $dbh->errstr;
+	$dbh->begin_work or die $dbh->errstr . "\n";
 
-	$rows_affected = $dbh->do (
-		qq {
-			CREATE TABLE IF NOT EXISTS $tablename (
-				id INT UNIQUE NOT NULL, -- artifact id
-				name TEXT PRIMARY KEY   -- artifact name
-			);
-		}
-	) or die $dbh->errstr;
+	my $query = <<"QUERY";
+CREATE TABLE IF NOT EXISTS $tablename (
+	id INT UNIQUE NOT NULL, -- artifact id
+	name TEXT PRIMARY KEY   -- artifact name
+);
+QUERY
 
-	my $sth = $dbh->prepare ("REPLACE INTO $tablename(id,name) VALUES (?,?)") or die $dbh->errstr;
+	$rows_affected = $dbh->do ($query) or die $dbh->errstr . "\n";
+	my $sth = $dbh->prepare ("REPLACE INTO $tablename(id,name) VALUES (?,?)") or die $dbh->errstr . "\n";
 
 	# Insert our archeological artifacts
-	my $c = 0;
+	my $counter = 0;
 
 	foreach my $artifact (@arch_artifacts) {
-		last if ($c == 10000);
+		last if ($counter == 10000);
 		$sth->execute ($c, $artifact);
-		$c++;
+		$counter++;
 	}
 
 	# Insert our fishing artifacts
-	$c = 10000;
+	$counter = 10000;
 
 	foreach my $artifact (@fisher_artifacts) {
-		last if ($c == 20000);
+		last if ($counter == 20000);
 		$sth->execute ($c, $artifact);
-		$c++;
+		$counter++;
 	}
 
 	# Add indexes
-	$rows_affected = $dbh->do ("CREATE INDEX IF NOT EXISTS myartifactid ON $tablename(id)") or die $dbh->errstr;
+	$rows_affected = $dbh->do ("CREATE INDEX IF NOT EXISTS myartifactid ON $tablename(id)") or die $dbh->errstr . "\n";
 
 	# Drop target table and replace it with our
-	$rows_affected = $dbh->do ("DROP TABLE IF EXISTS artifacts") or die $dbh->errstr;
-	$rows_affected = $dbh->do ("ALTER TABLE $tablename RENAME TO artifacts") or die $dbh->errstr;
+	$rows_affected = $dbh->do ('DROP TABLE IF EXISTS artifacts') or die $dbh->errstr . "\n";
+	$rows_affected = $dbh->do ("ALTER TABLE $tablename RENAME TO artifacts") or die $dbh->errstr . "\n";
 
 	# Close transaction
-	$dbh->commit or die $dbh->errstr;
-	$dbh->disconnect or warn (sprintf '[WARN] Unable to close gamestat db, sqlite error: %s', $dbh->errstr);
+	$dbh->commit or die $dbh->errstr . "\n";
+	$dbh->disconnect or warn (sprintf '[WARN] Unable to close gamestat db, sqlite error: %s', $dbh->errstr) . "\n";
 	return;
 }
 
