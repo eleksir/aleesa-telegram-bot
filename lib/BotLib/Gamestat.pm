@@ -60,7 +60,7 @@ sub SeedArtifacts {
 	$tablename = lc ($tablename);
 
 	unless (-d $gamestatdir) {
-		make_path ($gamestatdir)  ||  die "Unable to create $dir: $OS_ERROR\n";
+		make_path ($gamestatdir)  ||  die "Unable to create $gamestatdir: $OS_ERROR\n";
 	}
 
 	my $dbh = DBI->connect ("dbi:SQLite:$dbfile", '', '');
