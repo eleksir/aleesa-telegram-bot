@@ -1,0 +1,30 @@
+Migration procedure.
+
+When you require to perform this procedure?
+- When perl version is changed
+- When migration to other OS or distribution occurs
+
+Why do i have to perform this procedure?
+- Some modules are vendored with bot
+- BDB can vary its on-disk format depending on dbd version that linked with
+  perl interpreter itself and its apropriate module.
+
+How can i guess that i miss to perform this procedure?
+Most notable sympthom is 'BDB0091 DB_VERSION_MISMATCH' in logs and bot admin settings are lost.
+
+
+Procedure steps.
+
+On source system perform following steps:
+1. stop the bot, to unlock and close all files.
+2. make a backup
+3. prepare target system and copy bot to target system
+
+On target system perform these steps:
+1. remove vendor_perl dir in bot' directory
+2. run "bash bootstrap.sh" (no quotes) and wait until it suscessfuly build and
+   installl required modules.
+3. run perl bin/cache_import.pl script. It should create cache and exit
+   silently.
+
+Now it is possible to run bot without settings loss.
