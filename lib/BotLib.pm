@@ -14,6 +14,7 @@ use BotLib::Conf qw (LoadConf);
 use BotLib::Admin qw (@ForbiddenMessageTypes GetForbiddenTypes AddForbiddenType
                       DelForbiddenType ListForbidden FortuneToggle FortuneStatus
                       PluginToggle PluginStatus PluginEnabled);
+use BotLib::Anek qw (Anek);
 use BotLib::Archeologist qw (Dig);
 use BotLib::Buni qw (Buni);
 use BotLib::Drink qw (Drink);
@@ -71,6 +72,12 @@ sub Command {
 		$reply = 'Шта?';
 	} elsif (substr ($text, 1) eq 'ver' || substr ($text, 1) eq 'version' || substr ($text, 1) eq 'версия') {
 		$reply = 'Версия:  Нуль.Чего-то_там.Чего-то_там';
+	} elsif (substr ($text, 1) eq 'anek' || substr ($text, 1) eq 'анек' || substr ($text, 1) eq 'анекдот') {
+		$msg->typing ();
+		$reply = "```\n" . Anek () . "\n```";
+		sleep (irand (2) + 1);
+		$msg->replyMd ($reply);
+		return;
 	} elsif (length ($text) >= 2 && (substr ($text, 1, 2) eq 'w ' || substr ($text, 1, 2) eq 'п ')) {
 		my $city = substr $text, 3;
 		$reply = Weather $city;
@@ -208,6 +215,7 @@ sub Command {
 		$reply = << "MYHELP";
 ```
 ${csign}help | ${csign}помощь             - список команд
+${csign}anek | ${csign}анек | ${csign}анекдот    - рандомный анекдот с anekdot.ru
 ${csign}buni                       - рандомный стрип hapi buni
 ${csign}bunny | ${csign}rabbit | ${csign}кролик  - кролик
 ${csign}cat | ${csign}кис                 - кошечка
