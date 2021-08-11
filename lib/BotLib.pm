@@ -70,6 +70,26 @@ sub Command {
 		$reply = 'Wat?';
 	} elsif (substr ($text, 1) eq 'понг') {
 		$reply = 'Шта?';
+	} elsif (substr ($text, 1) eq 'coin' || substr ($text, 1) eq 'монетка') {
+		if (rand (101) < 0.016) {
+			$reply = "ребро";
+		} else {
+			if (irand (2) == 0) {
+				if (irand (2) == 0) {
+					$reply = 'орёл';
+				} else {
+					$reply = 'аверс';
+				}
+			} else {
+				if (irand (2) == 0) {
+					$reply = 'решка';
+				} else {
+					$reply = 'реверс';
+				}
+			}
+		}
+	} elsif (substr ($text, 1) eq 'roll' || substr ($text, 1) eq 'dice' || substr ($text, 1) eq 'кости') {
+		$reply = sprintf "На первой кости выпало %d, а на второй — %d.", irand (6) + 1, irand (6) + 1;
 	} elsif (substr ($text, 1) eq 'ver' || substr ($text, 1) eq 'version' || substr ($text, 1) eq 'версия') {
 		$reply = 'Версия:  Нуль.Чего-то_там.Чего-то_там';
 	} elsif (substr ($text, 1) eq 'anek' || substr ($text, 1) eq 'анек' || substr ($text, 1) eq 'анекдот') {
@@ -219,6 +239,7 @@ ${csign}anek | ${csign}анек | ${csign}анекдот    - рандомный
 ${csign}buni                       - рандомный стрип hapi buni
 ${csign}bunny | ${csign}rabbit | ${csign}кролик  - кролик
 ${csign}cat | ${csign}кис                 - кошечка
+${csign}coin | ${csign}монетка            - подбросить монетку - орёл или решка?
 ${csign}dig | ${csign}копать              - заняться археологией
 ${csign}drink | ${csign}праздник          - какой сегодня праздник?
 ${csign}fish | ${csign}рыба | ${csign}рыбка      - порыбачить
@@ -233,6 +254,7 @@ ${csign}lat | ${csign}лат                 - сгенерить фразу и�
 ${csign}monkeyuser                 - рандомный стрип MonkeyUser
 ${csign}owl | ${csign}сова                - сова
 ${csign}ping | ${csign}пинг               - попинговать бота
+${csign}roll | ${csign}dice | ${csign}кости      - бросить кости
 ${csign}snail | ${csign}улитка            - улитка
 ${csign}ver | ${csign}version | ${csign}версия   - что-то про версию ПО
 ${csign}w город | ${csign}п город         - погода в указанном городе
