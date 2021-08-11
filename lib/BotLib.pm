@@ -25,6 +25,7 @@ use BotLib::Image qw (Kitty Fox Oboobs Obutts Rabbit Owl Frog Horse Snail);
 use BotLib::Karma qw (KarmaSet KarmaGet);
 use BotLib::Lat qw (Lat);
 use BotLib::Monkeyuser qw (Monkeyuser);
+use BotLib::Proverb qw (Proverb);
 use BotLib::Util qw (trim);
 use BotLib::Weather qw (Weather);
 use BotLib::Xkcd qw (Xkcd);
@@ -209,6 +210,8 @@ sub Command {
 		return;
 	} elsif (substr ($text, 1) eq 'friday'  ||  substr ($text, 1) eq 'пятница') {
 		$reply = Friday ();
+	} elsif (substr ($text, 1) eq 'proverb'  ||  substr ($text, 1) eq 'пословица') {
+		$reply = Proverb ();
 	} elsif (substr ($text, 1) eq 'fortune'  ||  substr ($text, 1) eq 'фортунка'  ||  substr ($text, 1) eq 'f'  ||  substr ($text, 1) eq 'ф') {
 		$reply = sprintf "```\n%s\n```\n", trim (Fortune ());
 		$msg->replyMd ($reply);
@@ -253,6 +256,7 @@ ${csign}horse | ${csign}лошадка           - лошадка
 ${csign}lat | ${csign}лат                 - сгенерить фразу из крылатых латинских выражений
 ${csign}monkeyuser                 - рандомный стрип MonkeyUser
 ${csign}owl | ${csign}сова                - сова
+${csign}proverb | ${csign}пословица       - рандомная русская пословица
 ${csign}ping | ${csign}пинг               - попинговать бота
 ${csign}roll | ${csign}dice | ${csign}кости      - бросить кости
 ${csign}snail | ${csign}улитка            - улитка

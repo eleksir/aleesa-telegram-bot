@@ -11,5 +11,6 @@ data/gamestat/**
 data/image/**
 data/karma/**
 data/lat/**
+data/proverb/**
 data/telegrambot-brains/**
 vendor_perl/**

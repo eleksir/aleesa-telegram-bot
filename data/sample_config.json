@@ -12,6 +12,11 @@
         "srcdir" : "data/fortune_src"
     },
 
+    "proverb" : {
+        "dir" : "data/proverb",
+        "srcdir" : "data/proverb_src"
+    },
+
     "friday" : {
         "dir" : "data/friday",
         "src" : "data/friday.txt"
