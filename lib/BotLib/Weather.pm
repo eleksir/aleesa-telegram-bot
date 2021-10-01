@@ -30,6 +30,15 @@ sub Weather {
 	return 'Длинновато для названия города.' if (length ($city) > 80);
 
 	$city = ucfirst $city;
+
+	if ($city eq 'Мск' || $city eq 'Default' || $city eq 'Dc' || $city eq 'Msk' || $city eq 'Dc-universe') {
+		$city = 'Москва';
+	} elsif ($city eq 'Спб' || $city eq 'Spb') {
+		$city = 'Санкт-Петербург';
+	} elsif ($city eq 'Ект' || $city eq 'Ебург' || $city eq 'Ёбург' || $city eq 'Екат' || $city eq 'Ekt' || $city eq 'Eburg' || $city eq 'Ekat') {
+		$city = 'Екатеринбург';
+	}
+
 	my $w = __weather ($city);
 	my $reply;
 
