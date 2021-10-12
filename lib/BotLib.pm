@@ -232,8 +232,17 @@ sub Command {
 		sleep (irand (2) + 1);
 		$msg->replyMd ($reply);
 		return;
-	} elsif (substr ($text, 1) eq 'хэлп' || substr ($text, 1) eq 'хелп') {
+	} elsif (substr ($text, 1) eq 'хэлп' || substr ($text, 1) eq 'halp') {
 		$reply = 'HALP!!!11';
+	} elsif (substr ($text, 1) eq 'kde' || substr ($text, 1) eq 'кде') {
+		my @phrases = (
+			'Нет, я не буду поднимать вам плазму.',
+			'Повторяйте эту мантру по утрам не менее 5 раз: "Плазма не падает." И, возможно, она перестанет у вас падать.',
+			'Плазма не падает, она просто выходит отдохнуть.',
+			'Плазма это не агрегатное состояние, это суперпозиция. Во время работы она находится сразу в жидком, мягком и тёплом состояниях.'
+		);
+
+		$reply = $phrases[irand ($#phrases + 1)];
 	} elsif (substr ($text, 1) eq 'help'  ||  substr ($text, 1) eq 'помощь') {
 		$reply = << "MYHELP";
 ```
