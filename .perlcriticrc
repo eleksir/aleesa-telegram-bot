@@ -52,7 +52,7 @@ verbose     = 8
 
 [-ValuesAndExpressions::ProhibitEmptyQuotes]
 # cause we consider following correct and useful:  my $var = '';
-# the recomended use of q{} looks too complex:     my $var = q{};
+# the recommended use of q{} looks too complex:     my $var = q{};
 
 [-ValuesAndExpressions::ProhibitNoisyQuotes]
 # Other people, other opinions: ","  is better readable than qw(,)
@@ -92,4 +92,3 @@ lib_sections    = NAME | VERSION | DESCRIPTION | AUTHOR | LICENSE AND COPYRIGHT
 
 [-ControlStructures::ProhibitDeepNests]
 # Have to use it, so fuckoff
-

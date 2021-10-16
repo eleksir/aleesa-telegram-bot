@@ -38,11 +38,11 @@ and all libraries should be downloaded, built, tested and installed.
 ## Running
 
 This bot does not [ultilize][4] webhooks, so in order to run it only well
-internet connection is requied, no public-available ip address is needed.
+internet connection is required, no public-available ip address is needed.
 
 ### Additional Settings to be performed in order to run bot as it designed
 
-There are some "plugins" that requires registration on thrird party services
+There are some "plugins" that requires registration on third party services
 and API keys and secrets in order to work.
 
 #### OpenWeatherMap
@@ -58,13 +58,13 @@ It is still impossible to disable this plugin, but "I'm working on it".
 #### Imgur
 
 This plugin "just exists" and is actually used nowhere around the code.
-Anyway, to make use of it besides registering apropriate handler in code, you
+Anyway, to make use of it besides registering appropriate handler in code, you
 should sign in imgur and get access token.
 
 Actually at this time this "plugin" can be stub-ed with default config values.
 
 Anyway, to fetch access token you should [login][8] and perform [registration][9]
-of your app. Then you should authorise your app according to [this][10] manual. Or
+of your app. Then you should authorize your app according to [this][10] manual. Or
 [this][11] one.
 
 #### Flickr
@@ -77,13 +77,13 @@ and secrets from flickr api.
 Before using it bot must be bootstrapped via **`bootstrap.sh`**.
 
 [Login][11] and create an [app][12] in your flickr account. Then *logout* flickr account.
-(It is required in order to properly get "verfier" parameter later).
+(It is required in order to properly get "verifier" parameter later).
 
 Put your [app key and secret][13] to **config.json**. Ensure that "verifier" parameter
 in Flickr-related part of config either absent or commented out.
 
-Run **bin/flickr_init.pl** first time and follow on screen instuctions - copy and
-paste given link to browser login to flickr account adn yo'll be redirected to
+Run **bin/flickr_init.pl** first time and follow on screen instructions - copy and
+paste given link to browser login to flickr account and you'll be redirected to
 example.com. Check address bar in browser to get so-called "verifier", put it in
 **config.json**. Then run **bin/flickr_init.pl** again to store API access token in db
 under data/image directory (in default config). You're done.

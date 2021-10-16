@@ -7,10 +7,10 @@ When you require to perform this procedure?
 Why do i have to perform this procedure?
 - Some modules are vendored with bot
 - BDB can vary its on-disk format depending on dbd version that linked with
-  perl interpreter itself and its apropriate module.
+  perl interpreter itself and its appropriate module.
 
 How can i guess that i miss to perform this procedure?
-Most notable sympthom is 'BDB0091 DB_VERSION_MISMATCH' in logs and bot admin settings are lost.
+Most notable symptom is 'BDB0091 DB_VERSION_MISMATCH' in logs and bot admin settings are lost.
 
 
 Procedure steps.
@@ -22,8 +22,8 @@ On source system perform following steps:
 
 On target system perform these steps:
 1. remove vendor_perl dir in bot' directory
-2. run "bash bootstrap.sh" (no quotes) and wait until it suscessfuly build and
-   installl required modules.
+2. run "bash bootstrap.sh" (no quotes) and wait until it successfully build and
+   install required modules.
 3. run perl bin/cache_import.pl script. It should create cache and exit
    silently.
 
