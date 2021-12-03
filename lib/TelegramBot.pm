@@ -115,6 +115,13 @@ sub __on_msg {
 	# Newcommer event, greet our new member and suggest to introduce themself.
 	if ($msg->can ('new_chat_members') && defined ($msg->new_chat_members)) {
 		my @members;
+		my @introduce = (
+			'Дратути',
+			'Дарована',
+			'Доброе утро, день или вечер',
+			'Добро пожаловать в наше скромное коммунити',
+			'Наше вам с кисточкой тут, на канальчике'
+		);
 
 		foreach my $member (@{$msg->new_chat_members}) {
 			my $member_str = '';
@@ -138,9 +145,9 @@ sub __on_msg {
 
 		if ($#members > 1) {
 			my $lastone = pop @members;
-			$phrase = sprintf 'Дратути, %s и %s. Представьтес, пожалуйста, и расскажите, что вас сюда привело.', join (', ', @members), $lastone;
+			$phrase = sprintf '%s, %s и %s. Представьтес, пожалуйста, и расскажите, что вас сюда привело.', $introduce[irand ($#introduce + 1)], join (', ', @members), $lastone;
 		} else {
-			$phrase = sprintf 'Дратути, %s. Представьтес, пожалуйста, и расскажите, что вас сюда привело.', $members[0];
+			$phrase = sprintf '%s, %s. Представьтес, пожалуйста, и расскажите, что вас сюда привело.', $introduce[irand ($#introduce + 1)], $members[0];
 		}
 
 		BotSleep $msg;
