@@ -76,7 +76,7 @@ sub Imgur {
 			$refresh_url => form {
 				refresh_token => $imgur_refresh_token,
 				client_id => $imgur_client_id,
-				clinent_secret => $imgur_client_secret,
+				client_secret => $imgur_client_secret,
 				grant_type => 'refresh_token',
 			}
 		);

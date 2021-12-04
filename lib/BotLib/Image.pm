@@ -158,7 +158,7 @@ sub Obutts {
 	return $ret;
 }
 
-# It works but results are not particulary relevant, partially. about 20-30% miss
+# It works but results are not particularly relevant, partially. about 20-30% miss
 # So i prefer to use flickr rabbits selection :)
 sub rabbit_imgur {
 	my @terms = (

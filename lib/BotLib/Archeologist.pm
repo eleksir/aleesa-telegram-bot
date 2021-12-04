@@ -90,7 +90,7 @@ sub Dig {
 	}
 
 	my $phrase = sprintf "Вы начали раскопки %s и усиленно роете лопатами, экскаватором...\n", $location[irand ($#location + 1)];
-	$phrase .= "Вам кажется что ваш совочек ударился обо что-то твердое. Может, это клад?!\n\n";
+	$phrase .= "Вам кажется, что ваш совочек ударился обо что-то твердое. Может, это клад?!\n\n";
 	my $artifact = getRandomArtifact();
 
 	if ($success_probability <= 25) {

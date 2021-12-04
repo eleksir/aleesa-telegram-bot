@@ -5,13 +5,12 @@ use 5.018;
 use strict;
 use warnings;
 use utf8;
-use Data::Dumper;
 use open qw (:std :utf8);
 use English qw ( -no_match_vars );
 use Carp qw (cluck carp);
 use File::Path qw (make_path);
 use Hailo;
-use Log::Any qw($log);
+use Log::Any qw ($log);
 use Math::Random::Secure qw (irand);
 use Mojo::Base 'Teapot::Bot::Brain';
 use BotLib::Admin qw (FortuneToggleList);
@@ -120,7 +119,7 @@ sub __on_msg {
 			'Дарована',
 			'Доброе утро, день или вечер',
 			'Добро пожаловать в наше скромное коммунити',
-			'Наше вам с кисточкой тут, на канальчике'
+			'Наше вам с кисточкой тут, на канальчике',
 		);
 
 		foreach my $member (@{$msg->new_chat_members}) {
