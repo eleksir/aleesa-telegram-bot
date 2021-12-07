@@ -52,9 +52,11 @@ has 'forward_from_message_id';
 has 'forward_signature';
 has 'forward_sender_name';
 has 'forward_date';
+has 'is_automatic_forward';
 has 'reply_to_message'; # Message
 has 'via_bot'; # User
 has 'edit_date';
+has 'has_protected_content';
 has 'media_group_id';
 has 'author_signature';
 has 'text';
@@ -102,8 +104,8 @@ sub fields {
   return {
           'scalar'                                      => [qw/message_id date forward_from_message_id
                                                             forward_signature forward_sender_name
-                                                            forward_date edit_date media_group_id
-                                                            author_signature text caption
+                                                            forward_date is_automatic_forward edit_date has_protected_content
+                                                            media_group_id author_signature text caption
                                                             new_chat_title delete_chat_photo
                                                             group_chat_created supergroup_chat_created
                                                             channel_chat_created migrate_to_chat_id

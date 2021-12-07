@@ -8,15 +8,19 @@ $Teapot::Bot::Object::ChatInviteLink::VERSION = '0.022';
 
 has 'invite_link';
 has 'creator';
+has 'creates_join_request';
 has 'is_primary';
 has 'is_revoked';
+has 'name';
 has 'expire_date';  # Optional. Point in time (Unix timestamp) when the link will expire or has been expired
 has 'member_limit'; # Optional. Maximum number of users that can be members of the chat simultaneously after joining
                     # the chat via this invite link; 1-99999
+has 'pending_join_request_count';
 
 sub fields {
   return {
-    'scalar'                    => [qw/invite_link is_primary is_revoked expire_date expire_date member_limit/],
+    'scalar'                    => [qw/invite_link creates_join_request is_primary is_revoked name expire_date
+                                       member_limit pending_join_request_count/],
     'Teapot::Bot::Object::User' => [qw/creator/],
   };
 }

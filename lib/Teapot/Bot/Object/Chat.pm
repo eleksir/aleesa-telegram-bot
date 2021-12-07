@@ -17,6 +17,9 @@ has 'first_name';               # Optional.
 has 'last_name';                # Optional.
 has 'photo';                    # Teapot::Bot::Object::ChatPhoto. Optional. Returned only in getChat.
 has 'bio';                      # Optional. Bio of the other party in a private chat. Returned only in getChat.
+has 'has_private_forwards';     # Optional. True, if privacy settings of the other party in the private chat allows to
+                                # use tg://user?id=<user_id> links only in chats with the user.
+                                # Returned only in getChat.
 has 'description';              # Optional. Returned only in getChat.
 has 'invite_link';              # Optional. Returned only in getChat.
 has 'pinned_message';           # Teapot::Bot::Object::Message
@@ -25,6 +28,8 @@ has 'permissions';              # Teapot::Bot::Object::ChatPermissions. Optional
 has 'slow_mode_delay';          # Optional. Returned only in getChat.
 has 'message_auto_delete_time'; # Optional. The time after which all messages sent to the chat will be automatically
                                 # deleted; in seconds. Returned only in getChat.
+has 'has_protected_content';    # Optional. True, if messages from the chat can't be forwarded to other chats.
+                                # Returned only in getChat.
 has 'sticker_set_name';         # Optional. Returned only in getChat.
 has 'can_set_sticker_set';      # Optional. Returned only in getChat.
 has 'linked_chat_id';           # Optional. greater than 32 bits, smaller than 52 bits
@@ -32,8 +37,9 @@ has 'location';                 # Optional. Returned only in getChat.
 
 sub fields {
   return {
-          'scalar'                               => [qw/id type title username first_name last_name bio description
-                                                        invite_link slow_mode_delay message_auto_delete_time
+          'scalar'                               => [qw/id type title username first_name last_name bio
+                                                        has_private_forwards description invite_link slow_mode_delay
+                                                        message_auto_delete_time has_protected_content
                                                         sticker_set_name can_set_sticker_set linked_chat_id/],
           'Teapot::Bot::Object::ChatPhoto'       => [qw/photo/],
           'Teapot::Bot::Object::Message'         => [qw/pinned_message/],

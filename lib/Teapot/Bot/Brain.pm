@@ -458,6 +458,9 @@ sub sendChatAction {
   elsif ($args->{action} eq 'upload_video_note') {
     $send_args->{action} = 'upload_video_note';
   }
+  elsif ($args->{action} eq 'choose_sticker') {
+    $send_args->{action} = 'choose_sticker';
+  }
   else {
     $send_args->{action} = 'typing';
   }
