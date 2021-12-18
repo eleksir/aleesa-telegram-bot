@@ -102,6 +102,12 @@ sub Command {
 	} elsif (length ($text) >= 2 && (substr ($text, 1, 2) eq 'w ' || substr ($text, 1, 2) eq 'п ')) {
 		my $city = substr $text, 3;
 		$reply = Weather $city;
+	} elsif (substr ($text, 1, 7) eq 'погода ') {
+		my $city = substr $text, 7;
+		$reply = Weather $city;
+	} elsif ((substr ($text, 1, 8) eq 'погодка ') || (substr ($text, 1, 8) eq 'погадка ') || (substr ($text, 1, 8) eq 'weather ')){
+		my $city = substr $text, 8;
+		$reply = Weather $city;
 	} elsif (substr ($text, 1) eq 'buni') {
 		$msg->typing ();
 		$reply = Buni ();
@@ -178,11 +184,11 @@ sub Command {
 		$msg->replyMd ($reply);
 		return;
 	} elsif (
-		substr ($text, 1) eq 'tits'  ||
-		substr ($text, 1) eq 'boobs'  ||
+		substr ($text, 1) eq 'tits'    ||
+		substr ($text, 1) eq 'boobs'   ||
 		substr ($text, 1) eq 'tities'  ||
-		substr ($text, 1) eq 'boobies'  ||
-		substr ($text, 1) eq 'сиси'  ||
+		substr ($text, 1) eq 'boobies' ||
+		substr ($text, 1) eq 'сиси'    ||
 		substr ($text, 1) eq 'сисечки'
 	) {
 		if (PluginEnabled $chatid, 'oboobs') {
@@ -195,8 +201,8 @@ sub Command {
 		return;
 	} elsif (
 		substr ($text, 1) eq 'butt'  ||
-		substr ($text, 1) eq 'booty'  ||
-		substr ($text, 1) eq 'ass'  ||
+		substr ($text, 1) eq 'booty' ||
+		substr ($text, 1) eq 'ass'   ||
 		substr ($text, 1) eq 'попа'  ||
 		substr ($text, 1) eq 'попка'
 	) {
@@ -271,6 +277,10 @@ ${csign}roll | ${csign}dice | ${csign}кости      - бросить кост�
 ${csign}snail | ${csign}улитка            - улитка
 ${csign}ver | ${csign}version | ${csign}версия   - что-то про версию ПО
 ${csign}w город | ${csign}п город         - погода в указанном городе
+${csign}weather город                     - погода в указанном городе
+${csign}погода город                      - погода в указанном городе
+${csign}погодка город                     - погода в указанном городе
+${csign}погадка город                     - погода в указанном городе
 ${csign}xkcd                       - рандомный стрип с сайта xkcd.ru
 ${csign}karma фраза | ${csign}карма фраза - посмотреть карму фразы
 фраза-- | фраза++           - убавить или добавить карму фразе

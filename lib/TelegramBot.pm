@@ -198,20 +198,32 @@ sub __on_msg {
 			}
 
 			if ($just_message_in_chat) {
-				my $str = $hailo->{$msg->chat->id}->learn_reply ($text);
+				if ($text =~ /^кто +все +эти +люди *\?$/i) {
+					$reply = 'Какие люди? Мы здесь вдвоём, только ты и я.';
+				} elsif ($text =~ /покажи +(сиськи|сиси|титьки) *$/i) {
+					$reply = Oboobs ();
+				} elsif ($text =~ /show +(titts|tities|boobs) *$/i) {
+					$reply = Oboobs ();
+				} elsif ($text =~ /покажи +(попку|попу) *$/i) {
+					$reply = Obutts ();
+				} elsif ($text =~ /show +(ass|butt|butty) *$/i) {
+					$reply = Obutts ();
+				} else {
+					my $str = $hailo->{$msg->chat->id}->learn_reply ($text);
 
-				if (defined ($str) && $str ne '') {
-					$reply = $str;
-					$phrase = trim $text;
+					if (defined ($str) && $str ne '') {
+						$reply = $str;
+						$phrase = trim $text;
 
-					while ($phrase =~ /[\.|\,|\?|\!]$/) {
-						chop $phrase;
-					}
+						while ($phrase =~ /[\.|\,|\?|\!]$/) {
+							chop $phrase;
+						}
 
-					$phrase = lc $phrase;
+						$phrase = lc $phrase;
 
-					if (fmatch (lc ($reply), $phrase)) {
-						$reply = RandomCommonPhrase ();
+						if (fmatch (lc ($reply), $phrase)) {
+							$reply = RandomCommonPhrase ();
+						}
 					}
 				}
 			}

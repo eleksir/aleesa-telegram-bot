@@ -206,6 +206,11 @@ sub PluginEnabled (@) {
 	my $chatid = shift;
 	my $plugin = shift;
 
+	# seems that we have point to return always true if chat is private
+	if ($chatid > 0) {
+		return 1;
+	}
+
 	my $cache = CHI->new (
 		driver => 'BerkeleyDB',
 		root_dir => $cachedir,
