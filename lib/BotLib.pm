@@ -92,7 +92,7 @@ sub Command {
 	} elsif (substr ($text, 1) eq 'roll' || substr ($text, 1) eq 'dice' || substr ($text, 1) eq 'кости') {
 		$reply = sprintf 'На первой кости выпало %d, а на второй — %d.', irand (6) + 1, irand (6) + 1;
 	} elsif (substr ($text, 1) eq 'ver' || substr ($text, 1) eq 'version' || substr ($text, 1) eq 'версия') {
-		$reply = 'Версия:  Нуль.Чего-то_там.Чего-то_там';
+		$reply = 'Версия:  Три.Чего-то_там.С_мелочью';
 	} elsif (substr ($text, 1) eq 'anek' || substr ($text, 1) eq 'анек' || substr ($text, 1) eq 'анекдот') {
 		$msg->typing ();
 		$reply = "```\n" . Anek () . "\n```";

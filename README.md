@@ -1,5 +1,12 @@
 # Aleesa-Telegram-bot - Telegram chatty bot
 
+## Disclaimer
+
+This version - 3 (something) - considered stable. It means that further
+development of new features kind of frosen. Most effort will be targeted to
+future 4-th version development. If you have some ideas or fixes to this version
+feel free PR them, they will be merged as soon as being reviewed.
+
 ## About
 
 It is based on Perl modules [Telegram::Bot][1] and [Hailo][2] as conversation
