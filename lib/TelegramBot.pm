@@ -17,6 +17,7 @@ use BotLib::Admin qw (FortuneToggleList);
 use BotLib qw (RandomCommonPhrase Command Highlight BotSleep IsCensored);
 use BotLib::Conf qw (LoadConf);
 use BotLib::Fortune qw (Fortune);
+use BotLib::Image qw (Oboobs Obutts);
 use BotLib::Karma qw (KarmaSet);
 use BotLib::Util qw (trim fmatch);
 
@@ -195,16 +196,22 @@ sub __on_msg {
 				} else {
 					$just_message_in_chat = 1;
 				}
+			} else {
+				$just_message_in_chat = 1;
 			}
 
 			if ($just_message_in_chat) {
-				if ($text =~ /^кто +все +эти +люди *\?$/i) {
-					$reply = 'Какие люди? Мы здесь вдвоём, только ты и я.';
-				} elsif ($text =~ /покажи +(сиськи|сиси|титьки) *$/i) {
+				if ($text =~ /^ *кто +все +эти +люди *\?$/ui) {
+					$reply = 'Какие "люди"? Мы здесь вдвоём, только ты и я.';
+				} elsif ($text =~ /^ *кто +я *\?$/ui) {
+					$reply = 'Где?';
+				} elsif ($text =~ /^ *кто +(здесь|тут) *\?$/ui) {
+					$reply = 'Ты да я, да мы с тобой.';
+				} elsif ($text =~ /покажи +(сиськи|сиси|титьки) *$/ui) {
 					$reply = Oboobs ();
 				} elsif ($text =~ /show +(titts|tities|boobs) *$/i) {
 					$reply = Oboobs ();
-				} elsif ($text =~ /покажи +(попку|попу) *$/i) {
+				} elsif ($text =~ /покажи +(попку|попу) *$/ui) {
 					$reply = Obutts ();
 				} elsif ($text =~ /show +(ass|butt|butty) *$/i) {
 					$reply = Obutts ();
@@ -295,8 +302,12 @@ sub __on_msg {
 			if ((lc ($text) =~ /^${qname}[\,|\:]? (.+)/) or (lc ($text) =~ /^${qtname}[\,|\:]? (.+)/)){
 				$phrase = $1;
 
-				if ($phrase =~ /^кто +все +эти +люди *\?$/i) {
+				if ($phrase =~ /^ *кто +все +эти +люди *\?$/ui) {
 					$reply = 'Кто здесь?';
+				} elsif ($phrase =~ /^ *кто +я *?$/ui){
+					$reply = 'Где?';
+				} elsif ($phrase =~ /^ *кто +(здесь|тут) *\?$/ui) {
+					$reply = 'Здесь все: Никита, Стас, Гена, Турбо и Дюша Метёлкин.';
 				} else {
 					$reply = $hailo->{$msg->chat->id}->learn_reply ($phrase);
 				}
@@ -304,8 +315,12 @@ sub __on_msg {
 			} elsif ((lc ($text) =~ /.+ ${qname}[\,|\!|\?|\.| ]/) or (lc ($text) =~ / $qname$/)) {
 				$phrase = $text;
 
-				if ($phrase =~ /^кто +все +эти +люди *\?$/i) {
+				if ($phrase =~ /^ *кто +все +эти +люди *\?$/ui) {
 					$reply = 'Кто здесь?';
+				} elsif ($phrase =~ /^ *кто +я *?$/ui){
+					$reply = 'Где?';
+				} elsif ($phrase =~ /^ *кто +(здесь|тут) *\?$/ui) {
+					$reply = 'Здесь все: Никита, Стас, Гена, Турбо и Дюша Метёлкин.';
 				} else {
 					$reply = $hailo->{$msg->chat->id}->learn_reply ($phrase);
 				}
@@ -313,8 +328,12 @@ sub __on_msg {
 			} elsif ((lc ($text) =~ /.+ ${qtname}[\,|\!|\?|\.| ]/) or (lc ($text) =~ / $qtname$/)) {
 				$phrase = $text;
 
-				if ($phrase =~ /^кто +все +эти +люди *\?$/i) {
+				if ($phrase =~ /^ *кто +все +эти +люди *\?$/ui) {
 					$reply = 'Кто здесь?';
+				} elsif ($phrase =~ /^ *кто +я *?$/ui){
+					$reply = 'Где?';
+				} elsif ($phrase =~ /^ *кто +(здесь|тут) *\?$/ui) {
+					$reply = 'Здесь все: Никита, Стас, Гена, Турбо и Дюша Метёлкин.';
 				} else {
 					$reply = $hailo->{$msg->chat->id}->learn_reply ($phrase);
 				}
@@ -330,8 +349,12 @@ sub __on_msg {
 				}
 			# just message in chat
 			} else {
-				if ($text =~ /^кто +все +эти +люди *\?$/i) {
+				if ($text =~ /^ *кто +все +эти +люди *\?$/ui) {
 					$reply = 'Кто здесь?';
+				} elsif ($phrase =~ /^ *кто +я *?$/ui){
+					$reply = 'Где?';
+				} elsif ($phrase =~ /^ *кто +(здесь|тут) *\?$/ui) {
+					$reply = 'Здесь все: Никита, Стас, Гена, Турбо и Дюша Метёлкин.';
 				} else {
 					$hailo->{$msg->chat->id}->learn ($text);
 				}
