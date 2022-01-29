@@ -269,20 +269,31 @@ sub __on_msg {
 			$log->debug (sprintf ('[DEBUG] In public chat %s (%s) %s quote us!', $chatname, $chatid, $vis_a_vi));
 
 			# do not answer back if someone quote our new member greet
-			if ((substr ($msg->reply_to_message->text, 0, 9) eq 'Дратути, ') &&
-			    (substr ($msg->reply_to_message->text, -61) eq 'Представьтес, пожалуйста, и расскажите, что вас сюда привело.')) {
-				return;
-			} else {
-				# remove our name from users reply, just in case
-				my $pat1 = quotemeta ('@' . $myusername);
-				my $pat2 = quotemeta $myfullname;
-				$phrase = $text;
-				$phrase =~ s/$pat1//g;
-				$phrase =~ s/$pat2//g;
+			if (substr ($msg->reply_to_message->text, -61) eq 'Представьтес, пожалуйста, и расскажите, что вас сюда привело.') {
+				my @hello = (
+					'Дратути, ',
+					'Дарована, ',
+					'Доброе утро, день или вечер, ',
+					'Добро пожаловать в наше скромное коммунити, ',
+					'Наше вам с кисточкой тут, на канальчике, ',
+				);
+
+				foreach my $hi (@hello) {
+					if (substr ($msg->reply_to_message->text, 0, length $hi) eq $hi) {
+						return;
+					}
+				}
+			}
+
+			# remove our name from users reply, just in case
+			my $pat1 = quotemeta ('@' . $myusername);
+			my $pat2 = quotemeta $myfullname;
+			$phrase = $text;
+			$phrase =~ s/$pat1//g;
+			$phrase =~ s/$pat2//g;
 
 			# figure out reply :)
-				$reply = $hailo->{$msg->chat->id}->learn_reply ($phrase) if (length ($phrase) > 3);
-			}
+			$reply = $hailo->{$msg->chat->id}->learn_reply ($phrase) if (length ($phrase) > 3);
 		# simple commands
 		} elsif (substr ($text, 0, 1) eq $csign) {
 			$reply = Command ($self, $msg, $text, $chatid);
