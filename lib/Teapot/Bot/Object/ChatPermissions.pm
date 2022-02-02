@@ -39,26 +39,26 @@ sub canTalk {
     my $chatobj = $self->_brain->getChat ({ 'chat_id' => $chatid });
 
     # on api error, keep silence
-    unless ($chatobj) {
+    if ($chatobj == 0 || $chatobj->{error}) {
       carp "Unable to get chat info for $chatid from telegram API";
-      return 0;
+      return $can_talk;
     }
 
     my $myObj = $self->_brain->getMe ();
 
     # on api error, keep silence
-    unless ($chatobj) {
+    if ($myObj == 0 || $myObj->{error}) {
       carp "Unable to get chat info for $chatid from telegram API";
-      return 0;
+      return $can_talk;
     }
 
     my $myid = $myObj->id;
     my $me = $self->_brain->getChatMember ({ 'chat_id' => $chatid, 'user_id' => $myid });
 
     # on api error, keep silence
-    unless ($me) {
+    if ($me == 0 || $me->{error}) {
       carp 'Unable to get chat info for bot itself from telegram API';
-      return 0;
+      return $can_talk;
     }
 
     if ($me->{'status'} eq 'administrator') {
