@@ -5,6 +5,7 @@ use Mojo::Base -base;
 use List::Util qw/any/;
 use Carp qw/croak cluck/;
 use Data::Dumper;
+use JSON::PP ();
 
 $Teapot::Bot::Object::Base::VERSION = '0.022';
 

@@ -20,6 +20,7 @@ requires 'Hailo',                   '==0.75';
 requires 'HTML::TokeParser',        '==3.76';
 requires 'IO::Socket::SSL',         '==2.074';
 requires 'JSON',                    '==4.05';
+requires 'JSON::PP',                '==4.07';
 requires 'JSON::XS',                '==4.03';
 requires 'List::Util',              '==1.60';
 requires 'local::lib',              '==2.000028';
