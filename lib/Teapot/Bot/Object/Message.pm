@@ -157,7 +157,7 @@ sub reply {
 
   my $chatid = $self->chat->id;
 
-  if (Teapot::Bot::Object::ChatPermissions::canTalk($self, $chatid)) {
+  if (Teapot::Bot::Object::ChatPermissions->canTalk($self, $chatid)) {
     return $self->_brain->sendMessage({chat_id => $chatid, text => $text});
   }
 
@@ -170,7 +170,7 @@ sub replyMd {
 
   my $chatid = $self->chat->id;
 
-  if (Teapot::Bot::Object::ChatPermissions::canTalk ($self, $chatid)) {
+  if (Teapot::Bot::Object::ChatPermissions->canTalk ($self, $chatid)) {
     my $send_args;
     $send_args->{text} = $text;
     $send_args->{parse_mode} = 'Markdown';
@@ -187,7 +187,7 @@ sub typing {
 
   my $chatid = $self->chat->id;
 
-  if (Teapot::Bot::Object::ChatPermissions::canTalk ($self, $chatid)) {
+  if (Teapot::Bot::Object::ChatPermissions->canTalk ($self, $chatid)) {
     return $self->_brain->sendChatAction({chat_id => $chatid});
   }
 
