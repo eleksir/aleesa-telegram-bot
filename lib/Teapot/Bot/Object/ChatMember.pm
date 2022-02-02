@@ -83,7 +83,7 @@ sub canDeleteMessage {
     my $chatobj = $self->getChat ({ 'chat_id' => $chatid });
 
     # on api error, keep silence
-    unless ($chatobj) {
+    if ($chatobj == 0 || $chatobj->{error}) {
       cluck "Unable to get chat info for $chatid from telegram API";
       return 0;
     }
@@ -91,7 +91,7 @@ sub canDeleteMessage {
     my $myObj = $self->getMe ();
 
     # on api error, keep silence
-    unless ($chatobj) {
+    if ($myObj == 0 || $myObj->{error}) {
       cluck "Unable to get chat info for $chatid from telegram API";
       return 0;
     }
@@ -100,7 +100,7 @@ sub canDeleteMessage {
     my $me = $self->getChatMember ({ 'chat_id' => $chatid, 'user_id' => $myid });
 
     # on api error, keep silence
-    unless ($me) {
+    if ($me == 0 || $me->{error}) {
       cluck 'Unable to get chat info for bot itself from telegram API';
       return 0;
     }
